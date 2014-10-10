@@ -1,5 +1,4 @@
 *.pyc
 *.pyo
-app.db
-search.db
+*.db
 flask
