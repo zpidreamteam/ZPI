@@ -33,8 +33,8 @@ def login():
 
         user = User.query.filter_by(email=form.email.data).first()
         if user is None:
-          flash(gettext('User %(email)s not found.', email=email))
-          return redirect(url_for('index'))
+            flash('User with email {email} not found.'.format(email=form.email.data))
+            return redirect(url_for('index'))
 
         remember_me = False
         if 'remember_me' in session:
