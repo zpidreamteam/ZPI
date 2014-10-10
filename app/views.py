@@ -6,66 +6,66 @@ from models import User
 
 @app.before_request
 def before_request():
-  g.user = current_user
+    g.user = current_user
 
 @lm.user_loader
 def load_user(id):
-  return User.query.get(int(id))
+    return User.query.get(int(id))
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
-  user = g.user
+    user = g.user
 
-  return render_template('index.html',
-                         title='Strona glowna',
-                         user=user)
+    return render_template('index.html',
+                           title='Strona glowna',
+                           user=user)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-  if g.user is not None and g.user.is_authenticated():
-    return redirect(url_for('index'))
+    if g.user is not None and g.user.is_authenticated():
+        return redirect(url_for('index'))
 
-  form = LoginForm()
-  if form.validate_on_submit():
-    session['remember_me'] = form.remember_me.data
+    form = LoginForm()
+    if form.validate_on_submit():
+        session['remember_me'] = form.remember_me.data
 
-    user = User.query.filter_by(email=form.email.data).first()
-    if user is None:
-      flash('User with {email} not found.'.format(email=form.email.data))
-      return redirect(url_for('index'))
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is None:
+          flash(gettext('User %(email)s not found.', email=email))
+          return redirect(url_for('index'))
 
-    remember_me = False
-    if 'remember_me' in session:
-        remember_me = session['remember_me']
-        session.pop('remember_me', None)
-    login_user(user, remember=remember_me)
+        remember_me = False
+        if 'remember_me' in session:
+            remember_me = session['remember_me']
+            session.pop('remember_me', None)
+        login_user(user, remember=remember_me)
 
-    return redirect('/index')
+        return redirect('/index')
 
-  return render_template('login.html',
-                         title='Logowanie',
-                         form=form)
+    return render_template('login.html',
+                           title='Logowanie',
+                           form=form)
 
 @app.route('/logout')
 def logout():
-  logout_user()
-  return redirect(url_for('index'))
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-  if g.user is not None and g.user.is_authenticated():
-    return redirect(url_for('index'))
+    if g.user is not None and g.user.is_authenticated():
+        return redirect(url_for('index'))
 
-  form = RegisterForm()
-  if form.validate_on_submit():
-    user = User(email=form.email.data)
-    user.hash_password(form.password.data)
-    db.session.add(user)
-    db.session.commit()
-    return redirect('/index')
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user = User(email=form.email.data)
+        user.hash_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        return redirect('/index')
 
-  return render_template('register.html',
-                         title='Rejestracja',
-                         form=form)
+    return render_template('register.html',
+                           title='Rejestracja',
+                           form=form)
