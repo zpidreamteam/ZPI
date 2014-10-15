@@ -21,6 +21,42 @@
             {% for error in form.password_repeat.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
+            Ulica:<br>
+            {{ form.street }}
+            {% for error in form.street.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+
+            Numer budynku:<br>
+            {{ form.building_number }}
+            {% for error in form.building_number.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Numer lokalu:<br>
+            {{ form.door_number }}
+            {% for error in form.door_number.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Miasto:<br>
+            {{ form.city }}
+            {% for error in form.city.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Kod pocztowy:<br>
+            {{ form.zipcode }}
+            {% for error in form.zipcode.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Kraj:<br>
+            {{ form.country }}
+            {% for error in form.country.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Telefon:<br>
+            {{ form.phone }}
+            {% for error in form.phone.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
         </p>
         <p><input type="submit" value="Zarejestruj się"></p>
     </form>
