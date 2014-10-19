@@ -2,8 +2,8 @@ from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm
 from forms import LoginForm, RegisterForm, OfferForm
-from models import User
-from models import Category
+from models import User, Offer, Category
+from datetime import datetime, timedelta
 
 @app.before_request
 def before_request():
@@ -78,12 +78,16 @@ def createOffer():
     form.category_id.choices = [(c.id, c.name) for c in Category.query.all()]
 
     if form.validate_on_submit():
-        print "Name", form.name.data
-        print "Price", form.price.data
-        print "Count", form.count.data
-        print "Body", form.body.data
-        print "Categories", form.category_id.data
-        # return redirect('offer/read/:id')
+        offer = Offer(name = form.name.data,
+                      price = form.price.data,
+                      count = form.count.data,
+                      body = form.body.data,
+                      timestamp = datetime.utcnow(),
+                      category = Category.query.get(form.category_id.data),
+                      author = g.user)
+        db.session.add(offer)
+        db.session.commit()
+        flash("Poprawnie dodano Twoje ogloszenie")
         return redirect('/index')
 
     return render_template('offer.html',
