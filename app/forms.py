@@ -1,5 +1,5 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, BooleanField, PasswordField, TextAreaField, FloatField, SelectField
+from wtforms import StringField, BooleanField, PasswordField, TextAreaField, FloatField, SelectField, DecimalField
 from wtforms.validators import DataRequired
 from models import Category
 
@@ -16,7 +16,7 @@ class RegisterForm(Form):
 
 class OfferForm(Form):
     name = StringField('name', validators=[DataRequired()])
-    price = StringField('price', validators=[DataRequired()])
-    count = FloatField('count', validators=[DataRequired()])
+    price = FloatField('price', validators=[DataRequired()])
+    count = DecimalField('count', validators=[DataRequired()])
     body = TextAreaField('body', validators=[DataRequired()])
-    category = SelectField('category', choices=[(c.id, c.name) for c in Category.query.all()])
+    category_id = SelectField('category', coerce=int)

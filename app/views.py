@@ -75,8 +75,14 @@ def register():
 @login_required
 def createOffer():
     form = OfferForm()
+    form.category_id.choices = [(c.id, c.name) for c in Category.query.all()]
 
     if form.validate_on_submit():
+        print "Name", form.name.data
+        print "Price", form.price.data
+        print "Count", form.count.data
+        print "Body", form.body.data
+        print "Categories", form.category_id.data
         # return redirect('offer/read/:id')
         return redirect('/index')
 
