@@ -90,13 +90,15 @@ def createOffer():
         flash("Poprawnie dodano Twoje ogloszenie")
         return redirect('/index')
 
-    return render_template('offer.html',
+    return render_template('create_offer.html',
                             title='Ogloszenie',
                             form=form)
 
-# @app.route('/offer/read/<int:id>')
-# @login_required
-# def readOffer():
+@app.route('/offer/read/<int:id>')
+@login_required
+def readOffer(id):
+    offer = Offer.query.get(id)
 
-
-#     return render_template('')
+    return render_template('read_offer.html',
+                            title='Ogloszenie',
+                            offer = offer)
