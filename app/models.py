@@ -36,6 +36,12 @@ class Category(db.Model):
     name = db.Column(db.String(128), index=True, unique=True)
     offers = db.relationship('Offer', backref='category', lazy='dynamic')
 
+    def get_id(self):
+        try:
+            return unicode(self.id)  # python 2
+        except NameError:
+            return str(self.id)  # python 3
+
     def __repr__(self):
         return '<Category %r>' % (self.name)
 

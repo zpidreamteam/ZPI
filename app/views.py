@@ -1,8 +1,9 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm
-from forms import LoginForm, RegisterForm
+from forms import LoginForm, RegisterForm, OfferForm
 from models import User
+from models import Category
 
 @app.before_request
 def before_request():
@@ -69,3 +70,23 @@ def register():
     return render_template('register.html',
                            title='Rejestracja',
                            form=form)
+
+@app.route('/offer/create', methods=['GET', 'POST'])
+@login_required
+def createOffer():
+    form = OfferForm()
+
+    if form.validate_on_submit():
+        # return redirect('offer/read/:id')
+        return redirect('/index')
+
+    return render_template('offer.html',
+                            title='Ogloszenie',
+                            form=form)
+
+# @app.route('/offer/read/<int:id>')
+# @login_required
+# def readOffer():
+
+
+#     return render_template('')
