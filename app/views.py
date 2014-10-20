@@ -60,7 +60,7 @@ def register():
 
     form = RegisterForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data)
+        user = User(email=form.email.data, street=form.street.data)
         user.hash_password(form.password.data)
         db.session.add(user)
         db.session.commit()
