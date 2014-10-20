@@ -1,0 +1,10 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    {% for offer in offers %}
+        {% include 'offer_item.html' %}
+    {% endfor %}
+{% endblock %}
+{% if offers.has_prev %}<a href="{{ url_for('offer/category', page=offers.prev_num) }}"><< Newer offers</a>{% else %}<< Newer offers{% endif %} |
+{% if offers.has_next %}<a href="{{ url_for('offer/category', page=offers.next_num) }}">Older offers >></a>{% else %}Older offers >>{% endif %}

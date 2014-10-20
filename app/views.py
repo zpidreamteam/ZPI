@@ -4,6 +4,7 @@ from app import app, db, lm
 from forms import LoginForm, RegisterForm, OfferForm
 from models import User, Offer, Category
 from datetime import datetime, timedelta
+from config import OFFERS_PER_PAGE
 
 @app.before_request
 def before_request():
@@ -73,7 +74,7 @@ def register():
 
 @app.route('/offer/create', methods=['GET', 'POST'])
 @login_required
-def createOffer():
+def create_offer():
     form = OfferForm()
     form.category_id.choices = [(c.id, c.name) for c in Category.query.all()]
 
@@ -95,10 +96,25 @@ def createOffer():
                             form=form)
 
 @app.route('/offer/read/<int:id>')
-@login_required
-def readOffer(id):
+def read_offer(id):
     offer = Offer.query.get(id)
 
     return render_template('read_offer.html',
                             title='Ogloszenie',
                             offer = offer)
+
+@app.route('/offer/<category>')
+@app.route('/offer/<category>/<int:page>')
+def read_offers_by_category(category, page=1):
+    c = Category.query.filter_by(name=category).first()
+    if c is None:
+        flash('Category %s not found.' % category)
+        redirect(url_for('index'))
+
+    offers = c.offers.paginate(page, OFFERS_PER_PAGE, False).items #need to check either particular offer is still available or not
+    print offers
+
+    return render_template('offers.html',
+                            title='Ogloszenia',
+                            offers = offers)
+
