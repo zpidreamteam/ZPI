@@ -3,9 +3,17 @@ from passlib.apps import custom_app_context as pwd_context
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    nickname = db.Column(db.String(32), unique=True)
     email = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     offers = db.relationship('Offer', backref='author', lazy='dynamic')
+    street = db.Column(db.String(128))
+    building_number = db.Column(db.String(16))
+    door_number = db.Column(db.String(16))
+    city = db.Column(db.String(32))
+    zipcode = db.Column(db.String(16))
+    country = db.Column(db.String(32))
+    phone = db.Column(db.String(16))
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
