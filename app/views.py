@@ -77,3 +77,9 @@ def register():
     return render_template('register.html',
                            title='Rejestracja',
                            form=form)
+
+@app.route('/test')
+def test():
+    return render_template('test.html',
+                           title='testa')
+                           
