@@ -11,6 +11,11 @@
             {% for error in form.email.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
+            Nickname:<br>
+            {{ form.nickname }}
+            {% for error in form.nickname.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
             Hasło:<br>
             {{ form.password }}
             {% for error in form.password.errors %}
