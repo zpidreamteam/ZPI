@@ -78,8 +78,13 @@ def register():
                            title='Rejestracja',
                            form=form)
 
-@app.route('/test')
-def test():
-    return render_template('test.html',
-                           title='testa')
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template('500.html'), 500
                            
