@@ -10,7 +10,7 @@ class LoginForm(Form):
 class RegisterForm(Form):
     password = PasswordField('password', validators=[DataRequired(), Length(min=6, message="Podane haslo jest za krotkie"), EqualTo('password_repeat', message="Podane hasla musza byc takie same")])
     email = StringField('email', validators=[DataRequired(), Email(message="Prosze podac poprawny adres email"), Length(max=128, message="Podany adres email jest za dlugi")])
-    nickname = StringField('email', validators=[DataRequired(), Length(min=3, max=32, message="Nickname musi skladac sie z minimalnie 3 a maksymalnie 32 znakow")])
+    nickname = StringField('nickname', validators=[DataRequired(), Length(min=3, max=32, message="Nickname musi skladac sie z minimalnie 3 a maksymalnie 32 znakow")])
     password_repeat = PasswordField('password_repeat', validators=[DataRequired()])
     street = StringField('street', validators=[DataRequired(), Length(max=128, message="Podana nazwa ulicy jest za dluga")])
     building_number = StringField('building_number', validators=[DataRequired(), Length(max=16, message="Podany numer budynku jest za dlugi")])
