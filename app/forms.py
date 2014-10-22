@@ -1,6 +1,6 @@
 from flask.ext.wtf import Form
 from wtforms import StringField, BooleanField, PasswordField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
 
 class LoginForm(Form):
     email = StringField('email', validators=[DataRequired()])
@@ -8,13 +8,14 @@ class LoginForm(Form):
     remember_me = BooleanField('remember_me', default=False)
 
 class RegisterForm(Form):
-    email = StringField('email', validators=[DataRequired()])
-    password = PasswordField('password', validators=[DataRequired()])
+    password = PasswordField('password', validators=[DataRequired(), Length(min=6, message="Podane haslo jest za krotkie"), EqualTo('password_repeat', message="Podane hasla musza byc takie same")])
+    email = StringField('email', validators=[DataRequired(), Email(message="Prosze podac poprawny adres email"), Length(max=128, message="Podany adres email jest za dlugi")])
+    nickname = StringField('email', validators=[DataRequired(), Length(min=3, max=32, message="Nickname musi skladac sie z minimalnie 3 a maksymalnie 32 znakow")])
     password_repeat = PasswordField('password_repeat', validators=[DataRequired()])
-    street = StringField('street', validators=[DataRequired()])
-    building_number = StringField('building_number', validators=[DataRequired()])
-    door_number = StringField('door_number', validators=[DataRequired()])
-    city = StringField('city', validators=[DataRequired()])
-    zipcode = StringField('zipcode', validators=[DataRequired()])
-    country = StringField('country', validators=[DataRequired()])
-    phone = StringField('phone', validators=[DataRequired()])
+    street = StringField('street', validators=[DataRequired(), Length(max=128, message="Podana nazwa ulicy jest za dluga")])
+    building_number = StringField('building_number', validators=[DataRequired(), Length(max=16, message="Podany numer budynku jest za dlugi")])
+    door_number = StringField('door_number', validators=[Optional(strip_whitespace=True), Length(max=16, message="Podany numer lokalu jest za dlugi")])
+    city = StringField('city', validators=[DataRequired(), Length(max=32, message="Podana nazwa miejscowosci jest za dluga")])
+    zipcode = StringField('zipcode', validators=[DataRequired(), Length(max=16, message="Podany kod pocztowy jest za dlugi")])
+    country = StringField('country', validators=[DataRequired(), Length(max=32, message="Podana nazwa kraju jest za dluga")])
+    phone = StringField('phone', validators=[DataRequired(), Length(max=16, message="Podany numer telefonu jest za dlugi")])
