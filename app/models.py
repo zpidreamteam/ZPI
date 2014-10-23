@@ -1,5 +1,6 @@
-from app import db
+from app import db, app
 from passlib.apps import custom_app_context as pwd_context
+import flask.ext.whooshalchemy as whooshalchemy
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -54,6 +55,8 @@ class Category(db.Model):
         return '<Category %r>' % (self.name)
 
 class Offer(db.Model):
+    __searchable__ = ['name', 'body']
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), index=True)
     price = db.Column(db.Float)
@@ -65,3 +68,5 @@ class Offer(db.Model):
 
     def __repr__(self):
         return '<Offer %r>' % (self.body)
+
+whooshalchemy.whoosh_index(app, Offer)

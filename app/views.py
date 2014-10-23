@@ -1,13 +1,16 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm
-from forms import LoginForm, RegisterForm, OfferForm
+from forms import LoginForm, RegisterForm, OfferForm, SearchForm
 from models import User, Offer, Category
 from datetime import datetime, timedelta
+from config import MAX_SEARCH_RESULTS
+
 
 @app.before_request
 def before_request():
     g.user = current_user
+    g.search_form = SearchForm()
 
 @lm.user_loader
 def load_user(id):
@@ -22,6 +25,20 @@ def index():
     return render_template('index.html',
                            title='Strona glowna',
                            user=user)
+
+@app.route('/search', methods=['POST'])
+def search():
+    if not g.search_form.validate_on_submit():
+        return redirect(url_for('index'))
+    return redirect(url_for('search_results', query=g.search_form.search.data))
+
+
+@app.route('/search_results/<query>')
+def search_results(query):
+    results = Offer.query.whoosh_search(query, MAX_SEARCH_RESULTS).all()
+    return render_template('search_results.html',
+                           query=query,
+                           results=results)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

@@ -7,3 +7,4 @@ SECRET_KEY = 'you-will-never-guess'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'zpi.db')
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 
+MAX_SEARCH_RESULTS = 50

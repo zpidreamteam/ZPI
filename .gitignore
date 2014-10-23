@@ -3,3 +3,4 @@
 *.db
 virtualenv-*
 flask
+whoosh_index
