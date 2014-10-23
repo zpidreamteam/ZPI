@@ -4,7 +4,6 @@ from app import app, db, lm
 from forms import LoginForm, RegisterForm, OfferForm
 from models import User, Offer, Category
 from datetime import datetime, timedelta
-from config import OFFERS_PER_PAGE
 
 @app.before_request
 def before_request():
