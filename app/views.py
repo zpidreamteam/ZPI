@@ -62,14 +62,14 @@ def register():
 
     form = RegisterForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data, 
-                    nickname=form.nickname.data, 
-                    street=form.street.data, 
-                    building_number=form.building_number.data, 
-                    door_number=form.door_number.data, 
-                    city=form.city.data, 
-                    zipcode=form.zipcode.data, 
-                    country=form.country.data, 
+        user = User(email=form.email.data,
+                    nickname=form.nickname.data,
+                    street=form.street.data,
+                    building_number=form.building_number.data,
+                    door_number=form.door_number.data,
+                    city=form.city.data,
+                    zipcode=form.zipcode.data,
+                    country=form.country.data,
                     phone=form.phone.data)
         user.hash_password(form.password.data)
         db.session.add(user)
@@ -119,8 +119,7 @@ def read_offers_by_category(category, page=1):
         flash('Category %s not found.' % category)
         redirect(url_for('index'))
 
-    offers = c.offers.paginate(page, OFFERS_PER_PAGE, False).items #need to check either particular offer is still available or not
-    print offers
+    offers = c.offers
 
     return render_template('offers.html',
                             title='Ogloszenia',
