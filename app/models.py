@@ -59,3 +59,15 @@ class Offer(db.Model):
 
     def __repr__(self):
         return '<Offer %r>' % (self.body)
+
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    offer_id = db.Column(db.Integer, db.ForeignKey('offer.id'))
+    price = db.Column(db.Float)
+    hash_link = db.Column(db.String(128))
+    is_finalised = db.Column(db.Boolean)
+
+    def __repr__(self):
+        return '<Transaction %r>' % (self.id)

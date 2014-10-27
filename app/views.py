@@ -77,3 +77,9 @@ def register():
     return render_template('register.html',
                            title='Rejestracja',
                            form=form)
+
+
+@app.route('/validate_offer')
+def validate_offer(offer_id):
+    
+    return redirect(url_for('index'))
