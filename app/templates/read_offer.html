@@ -1,0 +1,18 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ offer.name }}</h1>
+    <p>
+        Cena za sztukę:
+        {{ offer.price }}
+
+        <br>
+        Liczba sztuk:
+        {{ offer.count }}
+
+        <br>
+        Opis:
+        {{ offer.body }}
+    </p>
+{% endblock %}

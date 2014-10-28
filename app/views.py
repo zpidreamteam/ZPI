@@ -1,12 +1,16 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm
-from forms import LoginForm, RegisterForm
-from models import User
+from forms import LoginForm, RegisterForm, OfferForm, SearchForm
+from models import User, Offer, Category
+from datetime import datetime, timedelta
+from config import MAX_SEARCH_RESULTS
+
 
 @app.before_request
 def before_request():
     g.user = current_user
+    g.search_form = SearchForm()
 
 @lm.user_loader
 def load_user(id):
@@ -21,6 +25,20 @@ def index():
     return render_template('index.html',
                            title='Strona glowna',
                            user=user)
+
+@app.route('/search', methods=['POST'])
+def search():
+    if not g.search_form.validate_on_submit():
+        return redirect(url_for('index'))
+    return redirect(url_for('search_results', query=g.search_form.search.data))
+
+
+@app.route('/search_results/<query>')
+def search_results(query):
+    results = Offer.query.whoosh_search(query, MAX_SEARCH_RESULTS).all()
+    return render_template('search_results.html',
+                           query=query,
+                           results=results)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -60,14 +78,14 @@ def register():
 
     form = RegisterForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data, 
-                    nickname=form.nickname.data, 
-                    street=form.street.data, 
-                    building_number=form.building_number.data, 
-                    door_number=form.door_number.data, 
-                    city=form.city.data, 
-                    zipcode=form.zipcode.data, 
-                    country=form.country.data, 
+        user = User(email=form.email.data,
+                    nickname=form.nickname.data,
+                    street=form.street.data,
+                    building_number=form.building_number.data,
+                    door_number=form.door_number.data,
+                    city=form.city.data,
+                    zipcode=form.zipcode.data,
+                    country=form.country.data,
                     phone=form.phone.data)
         user.hash_password(form.password.data)
         db.session.add(user)
@@ -77,3 +95,49 @@ def register():
     return render_template('register.html',
                            title='Rejestracja',
                            form=form)
+
+@app.route('/offer/create', methods=['GET', 'POST'])
+@login_required
+def create_offer():
+    form = OfferForm()
+    form.category_id.choices = [(c.id, c.name) for c in Category.query.all()]
+
+    if form.validate_on_submit():
+        offer = Offer(name = form.name.data,
+                      price = form.price.data,
+                      count = form.count.data,
+                      body = form.body.data,
+                      timestamp = datetime.utcnow(),
+                      category = Category.query.get(form.category_id.data),
+                      author = g.user)
+        db.session.add(offer)
+        db.session.commit()
+        flash("Poprawnie dodano Twoje ogloszenie")
+        return redirect('/index')
+
+    return render_template('create_offer.html',
+                            title='Ogloszenie',
+                            form=form)
+
+@app.route('/offer/read/<int:id>')
+def read_offer(id):
+    offer = Offer.query.get(id)
+
+    return render_template('read_offer.html',
+                            title='Ogloszenie',
+                            offer = offer)
+
+@app.route('/offer/<category>')
+@app.route('/offer/<category>/<int:page>')
+def read_offers_by_category(category, page=1):
+    c = Category.query.filter_by(name=category).first()
+    if c is None:
+        flash('Category %s not found.' % category)
+        redirect(url_for('index'))
+
+    offers = c.offers
+
+    return render_template('offers.html',
+                            title='Ogloszenia',
+                            offers = offers)
+
