@@ -68,7 +68,7 @@ def login():
          # Tell Flask-Principal the identity changed
         identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
 
-        return redirect('/index')
+        return redirect(url_for('index'))
 
     return render_template('login.html',
                            title='Logowanie',
@@ -93,9 +93,6 @@ def logout():
 def on_identity_loaded(sender, identity):
 
     identity.user = current_user
-
-    print "current_user", current_user
-    print "user.role", current_user.role.name
 
     if hasattr(current_user, 'id'):
         identity.provides.add(UserNeed(current_user.id))
@@ -123,7 +120,7 @@ def register():
         user.hash_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        return redirect('/index')
+        return redirect(url_for('index'))
 
     return render_template('register.html',
                            title='Rejestracja',
@@ -146,7 +143,7 @@ def create_offer():
         db.session.add(offer)
         db.session.commit()
         flash("Poprawnie dodano Twoje ogloszenie")
-        return redirect('/index')
+        return redirect(url_for('index'))
 
     return render_template('create_offer.html',
                             title='Ogloszenie',
