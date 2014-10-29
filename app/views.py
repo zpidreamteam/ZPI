@@ -1,5 +1,6 @@
-from flask import render_template, flash, redirect, session, url_for, request, g
+from flask import render_template, flash, redirect, session, url_for, request, g, current_app
 from flask.ext.login import login_user, logout_user, current_user, login_required
+from flask_principal import ActionNeed, AnonymousIdentity, Identity, identity_changed, identity_loaded, Permission, Principal, UserNeed, RoleNeed
 from app import app, db, lm
 from forms import LoginForm, RegisterForm, OfferForm, SearchForm
 from models import User, Offer, Category
@@ -49,6 +50,7 @@ def login():
         session['remember_me'] = form.remember_me.data
 
         user = User.query.filter_by(email=form.email.data).first()
+
         if user is None:
             flash('User with email {email} not found.'.format(email=form.email.data))
             return redirect(url_for('index'))
@@ -61,7 +63,11 @@ def login():
         if 'remember_me' in session:
             remember_me = session['remember_me']
             session.pop('remember_me', None)
+
         login_user(user, remember=remember_me)
+
+         # Tell Flask-Principal the identity changed
+        identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
 
         return redirect('/index')
 
@@ -70,9 +76,35 @@ def login():
                            form=form)
 
 @app.route('/logout')
+@login_required
 def logout():
+    # Remove the user information from the session
     logout_user()
+
+    # Remove session keys set by Flask-Principal
+    for key in ('identity.name', 'identity.auth_type'):
+        session.pop(key, None)
+
+    # Tell Flask-Principal the user is anonymous
+    identity_changed.send(current_app._get_current_object(),
+                          identity=AnonymousIdentity())
+
     return redirect(url_for('index'))
+
+@identity_loaded.connect_via(app)
+def on_identity_loaded(sender, identity):
+
+    identity.user = current_user
+
+    # Add the UserNeed to the identity
+    if hasattr(current_user, 'id'):
+        identity.provides.add(UserNeed(current_user.id))
+
+    # Assuming the User model has a list of roles, update the
+    # identity with the roles that the user provides
+    if hasattr(current_user, 'roles'):
+        for role in current_user.roles:
+            identity.provides.add(RoleNeed(role.name))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
