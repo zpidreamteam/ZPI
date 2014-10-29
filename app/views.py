@@ -19,7 +19,6 @@ def load_user(id):
 
 @app.route('/')
 @app.route('/index')
-@login_required
 def index():
     user = g.user
 
