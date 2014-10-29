@@ -77,7 +77,6 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
-    # Remove the user information from the session
     logout_user()
 
     # Remove session keys set by Flask-Principal
@@ -95,15 +94,15 @@ def on_identity_loaded(sender, identity):
 
     identity.user = current_user
 
-    # Add the UserNeed to the identity
+    print "current_user", current_user
+    print "user.role", current_user.role.name
+
     if hasattr(current_user, 'id'):
         identity.provides.add(UserNeed(current_user.id))
 
-    # Assuming the User model has a list of roles, update the
-    # identity with the roles that the user provides
-    if hasattr(current_user, 'roles'):
-        for role in current_user.roles:
-            identity.provides.add(RoleNeed(role.name))
+    if hasattr(current_user, 'role'):
+        print current_user.role
+        identity.provides.add(RoleNeed(current_user.role.name))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

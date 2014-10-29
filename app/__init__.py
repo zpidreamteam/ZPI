@@ -17,13 +17,16 @@ principals = Principal(app, skip_static=True)
 
 #Needs
 be_admin = RoleNeed('admin')
+be_user  = RoleNeed('user')
 
 #Permissions
 admin_permission = Permission(be_admin)
 admin_permission.description = "Admin's permissions"
+user_perrmission = Permission(be_user)
+user_perrmission.description = "User's permissions"
 
-apps_needs = [be_admin]
-apps_permissions = [admin_permission]
+apps_needs = [be_admin, be_user]
+apps_permissions = [admin_permission, user_perrmission]
 
 from app import views, models, admin_panel
 
