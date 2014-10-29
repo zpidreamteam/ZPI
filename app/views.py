@@ -32,7 +32,6 @@ def search():
         return redirect(url_for('index'))
     return redirect(url_for('search_results', query=g.search_form.search.data))
 
-
 @app.route('/search_results/<query>')
 def search_results(query):
     results = Offer.query.whoosh_search(query, MAX_SEARCH_RESULTS).all()
@@ -52,6 +51,10 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None:
             flash('User with email {email} not found.'.format(email=form.email.data))
+            return redirect(url_for('index'))
+
+        if user.verify_password(form.password.data) is False:
+            flash('Wrong password')
             return redirect(url_for('index'))
 
         remember_me = False
