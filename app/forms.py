@@ -1,7 +1,8 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, BooleanField, PasswordField, TextAreaField, FloatField, SelectField, IntegerField
+from wtforms import StringField, BooleanField, PasswordField, TextAreaField, FloatField, SelectField, IntegerField, FileField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
 from models import Category
+
 
 class LoginForm(Form):
     email = StringField('email', validators=[DataRequired()])
@@ -27,6 +28,8 @@ class OfferForm(Form):
     count = IntegerField(validators=[DataRequired()])
     body = TextAreaField('body', validators=[DataRequired()])
     category_id = SelectField('category', coerce=int)
+    filename = FileField()
+	
 
 class SearchForm(Form):
     search = StringField('search', validators=[DataRequired()])

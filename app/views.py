@@ -5,7 +5,7 @@ from forms import LoginForm, RegisterForm, OfferForm, SearchForm
 from models import User, Offer, Category
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS
-
+from werkzeug import secure_filename
 
 @app.before_request
 def before_request():
@@ -113,6 +113,10 @@ def create_offer():
                       timestamp = datetime.utcnow(),
                       category = Category.query.get(form.category_id.data),
                       author = g.user)
+#tutaj gdzies wrzucic kod do ladowania zdjecia
+        filename = secure_filename(form.filename.file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        form.filename.file.save(file_path)
         db.session.add(offer)
         db.session.commit()
         flash("Poprawnie dodano Twoje ogloszenie")

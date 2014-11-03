@@ -31,6 +31,14 @@
             {% for error in form.body.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
+			
+     <form action="" method="post" name="simple" enctype="multipart/form-data">
+        <p>
+           Dodaj zdjęcie:
+             {{form.filename()}}
+         </p>
+     </form> 
+			
         </p>
         <p><input type="submit" value="Dodaj"></p>
     </form>
