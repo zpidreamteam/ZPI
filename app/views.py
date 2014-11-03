@@ -113,18 +113,22 @@ def create_offer():
                       timestamp = datetime.utcnow(),
                       category = Category.query.get(form.category_id.data),
                       author = g.user)
-#tutaj gdzies wrzucic kod do ladowania zdjecia
-        filename = secure_filename(form.filename.file.filename)
+
+        filename = secure_filename(form.photo.file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         form.filename.file.save(file_path)
+
         db.session.add(offer)
         db.session.commit()
+
         flash("Poprawnie dodano Twoje ogloszenie")
-        return redirect('/index')
+
+        return redirect('/index') # redirect to offers' page
 
     return render_template('create_offer.html',
                             title='Ogloszenie',
-                            form=form)
+                            form=form,
+                            filename=filename)
 
 @app.route('/offer/read/<int:id>')
 def read_offer(id):
