@@ -90,9 +90,11 @@ def register():
                     country=form.country.data,
                     phone=form.phone.data)
         user.hash_password(form.password.data)
+
         db.session.add(user)
         db.session.commit()
-        return redirect('/index')
+
+        return redirect(url_for('index'))
 
     return render_template('register.html',
                            title='Rejestracja',
@@ -113,19 +115,20 @@ def create_offer():
                       category = Category.query.get(form.category_id.data),
                       author = g.user)
 
-        filename = secure_filename(form.photo.file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        form.filename.file.save(file_path)
-		db.session.add(offer)
+        # filename = secure_filename(form.photo.file.filename)
+        # file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        # form.filename.file.save(file_path)
+
+        db.session.add(offer)
         db.session.commit()
-		flash("Poprawnie dodano Twoje ogloszenie")
-        
-		return redirect('/index') # redirect to offers' page
+
+        flash("Poprawnie dodano Twoje ogloszenie")
+
+		return redirect(url_for('index')) # TODO redirect to offers' page
 
     return render_template('create_offer.html',
                             title='Ogloszenie',
-                            form=form,
-							filename=filename)
+                            form=form)
 
 @app.route('/offer/read/<int:id>')
 def read_offer(id):
