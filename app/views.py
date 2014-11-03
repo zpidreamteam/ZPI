@@ -115,8 +115,8 @@ def create_offer():
         db.session.add(offer)
         db.session.commit()
         flash("Poprawnie dodano Twoje ogloszenie")
-        mystring = "/offer/read/%i" % (offer.id)
-        return redirect(mystring)
+        address = "/offer/read/%i" % (offer.id)
+        return redirect(address)
 
     return render_template('create_offer.html',
                             title='Ogloszenie',
