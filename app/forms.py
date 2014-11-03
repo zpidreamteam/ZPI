@@ -1,6 +1,7 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, BooleanField, PasswordField
+from wtforms import StringField, BooleanField, PasswordField, TextAreaField, FloatField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
+from models import Category
 
 class LoginForm(Form):
     email = StringField('email', validators=[DataRequired()])
@@ -19,3 +20,16 @@ class RegisterForm(Form):
     zipcode = StringField('zipcode', validators=[DataRequired(), Length(max=16, message="Podany kod pocztowy jest za dlugi")])
     country = StringField('country', validators=[DataRequired(), Length(max=32, message="Podana nazwa kraju jest za dluga")])
     phone = StringField('phone', validators=[DataRequired(), Length(max=16, message="Podany numer telefonu jest za dlugi")])
+
+class OfferForm(Form):
+    name = StringField('name', validators=[DataRequired()])
+    price = FloatField('price', validators=[DataRequired()])
+    count = IntegerField(validators=[DataRequired()])
+    body = TextAreaField('body', validators=[DataRequired()])
+    category_id = SelectField('category', coerce=int)
+
+class SearchForm(Form):
+    search = StringField('search', validators=[DataRequired()])
+
+class PurchaseForm(Form):
+    number_of_books = IntegerField('number_of_books', default=1, validators=[DataRequired()])

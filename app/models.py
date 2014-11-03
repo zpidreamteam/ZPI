@@ -1,5 +1,6 @@
-from app import db
+from app import db, app
 from passlib.apps import custom_app_context as pwd_context
+import flask.ext.whooshalchemy as whooshalchemy
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,10 +45,18 @@ class Category(db.Model):
     name = db.Column(db.String(128), index=True, unique=True)
     offers = db.relationship('Offer', backref='category', lazy='dynamic')
 
+    def get_id(self):
+        try:
+            return unicode(self.id)  # python 2
+        except NameError:
+            return str(self.id)  # python 3
+
     def __repr__(self):
         return '<Category %r>' % (self.name)
 
 class Offer(db.Model):
+    __searchable__ = ['name', 'body']
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), index=True)
     price = db.Column(db.Float)
@@ -57,6 +66,19 @@ class Offer(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+    def is_valid(self):
+        #offer = Offer.query.get(self.id)
+        if self is not None and self.count > 0:
+            return True
+        else:
+            return False
+
+    def is_available(self, count):
+        if self is not None and self.count-count >= 0:
+            return True
+        else:
+            return False
+
     def __repr__(self):
         return '<Offer %r>' % (self.body)
 
@@ -65,9 +87,13 @@ class Transaction(db.Model):
     timestamp = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     offer_id = db.Column(db.Integer, db.ForeignKey('offer.id'))
+    count = db.Column(db.Integer)
     price = db.Column(db.Float)
     hash_link = db.Column(db.String(128))
     is_finalised = db.Column(db.Boolean)
 
     def __repr__(self):
         return '<Transaction %r>' % (self.id)
+
+whooshalchemy.whoosh_index(app, Offer)
+

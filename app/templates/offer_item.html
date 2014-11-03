@@ -1,0 +1,10 @@
+<tr valign="top">
+  <td>
+    <a href="{{ url_for('read_offer', id = offer.id) }}">
+      <h1>{{ offer.name }} </h1>
+    </a>
+    <i>Cena: {{ offer.price }} </i>
+    <i>Czas utworzenia: {{ offer.timestamp }} </i>
+    <i>Liczba dostępnych sztuk: {{ offer.count }} </i>
+  </td>
+</tr>
