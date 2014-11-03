@@ -115,7 +115,8 @@ def create_offer():
         db.session.add(offer)
         db.session.commit()
         flash("Poprawnie dodano Twoje ogloszenie")
-        return redirect('/index')
+        mystring = "/offer/read/%i" % (offer.id)
+        return redirect(mystring)
 
     return render_template('create_offer.html',
                             title='Ogloszenie',
@@ -136,7 +137,7 @@ def read_offers_by_category(category, page=1):
     if c is None:
         flash('Category %s not found.' % category)
         redirect(url_for('index'))
-
+    
     offers = c.offers
 
     return render_template('offers.html',
