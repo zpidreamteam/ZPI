@@ -4,8 +4,8 @@ from app import app, db, lm
 from forms import LoginForm, RegisterForm, OfferForm, SearchForm
 from models import User, Offer, Category
 from datetime import datetime, timedelta
-from config import MAX_SEARCH_RESULTS
-from werkzeug import secure_filename
+from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW
+from flask.ext.uploads import save
 
 @app.before_request
 def before_request():
@@ -94,6 +94,7 @@ def register():
                     phone=form.phone.data)
         user.hash_password(form.password.data)
 
+
         db.session.add(user)
         db.session.commit()
 
@@ -118,10 +119,7 @@ def create_offer():
                       category = Category.query.get(form.category_id.data),
                       author = g.user)
 
-        print "form.photo.file", form.photo.file
-        # filename = secure_filename(form.photo.file.filename)
-        # file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        # form.filename.file.save(file_path)
+        save(request.files['upload'])
 
         db.session.add(offer)
         db.session.commit()
@@ -147,7 +145,7 @@ def read_offer(id):
 def read_offers_by_category(category, page=1):
     c = Category.query.filter_by(name=category).first()
     if c is None:
-        flash('Category %s not found.' % category)
+        flash('Nie ma takiej kategorii %s.' % category)
         redirect(url_for('index'))
 
     offers = c.offers
