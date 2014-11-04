@@ -50,11 +50,11 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None:
             flash('User with email {email} not found.'.format(email=form.email.data))
-            return redirect(url_for('index'))
+            return redirect(request.args.get("next") or url_for("index"))
 
         if user.verify_password(form.password.data) is False:
             flash('Wrong password')
-            return redirect(url_for('index'))
+            return redirect(request.args.get("next") or url_for("index"))
 
         remember_me = False
         if 'remember_me' in session:
@@ -62,8 +62,7 @@ def login():
             session.pop('remember_me', None)
         login_user(user, remember=remember_me)
 
-        return redirect('/index')
-
+        return redirect(request.args.get("next") or url_for("index"))
     return render_template('login.html',
                            title='Logowanie',
                            form=form)
