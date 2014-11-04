@@ -29,7 +29,6 @@ class OfferForm(Form):
     body = TextAreaField('body', validators=[DataRequired()])
     category_id = SelectField('category', coerce=int)
     photo = FileField('photo')
-	
 
 class SearchForm(Form):
     search = StringField('search', validators=[DataRequired()])

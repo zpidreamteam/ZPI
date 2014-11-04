@@ -29,11 +29,13 @@ def index():
 def search():
     if not g.search_form.validate_on_submit():
         return redirect(url_for('index'))
+
     return redirect(url_for('search_results', query=g.search_form.search.data))
 
 @app.route('/search_results/<query>')
 def search_results(query):
     results = Offer.query.whoosh_search(query, MAX_SEARCH_RESULTS).all()
+
     return render_template('search_results.html',
                            query=query,
                            results=results)
@@ -71,6 +73,7 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
+
     return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -115,21 +118,21 @@ def create_offer():
                       category = Category.query.get(form.category_id.data),
                       author = g.user)
 
-        filename = secure_filename(form.photo.file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        form.filename.file.save(file_path)
+        print "form.photo.file", form.photo.file
+        # filename = secure_filename(form.photo.file.filename)
+        # file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        # form.filename.file.save(file_path)
 
         db.session.add(offer)
         db.session.commit()
 
         flash("Poprawnie dodano Twoje ogloszenie")
 
-        return redirect('/index') # redirect to offers' page
+        return redirect(url_for('index')) # redirect to offers' page
 
     return render_template('create_offer.html',
                             title='Ogloszenie',
-                            form=form,
-                            filename=filename)
+                            form=form)
 
 @app.route('/offer/read/<int:id>')
 def read_offer(id):
