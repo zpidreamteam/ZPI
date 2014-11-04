@@ -4,8 +4,8 @@ from app import app, db, lm
 from forms import LoginForm, RegisterForm, OfferForm, SearchForm
 from models import User, Offer, Category
 from datetime import datetime, timedelta
-from config import MAX_SEARCH_RESULTS
-
+from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW
+from flask.ext.uploads import save
 
 @app.before_request
 def before_request():
@@ -29,11 +29,13 @@ def index():
 def search():
     if not g.search_form.validate_on_submit():
         return redirect(url_for('index'))
+
     return redirect(url_for('search_results', query=g.search_form.search.data))
 
 @app.route('/search_results/<query>')
 def search_results(query):
     results = Offer.query.whoosh_search(query, MAX_SEARCH_RESULTS).all()
+
     return render_template('search_results.html',
                            query=query,
                            results=results)
@@ -70,6 +72,7 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
+
     return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -89,9 +92,12 @@ def register():
                     country=form.country.data,
                     phone=form.phone.data)
         user.hash_password(form.password.data)
+
+
         db.session.add(user)
         db.session.commit()
-        return redirect('/index')
+
+        return redirect(url_for('index'))
 
     return render_template('register.html',
                            title='Rejestracja',
@@ -111,9 +117,14 @@ def create_offer():
                       timestamp = datetime.utcnow(),
                       category = Category.query.get(form.category_id.data),
                       author = g.user)
+
+        save(request.files['upload'])
+
         db.session.add(offer)
         db.session.commit()
+
         flash("Poprawnie dodano Twoje ogloszenie")
+
         address = "/offer/read/%i" % (offer.id)
         return redirect(address)
 
@@ -134,9 +145,9 @@ def read_offer(id):
 def read_offers_by_category(category, page=1):
     c = Category.query.filter_by(name=category).first()
     if c is None:
-        flash('Category %s not found.' % category)
+        flash('Nie ma takiej kategorii %s.' % category)
         redirect(url_for('index'))
-    
+
     offers = c.offers
 
     return render_template('offers.html',
