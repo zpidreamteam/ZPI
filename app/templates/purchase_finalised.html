@@ -2,5 +2,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Dokonano zakupu! Dziękujemy.</h1>
+    <h1>Przyjęto zamówienie. Możesz dokonać płatności teraz:</h1>
+    <form action="/{{payment_method_name}}/{{transaction.user_id}}/{{transaction.offer_id}}/{{transaction.hash_link}}">
+    <input type="submit" value="Przelewy48">
+</form>
 {% endblock %}

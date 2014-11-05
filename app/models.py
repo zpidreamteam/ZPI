@@ -1,6 +1,8 @@
 from app import db, app
 from passlib.apps import custom_app_context as pwd_context
 import flask.ext.whooshalchemy as whooshalchemy
+import string
+import random
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -90,6 +92,9 @@ class Transaction(db.Model):
     price = db.Column(db.Float)
     hash_link = db.Column(db.String(128))
     is_finalised = db.Column(db.Boolean)
+
+    def hash_generator(self, size=32, chars=string.ascii_uppercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
 
     def __repr__(self):
         return '<Transaction %r>' % (self.id)
