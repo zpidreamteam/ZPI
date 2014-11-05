@@ -3,7 +3,9 @@
 
 {% block content %}
     <h1>{{ offer.name }}</h1>
-    <img src="{{ url_for('static', filename=photo) }}" />
+    <p>
+    <img src="/static/{{photo_name}}">
+    </p>
     <p>
         Cena za sztukę:
         {{ offer.price }}
