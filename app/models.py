@@ -67,7 +67,6 @@ class Offer(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def is_valid(self):
-        #offer = Offer.query.get(self.id)
         if self is not None and self.count > 0:
             return True
         else:

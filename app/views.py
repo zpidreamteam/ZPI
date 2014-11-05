@@ -108,7 +108,7 @@ def purchase_offer(offer_id):
     offer = Offer.query.get(offer_id)
 
     if offer is None:
-        flash('Offer not found.')
+        flash('Nie ma takiej oferty.')
         return redirect(url_for('index'))
     elif offer.is_valid() == False:
         flash('Oferta wygasla!')
@@ -119,21 +119,22 @@ def purchase_offer(offer_id):
     if form.validate_on_submit():
         if not offer.is_available(form.number_of_books.data):
             flash('Nie ma takiej liczby dostepnych egzemplarzy')
-            return redirect(url_for('index'))
+            return redirect(url_for("/offer/read/%i" % (offer_id)))
 
-        transaction = Transaction(timestamp=datetime.utcnow(), 
-                                  user_id=g.user.id,
-                                  offer_id=offer_id,
-                                  count=form.number_of_books.data,
-                                  price=offer.price,
-                                  hash_link='test',
-                                  is_finalised=0)
+        t = Transaction(timestamp=datetime.utcnow(),
+                        user_id=g.user.id,
+                        offer_id=offer_id,
+                        count=form.number_of_books.data,
+                        price=offer.price,
+                        hash_link='test',
+                        is_finalised=0)
 
         alteredOffer = Offer.query.filter_by(id=offer_id).first()
         alteredOffer.count -= form.number_of_books.data
 
-        db.session.add(transaction)
+        db.session.add(t)
         db.session.commit()
+
         return render_template('purchase_finalised.html',
                            title='Dokonano zakupu')
 
