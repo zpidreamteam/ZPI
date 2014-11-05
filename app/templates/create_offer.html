@@ -3,7 +3,7 @@
 
 {% block content %}
     <h1>Dodaj nowe ogłoszenie</h1>
-    <form action="" method="post" name="offer/create">
+    <form action="" method="post" name="offer/create" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <p>
             Nazwa ogłoszenia:<br>
@@ -31,6 +31,9 @@
             {% for error in form.body.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
+
+            Zdjecie:<br>
+            <input name="upload" type="file">
         </p>
         <p><input type="submit" value="Dodaj"></p>
     </form>
