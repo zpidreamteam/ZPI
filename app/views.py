@@ -1,11 +1,11 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
-from app import app, db, lm
+from app import app, db, lm, Storage
 from forms import LoginForm, RegisterForm, OfferForm, SearchForm
 from models import User, Offer, Category
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW
-from flask.ext.uploads import save
+from flask.ext.uploads import save, Upload
 
 @app.before_request
 def before_request():
@@ -93,7 +93,6 @@ def register():
                     phone=form.phone.data)
         user.hash_password(form.password.data)
 
-
         db.session.add(user)
         db.session.commit()
 
@@ -135,10 +134,12 @@ def create_offer():
 @app.route('/offer/read/<int:id>')
 def read_offer(id):
     offer = Offer.query.get(id)
+    photo = Upload.query.get_or_404(1)
 
     return render_template('read_offer.html',
                             title='Ogloszenie',
-                            offer = offer)
+                            offer = offer,
+                            photo = photo.name)
 
 @app.route('/offer/<category>')
 @app.route('/offer/<category>/<int:page>')
@@ -154,3 +155,38 @@ def read_offers_by_category(category, page=1):
                             title='Ogloszenia',
                             offers = offers)
 
+
+
+
+@app.route('/file')
+def file():
+    """List the uploads."""
+    uploads = Upload.query.all()
+    print "uploads", uploads
+
+    return (
+        '<a href="/upload">New Upload</a><br>' +
+        u''.join(
+            u'<a href="%s">%s</a>'
+            u'<form action="/delete/%s" method="POST">'
+            u'  <button type="submit">Delete</button>'
+            u'</form><br>'
+            % (Storage().url(u.name), u.name, u.id)
+            for u in uploads
+        )
+    )
+
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    """Upload a new file."""
+    if request.method == 'POST':
+        print 'saving'
+        save(request.files['upload'])
+        return redirect(url_for('index'))
+    return (
+        u'<form method="POST" enctype="multipart/form-data">'
+        u'  <input name="upload" type="file">'
+        u'  <button type="submit">Upload</button>'
+        u'</form>'
+    )
