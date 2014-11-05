@@ -153,4 +153,12 @@ def read_offers_by_category(category, page=1):
     return render_template('offers.html',
                             title='Ogloszenia',
                             offers = offers)
+							
+@app.route('/offers')
+@app.route('/offers/<int:page>')							
+def read_offers(page=1):
+    offers = Offer.query.order_by(Offer.timestamp.desc()).all()
 
+    return render_template('offers.html',
+                            title='Ogloszenia',
+                            offers = offers)
