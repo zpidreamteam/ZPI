@@ -1,0 +1,9 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Rezultat dla "{{ query }}":</h1>
+  {% for offer in results %}
+      {% include 'offer_item.html' %}
+  {% endfor %}
+{% endblock %}

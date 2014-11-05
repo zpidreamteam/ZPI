@@ -62,6 +62,8 @@ class TestCase(unittest.TestCase):
         db.session.add(o2)
         db.session.commit()
 
+        assert len(Category.query.all()) == 2
+
 
 if __name__ == '__main__':
     unittest.main()
