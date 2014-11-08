@@ -30,3 +30,7 @@ class OfferForm(Form):
 
 class SearchForm(Form):
     search = StringField('search', validators=[DataRequired()])
+
+class PurchaseForm(Form):
+    number_of_books = IntegerField('number_of_books', default=1, validators=[DataRequired()])
+
