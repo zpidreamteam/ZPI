@@ -196,6 +196,7 @@ def purchase_finalised(user_id, offer_id, hash_link):
         return redirect(url_for('index'))
 
     payment_method_name = 'przelewy48'
+
     return render_template('purchase_finalised.html',
                            title='Dokonano zakupu',
                            transaction=t,
@@ -259,9 +260,14 @@ def read_offers_by_category(category, page=1):
 def read_offers(page=1):
     offers = Offer.query.order_by(Offer.timestamp.desc()).all()
 
+    return render_template('offers.html',
+                            title='Ogloszenia',
+                            offers = offers)
+
 @app.route('/przelewy48/<int:user_id>/<int:offer_id>/<string:hash_link>')
 def przelewy48(user_id, offer_id, hash_link):
     approve_method_name='approve'
+
     return render_template('przelewy48.html',
                            approve_method_name=approve_method_name,
                            user_id=user_id,
