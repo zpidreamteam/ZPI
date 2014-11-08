@@ -6,4 +6,5 @@ flask
 whoosh_index
 uploads
 photos
+static
 src/pip-delete-this-directory.txt

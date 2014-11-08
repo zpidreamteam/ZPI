@@ -9,10 +9,11 @@ from flask.ext.mail import Mail
 
 app = Flask(__name__)
 app.config.from_object('config')
-db = SQLAlchemy(app)
+
 lm = LoginManager()
 lm.init_app(app)
 lm.login_view = 'login'
+
 init(db, get_default_storage_class(app))
 app.config.update(
 	DEBUG=False,
@@ -25,6 +26,11 @@ app.config.update(
 	)
 mail = Mail()
 mail.init_app(app)
+
+db = SQLAlchemy(app)
+Storage = get_default_storage_class(app)
+init(db, Storage)
+
 from app import views, models
 
 
