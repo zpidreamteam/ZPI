@@ -1,0 +1,10 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <table>
+        {% for offer in offers %}
+            {% include 'offer_item.html' %}
+        {% endfor %}
+    </table>
+{% endblock %}

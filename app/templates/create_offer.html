@@ -1,0 +1,40 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Dodaj nowe ogłoszenie</h1>
+    <form action="" method="post" name="offer/create" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <p>
+            Nazwa ogłoszenia:<br>
+            {{ form.name }}
+            {% for error in form.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Cena za sztukę:<br>
+            {{ form.price }}
+            {% for error in form.price.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Liczba sztuk:<br>
+            {{ form.count }}
+            {% for error in form.count.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Kategoria:<br>
+            {{ form.category_id }}
+            {% for error in form.category_id.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Opis:<br>
+            {{ form.body }}
+            {% for error in form.body.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+
+            Zdjecie:<br>
+            <input name="upload" type="file">
+        </p>
+        <p><input type="submit" value="Dodaj"></p>
+    </form>
+{% endblock %}
