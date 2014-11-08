@@ -2,9 +2,54 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h3>Na tej stronce mozesz sie zalogowac. Logowanie zrobione w pythonie.</h3>
- 
-    <form action="" method="post" name="login">
+
+    <h1>Zaloguj sie</h1>
+    <form role="form"  method="post" name="login">
+        {{ form.hidden_tag() }}
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
+      
+          <input style="width:200px;" class="form-control" id="email" name="email" type="text" value="" placeholder="Adres Email">
+            
+            {% for error in form.email.errors %}
+                <span style="color: red;"> {{ error }}</span>
+            {% endfor %}<br>
+
+        </div>
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
+          <input style="width:200px;" class="form-control" id="password" name="password" type="password" value="" placeholder="Hasło">
+
+           {% for error in form.password.errors %}
+                <span style="color: red;"> {{ error }}</span>
+            {% endfor %}<br> 
+
+        </div>
+          <p>{{ form.remember_me }} Remember Me</p>
+          <p><input class="btn btn-default" type="submit" value="Zaloguj się"></p>
+          
+    </form>
+
+
+<!--
+ <div class="well">
+        <form role ="form" class="form-horizontal" action="" method="post" name="post">
+            {{ form.hidden_tag() }}
+            <div class="input-group">
+                <label class="control-label" for="post">fgh</label>
+                <div class="controls">
+                   {{ form.email }}
+                    {% for error in form.email.errors %}
+                        <span class="help-inline">[{{ error }}]</span><br>
+                    {% endfor %}
+                </div>
+            </div>
+        </form>
+    </div>
+-->
+<!--
+    <form role ="form" action="" method="post" name="login"> 
+>>>>>>> Stashed changes
         {{ form.hidden_tag() }}
         <p>
             Twój e-mail:<br>
@@ -22,4 +67,5 @@
         <p><input class="btn btn-embossed btn-primary" type="submit" value="Zaloguj się"></p>  
 
     </form>
+-->
 {% endblock %}
