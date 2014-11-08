@@ -1,6 +1,8 @@
 from app import db, app
 from passlib.apps import custom_app_context as pwd_context
 import flask.ext.whooshalchemy as whooshalchemy
+import string
+import random
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -66,7 +68,36 @@ class Offer(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+    def is_valid(self):
+        if self is not None and self.count > 0:
+            return True
+        else:
+            return False
+
+    def is_available(self, count):
+        if self is not None and self.count-count >= 0:
+            return True
+        else:
+            return False
+
     def __repr__(self):
         return '<Offer %r>' % (self.body)
 
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    offer_id = db.Column(db.Integer, db.ForeignKey('offer.id'))
+    count = db.Column(db.Integer)
+    price = db.Column(db.Float)
+    hash_link = db.Column(db.String(128))
+    is_finalised = db.Column(db.Boolean)
+
+    def hash_generator(self, size=32, chars=string.ascii_uppercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
+
+    def __repr__(self):
+        return '<Transaction %r>' % (self.id)
+
 whooshalchemy.whoosh_index(app, Offer)
+

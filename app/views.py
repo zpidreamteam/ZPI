@@ -1,11 +1,12 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
-from app import app, db, lm, Storage
-from forms import LoginForm, RegisterForm, OfferForm, SearchForm
-from models import User, Offer, Category
+from app import app, db, lm, mail, Storage
+from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm
+from models import User, Offer, Category, Transaction
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW
 from flask.ext.uploads import save, Upload
+from flask.ext.mail import Message
 
 @app.before_request
 def before_request():
@@ -112,6 +113,105 @@ def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
 
+@app.route('/approve/<int:user_id>/<int:offer_id>/<string:hash_link>/<int:return_payment_code>', methods=['GET'])
+def approve(user_id, offer_id, hash_link, return_payment_code):
+    t = Transaction.query.filter_by(user_id=user_id, offer_id=offer_id, hash_link=hash_link).first()
+    if t is None:
+        flash('Podana transakcja nie istnieje!')
+        #TODO redirect to 404 error page
+        return redirect(url_for('index'))
+
+    ##############################
+    ###return_payment_code -> kod zwracany przez zwenetrzna strone przelewow. 200 oznacza udana transakcje
+    ##############################
+
+    if return_payment_code==200 and t.is_finalised==0:
+        t.is_finalised=1
+        db.session.add(t)
+        db.session.commit()
+
+        buyerMail = User.query.get(user_id).email
+        sellerMail = User.query.get(Offer.query.get(offer_id).user_id).email
+
+        #Buyer mail
+        msg = Message("You've bought a book!",
+                  sender="no.reply.bookstree@gmail.com",
+                  recipients=["buyerMail"])
+        msg.body = "A mail body"
+        mail.send(msg)
+
+        #Seller mail
+        msg = Message("You sold a book!",
+                  sender="no.reply.bookstree@gmail.com",
+                  recipients=["sellerMail"])
+        msg.body = "A mail body"
+        mail.send(msg)
+    else:
+        flash('Transakcja nie przebiegla pomyslnie. Sprobuj ponownie')
+        #TODO redirect to error page
+        return redirect(url_for('index'))
+
+    return render_template('sold.html')
+
+
+@app.route('/purchase/<int:offer_id>', methods=['GET', 'POST'])
+@login_required
+def purchase_offer(offer_id):
+    offer = Offer.query.get(offer_id)
+
+    if offer is None:
+        flash('Nie ma takiej oferty.')
+        return redirect(url_for('index'))
+    elif offer.is_valid() == False:
+        flash('Oferta wygasla!')
+        return redirect(url_for('index'))
+
+    form = PurchaseForm()
+
+    if form.validate_on_submit():
+        if not offer.is_available(form.number_of_books.data):
+            flash('Nie ma takiej liczby dostepnych egzemplarzy')
+            return redirect(url_for("/offer/read/%i" % (offer_id)))
+
+        t = Transaction(timestamp=datetime.utcnow(),
+                        user_id=g.user.id,
+                        offer_id=offer_id,
+                        count=form.number_of_books.data,
+                        price=offer.price,
+                        is_finalised=0)
+
+        t.hash_link = t.hash_generator()
+
+        alteredOffer = Offer.query.filter_by(id=offer_id).first()
+        alteredOffer.count -= form.number_of_books.data
+
+        db.session.add(t)
+        db.session.commit()
+
+        address = "/purchase_finalised/%i/%i/%s" % (t.user_id, t.offer_id, t.hash_link)
+        return redirect(address)
+
+    return render_template('purchase.html',
+                           title='Zakup',
+                           form=form)
+
+@app.route('/purchase_finalised/<int:user_id>/<int:offer_id>/<string:hash_link>', methods=['GET', 'POST'])
+@login_required
+def purchase_finalised(user_id, offer_id, hash_link):
+
+    t = Transaction.query.filter_by(user_id=user_id, offer_id=offer_id, hash_link=hash_link).first()
+    if t is None:
+        flash('Podana transakcja nie istnieje!')
+        #TODO redirect to 404 error page
+        return redirect(url_for('index'))
+
+    payment_method_name = 'przelewy48'
+
+    return render_template('purchase_finalised.html',
+                           title='Dokonano zakupu',
+                           transaction=t,
+                           payment_method_name=payment_method_name)
+
 @app.route('/offer/create', methods=['GET', 'POST'])
 @login_required
 def create_offer():
@@ -164,3 +264,22 @@ def read_offers_by_category(category, page=1):
     return render_template('offers.html',
                             title='Ogloszenia',
                             offers = offers)
+
+@app.route('/offers')
+@app.route('/offers/<int:page>')
+def read_offers(page=1):
+    offers = Offer.query.order_by(Offer.timestamp.desc()).all()
+
+    return render_template('offers.html',
+                            title='Ogloszenia',
+                            offers = offers)
+
+@app.route('/przelewy48/<int:user_id>/<int:offer_id>/<string:hash_link>')
+def przelewy48(user_id, offer_id, hash_link):
+    approve_method_name='approve'
+
+    return render_template('przelewy48.html',
+                           approve_method_name=approve_method_name,
+                           user_id=user_id,
+                           offer_id=offer_id,
+                           hash_link=hash_link)
