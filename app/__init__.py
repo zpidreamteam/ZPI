@@ -10,11 +10,12 @@ from flask.ext.mail import Mail
 app = Flask(__name__)
 app.config.from_object('config')
 
+# login manager
 lm = LoginManager()
 lm.init_app(app)
 lm.login_view = 'login'
 
-init(db, get_default_storage_class(app))
+# mail
 app.config.update(
 	DEBUG=False,
 	#EMAIL SETTINGS
@@ -22,12 +23,14 @@ app.config.update(
 	MAIL_PORT=465,
 	MAIL_USE_SSL=True,
 	MAIL_USERNAME = 'no.reply.bookstree@gmail.com',
-	MAIL_PASSWORD = 'ZPIdream'
-	)
+	MAIL_PASSWORD = 'ZPIdream')
 mail = Mail()
 mail.init_app(app)
 
+# database
 db = SQLAlchemy(app)
+
+# storage
 Storage = get_default_storage_class(app)
 init(db, Storage)
 
