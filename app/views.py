@@ -4,7 +4,7 @@ from app import app, db, lm, mail, Storage
 from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm
 from models import User, Offer, Category, Transaction
 from datetime import datetime, timedelta
-from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW
+from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
 from flask.ext.uploads import save, Upload
 from flask.ext.mail import Message
 
@@ -246,10 +246,12 @@ def read_offer(id):
     offer = Offer.query.get(id)
     photo = Upload.query.get_or_404(id) #TODO need to handle offers without pictures
 
+    photo_path = UPLOADS_BOOKS_IMAGES + photo.name
+
     return render_template('read_offer.html',
                             title='Ogloszenie',
                             offer = offer,
-                            photo_name = photo.name)
+                            photo_path = photo_path)
 
 @app.route('/offer/<category>')
 @app.route('/offer/<category>/<int:page>')
