@@ -11,9 +11,24 @@
             {% for error in form.name.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
+			Tytuł:<br>
+            {{ form.title }}
+            {% for error in form.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+			Autor:<br>
+            {{ form.book_author }}
+            {% for error in form.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
             Cena za sztukę:<br>
             {{ form.price }}
             {% for error in form.price.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+			Koszt przesyłki:<br>
+            {{ form.shipping }}
+            {% for error in form.name.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
             Liczba sztuk:<br>
