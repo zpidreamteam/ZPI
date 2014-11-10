@@ -4,7 +4,7 @@ from app import app, db, lm, mail, Storage
 from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm
 from models import User, Offer, Category, Transaction
 from datetime import datetime, timedelta
-from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW
+from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
 from flask.ext.uploads import save, Upload
 from flask.ext.mail import Message
 
@@ -102,6 +102,16 @@ def register():
     return render_template('register.html',
                            title='Rejestracja',
                            form=form)
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template('500.html'), 500
 
 @app.route('/approve/<int:user_id>/<int:offer_id>/<string:hash_link>/<int:return_payment_code>', methods=['GET'])
 def approve(user_id, offer_id, hash_link, return_payment_code):
@@ -210,7 +220,10 @@ def create_offer():
 
     if form.validate_on_submit():
         offer = Offer(name = form.name.data,
+		              title = form.title.data,
+					  book_author = form.book_author.data,
                       price = form.price.data,
+					  shipping = form.shipping.data,
                       count = form.count.data,
                       body = form.body.data,
                       timestamp = datetime.utcnow(),
@@ -236,10 +249,12 @@ def read_offer(id):
     offer = Offer.query.get(id)
     photo = Upload.query.get_or_404(id) #TODO need to handle offers without pictures
 
+    photo_path = UPLOADS_BOOKS_IMAGES + photo.name
+
     return render_template('read_offer.html',
                             title='Ogloszenie',
                             offer = offer,
-                            photo_name = photo.name)
+                            photo_path = photo_path)
 
 @app.route('/offer/<category>')
 @app.route('/offer/<category>/<int:page>')
