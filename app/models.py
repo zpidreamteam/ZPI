@@ -61,7 +61,10 @@ class Offer(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), index=True)
+    title = db.Column(db.String(128))
+    book_author = db.Column(db.String(128))
     price = db.Column(db.Float)
+    shipping = db.Column(db.Float)
     count = db.Column(db.Integer)
     body = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime)
