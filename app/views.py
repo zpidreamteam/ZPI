@@ -220,7 +220,10 @@ def create_offer():
 
     if form.validate_on_submit():
         offer = Offer(name = form.name.data,
+		              title = form.title.data,
+					  book_author = form.book_author.data,
                       price = form.price.data,
+					  shipping = form.shipping.data,
                       count = form.count.data,
                       body = form.body.data,
                       timestamp = datetime.utcnow(),

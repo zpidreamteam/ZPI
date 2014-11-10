@@ -23,7 +23,10 @@ class RegisterForm(Form):
 
 class OfferForm(Form):
     name = StringField('name', validators=[DataRequired()])
+    title = StringField('title', validators=[DataRequired()])
+    book_author = StringField('book_author', validators=[DataRequired()])
     price = FloatField('price', validators=[DataRequired()])
+    shipping = FloatField('shipping', validators=[DataRequired()])
     count = IntegerField(validators=[DataRequired()])
     body = TextAreaField('body', validators=[DataRequired()])
     category_id = SelectField('category', coerce=int)

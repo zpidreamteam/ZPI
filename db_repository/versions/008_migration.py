@@ -5,21 +5,29 @@ from migrate import *
 from migrate.changeset import schema
 pre_meta = MetaData()
 post_meta = MetaData()
-transaction = Table('transaction', pre_meta,
-    Column('id', INTEGER, primary_key=True, nullable=False),
-    Column('timestamp', DATETIME),
-    Column('user_id', INTEGER),
-    Column('offer_id', INTEGER),
-    Column('count', INTEGER),
-    Column('price', FLOAT),
-    Column('hash_link', VARCHAR(length=128)),
-    Column('is_finalised', BOOLEAN),
+transaction = Table('transaction', post_meta,
+    Column('id', Integer, primary_key=True, nullable=False),
+    Column('timestamp', DateTime),
+    Column('user_id', Integer),
+    Column('offer_id', Integer),
+    Column('count', Integer),
+    Column('price', Float),
+    Column('hash_link', String(length=128)),
+    Column('is_finalised', Boolean),
 )
 
-upload = Table('upload', post_meta,
+offer = Table('offer', post_meta,
     Column('id', Integer, primary_key=True, nullable=False),
-    Column('name', Unicode(length=255), nullable=False),
-    Column('url', Unicode(length=255), nullable=False),
+    Column('name', String(length=128)),
+    Column('title', String(length=128)),
+    Column('author', String(length=128)),
+    Column('price', Float),
+    Column('shipping', Float),
+    Column('count', Integer),
+    Column('body', String(length=140)),
+    Column('timestamp', DateTime),
+    Column('category_id', Integer),
+    Column('user_id', Integer),
 )
 
 
@@ -28,13 +36,17 @@ def upgrade(migrate_engine):
     # migrate_engine to your metadata
     pre_meta.bind = migrate_engine
     post_meta.bind = migrate_engine
-    pre_meta.tables['transaction'].drop()
-    post_meta.tables['upload'].create()
+    post_meta.tables['transaction'].create()
+    post_meta.tables['offer'].columns['author'].create()
+    post_meta.tables['offer'].columns['shipping'].create()
+    post_meta.tables['offer'].columns['title'].create()
 
 
 def downgrade(migrate_engine):
     # Operations to reverse the above upgrade go here.
     pre_meta.bind = migrate_engine
     post_meta.bind = migrate_engine
-    pre_meta.tables['transaction'].create()
-    post_meta.tables['upload'].drop()
+    post_meta.tables['transaction'].drop()
+    post_meta.tables['offer'].columns['author'].drop()
+    post_meta.tables['offer'].columns['shipping'].drop()
+    post_meta.tables['offer'].columns['title'].drop()
