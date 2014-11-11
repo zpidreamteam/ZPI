@@ -263,7 +263,7 @@ def read_offers_by_category(category, page=1):
     c = Category.query.filter_by(name=category).first()
     if c is None:
         flash('Nie ma takiej kategorii %s.' % category)
-        redirect(url_for('index'))
+        return redirect(url_for('index'))
 
     offers = c.offers
 
@@ -290,18 +290,22 @@ def przelewy48(user_id, offer_id, hash_link):
                            offer_id=offer_id,
                            hash_link=hash_link)
 
+
 @app.route('/add_to_newsletter', methods=['GET', 'POST'])
 def add_to_newsletter():
-#    if not g.search_form.validate_on_submit():
-#        return redirect(url_for('index'))
-#
-    return redirect(url_for('add_to_newsletter_confirm', query=g.newsletter_form.newsletter.data))
-@app.route('/add_to_newsletter_confirm/<query>')
-def add_to_newsletter_confirm(query):
-# tu bedzie mozna wpieprzyc jakas captche!
-#    if form.validate_on_submit():
-    newsletter = Newsletter(email = query)
+    if not g.newsletter_form.validate_on_submit():
+        flash("Jesli chcesz zapisac sie do newslettera musisz podac swojego prawidlowego maila")
+        return redirect(url_for('index'))
+
+    return redirect(url_for('add_to_newsletter_confirm', email=g.newsletter_form.newsletter.data))
+
+@app.route('/add_to_newsletter_confirm/<email>')
+def add_to_newsletter_confirm(email):
+    newsletter = Newsletter(email = email)
+
     db.session.add(newsletter)
     db.session.commit()
+
     flash("Zostales zapisany do newslettera")
-    return redirect(url_for('index'))						   
+
+    return redirect(url_for('index'))
