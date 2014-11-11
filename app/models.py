@@ -87,9 +87,10 @@ class Offer(db.Model):
     def __repr__(self):
         return '<Offer %r>' % (self.body)
 
-class Newsletter(db.Model): 		
-    email = db.Column(db.String(128), primary_key=True, index=True, unique=True)
-	
+class Newsletter(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(128), index=True, unique=True)
+
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime)
