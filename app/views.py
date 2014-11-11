@@ -118,7 +118,6 @@ def approve(user_id, offer_id, hash_link, return_payment_code):
     t = Transaction.query.filter_by(user_id=user_id, offer_id=offer_id, hash_link=hash_link).first()
     if t is None:
         flash('Podana transakcja nie istnieje!')
-        #TODO redirect to 404 error page
         return redirect(url_for('index'))
 
     ##############################
@@ -138,14 +137,14 @@ def approve(user_id, offer_id, hash_link, return_payment_code):
                   sender="no.reply.bookstree@gmail.com",
                   recipients=["buyerMail"])
         msg.body = "A mail body"
-        mail.send(msg)
+        #mail.send(msg)
 
         #Seller mail
         msg = Message("You sold a book!",
                   sender="no.reply.bookstree@gmail.com",
                   recipients=["sellerMail"])
         msg.body = "A mail body"
-        mail.send(msg)
+        #mail.send(msg)
     else:
         flash('Transakcja nie przebiegla pomyslnie. Sprobuj ponownie')
         #TODO redirect to error page
@@ -156,7 +155,7 @@ def approve(user_id, offer_id, hash_link, return_payment_code):
 
 @app.route('/purchase/<int:offer_id>', methods=['GET', 'POST'])
 @login_required
-def purchase_offer(offer_id):
+def purchase(offer_id):
     offer = Offer.query.get(offer_id)
 
     if offer is None:
@@ -188,14 +187,14 @@ def purchase_offer(offer_id):
         db.session.add(t)
         db.session.commit()
 
-        address = "/purchase_finalised/%i/%i/%s" % (t.user_id, t.offer_id, t.hash_link)
+        address = "/purchase/finalised/%i/%i/%s" % (t.user_id, t.offer_id, t.hash_link)
         return redirect(address)
 
     return render_template('purchase.html',
                            title='Zakup',
                            form=form)
 
-@app.route('/purchase_finalised/<int:user_id>/<int:offer_id>/<string:hash_link>', methods=['GET', 'POST'])
+@app.route('/purchase/finalised/<int:user_id>/<int:offer_id>/<string:hash_link>', methods=['GET', 'POST'])
 @login_required
 def purchase_finalised(user_id, offer_id, hash_link):
 
