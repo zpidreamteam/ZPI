@@ -37,3 +37,5 @@ class SearchForm(Form):
 class PurchaseForm(Form):
     number_of_books = IntegerField('number_of_books', default=1, validators=[DataRequired()])
 
+class PurchaseOverviewForm(Form):
+    number_of_books = IntegerField('number_of_books', default=1, validators=[DataRequired()])
