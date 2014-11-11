@@ -39,25 +39,28 @@
             <div class="header_top">
                 <div class="container">
                     <div class="row">
-                        <div class="col-md-4 col-sm-4 col-sm-4">
+                        <div class="col-md-3 col-sm-4 col-sm-4">
                             <div class="logo">
-                                <a href=""><img src="{{ url_for('.static', filename='img/logo.png') }}" alt="Logo" /></a>
+                                <a href="{{ url_for('index') }}"><img src="{{ url_for('.static', filename='img/logo.png') }}" alt="Logo" /></a>
                             </div>
                         </div>
-                        <div class="col-md-8 col-sm-8 col-sm-8">
-                            <div class="main_menu">
-                                <ul>
+                        <div class="col-md-9 col-sm-8 col-sm-8">
+                            
 
+                            <div class="main_menu">    
+                                <ul>
                                     {% if g.user.is_authenticated() %}
 
                                     <li><a href="{{ url_for('index') }}">Strona Główna</a></li>
-                                    <li><a href="">Przeglądaj Ogłoszenia</a></li>
+                                    <li><a href="{{ url_for('read_offers') }}">Przeglądaj Ogłoszenia</a></li>
+                                    <li><a href="{{ url_for('create_offer') }}">Dodaj Ogłoszenie</a></li>
+                                    <li><a href="">Moje Konto</a></li>
                                     <li><a href="{{ url_for('logout') }}">Wyloguj</a></li>
                                     
                                     {% else %}
 
                                     <li><a href="{{ url_for('index') }}">Strona Główna</a></li>
-                                    <li><a href="">Przeglądaj Ogłoszenia</a></li>
+                                    <li><a href="{{ url_for('read_offers') }}">Przeglądaj Ogłoszenia</a></li>
                                     <li><a href="{{ url_for('login') }}">Zaloguj</a></li>
                                     <li><a href="{{ url_for('register') }}">Rejestracja</a></li>
 
@@ -76,7 +79,12 @@
                             <div class="search_from">
 
 
-                                 <form style="display: inline;" action="{{ url_for('search') }}" method="post" name="search">{{ g.search_form.hidden_tag() }}{{ g.search_form.search(size=20) }}<input type="submit" class="btn btn-default header_search_btn" value="Search"></form>
+                                 <form style="display: inline;" action="{{ url_for('search') }}" method="post" name="search">
+                                 <div class="input-group">
+                                    {{ g.search_form.hidden_tag() }}{{ g.search_form.search(size=20) }}
+                                    <button type="submit" class="btn btn-default header_search_btn"><i class="fa fa-search"></i></button>
+                                </div>
+                                </form>
 
                                   
                                     
@@ -99,17 +107,19 @@
             </div>
         </div>
          <div class="container">
-             
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <ul>
-            {% for message in messages %}
-                <li>{{ message }} </li>
-            {% endfor %}
-            </ul>
-            {% endif %}
-            {% endwith %}
-            {% block content %}{% endblock %}
+              <div class="row">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li>{{ message }} </li>
+                {% endfor %}
+                </ul>
+                {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+             </div>
          </div>
         <div class="footer_area">
             <div class="footer_top">
