@@ -1,8 +1,8 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm, mail, Storage
-from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm
-from models import User, Offer, Category, Transaction
+from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm
+from models import User, Offer, Category, Transaction, Newsletter
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
 from flask.ext.uploads import save, Upload
@@ -12,6 +12,7 @@ from flask.ext.mail import Message
 def before_request():
     g.user = current_user
     g.search_form = SearchForm()
+    g.newsletter_form = NewsletterForm()
 
 @lm.user_loader
 def load_user(id):
@@ -288,3 +289,19 @@ def przelewy48(user_id, offer_id, hash_link):
                            user_id=user_id,
                            offer_id=offer_id,
                            hash_link=hash_link)
+
+@app.route('/add_to_newsletter', methods=['GET', 'POST'])
+def add_to_newsletter():
+#    if not g.search_form.validate_on_submit():
+#        return redirect(url_for('index'))
+#
+    return redirect(url_for('add_to_newsletter_confirm', query=g.newsletter_form.newsletter.data))
+@app.route('/add_to_newsletter_confirm/<query>')
+def add_to_newsletter_confirm(query):
+# tu bedzie mozna wpieprzyc jakas captche!
+#    if form.validate_on_submit():
+    newsletter = Newsletter(email = query)
+    db.session.add(newsletter)
+    db.session.commit()
+    flash("Zostales zapisany do newslettera")
+    return redirect(url_for('index'))						   
