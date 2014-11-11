@@ -34,8 +34,11 @@ class OfferForm(Form):
 class SearchForm(Form):
     search = StringField('search', validators=[DataRequired()])
 
+class NewsletterForm(Form):
+    newsletter = StringField('newsletter', validators=[DataRequired(), Email(message="Prosze podac poprawny adres email")])
+
 class PurchaseForm(Form):
     number_of_books = IntegerField('number_of_books', default=1, validators=[DataRequired()])
 
-class NewsletterForm(Form):
-    newsletter = StringField('newsletter', validators=[DataRequired(), Email(message="Prosze podac poprawny adres email")])
+class PurchaseOverviewForm(Form):
+    number_of_books = IntegerField('number_of_books', default=1, validators=[DataRequired()])

@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm, mail, Storage
-from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm
+from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm
 from models import User, Offer, Category, Transaction, Newsletter
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
@@ -119,7 +119,6 @@ def approve(user_id, offer_id, hash_link, return_payment_code):
     t = Transaction.query.filter_by(user_id=user_id, offer_id=offer_id, hash_link=hash_link).first()
     if t is None:
         flash('Podana transakcja nie istnieje!')
-        #TODO redirect to 404 error page
         return redirect(url_for('index'))
 
     ##############################
@@ -139,14 +138,14 @@ def approve(user_id, offer_id, hash_link, return_payment_code):
                   sender="no.reply.bookstree@gmail.com",
                   recipients=["buyerMail"])
         msg.body = "A mail body"
-        mail.send(msg)
+        #mail.send(msg)
 
         #Seller mail
         msg = Message("You sold a book!",
                   sender="no.reply.bookstree@gmail.com",
                   recipients=["sellerMail"])
         msg.body = "A mail body"
-        mail.send(msg)
+        #mail.send(msg)
     else:
         flash('Transakcja nie przebiegla pomyslnie. Sprobuj ponownie')
         #TODO redirect to error page
@@ -154,25 +153,59 @@ def approve(user_id, offer_id, hash_link, return_payment_code):
 
     return render_template('sold.html')
 
-
-@app.route('/purchase/<int:offer_id>', methods=['GET', 'POST'])
 @login_required
-def purchase_offer(offer_id):
+def transaction_validator(user_id, offer_id, count=None):
     offer = Offer.query.get(offer_id)
+    error = False
 
     if offer is None:
         flash('Nie ma takiej oferty.')
-        return redirect(url_for('index'))
+        error = True
     elif offer.is_valid() == False:
         flash('Oferta wygasla!')
-        return redirect(url_for('index'))
+        error = True
+    elif user_id != g.user.id:
+        flash('Blad wewnetrzny. Proba Phishingu?')
+        error = True
+    elif count is not None:
+        if not offer.is_available(count):
+            flash('Nie ma takiej liczby dostepnych egzemplarzy')
+            error = True
+    return error
 
+@app.route('/purchase/<int:offer_id>', methods=['GET', 'POST'])
+@login_required
+def purchase(offer_id):
+    offer = Offer.query.get(offer_id)
     form = PurchaseForm()
 
+    if transaction_validator(g.user.id, offer_id):
+        return redirect(url_for('index'))
+
     if form.validate_on_submit():
-        if not offer.is_available(form.number_of_books.data):
-            flash('Nie ma takiej liczby dostepnych egzemplarzy')
-            return redirect(url_for("/offer/read/%i" % (offer_id)))
+        if transaction_validator(g.user.id, offer_id, form.number_of_books.data):
+            return redirect(url_for('index'))
+        address = "/purchase/overview/%i/%i/%s" % (g.user.id, offer_id, form.number_of_books.data)
+        return redirect(address)
+    return render_template('purchase.html',
+                           title='Zakup',
+                           form=form)
+
+@app.route('/purchase/overview/<int:user_id>/<int:offer_id>/<int:count>', methods=['GET', 'POST'])
+@login_required
+def purchase_overview(user_id, offer_id, count):
+
+    offer = Offer.query.get(offer_id)
+    form = PurchaseOverviewForm()
+
+    if transaction_validator(user_id, offer_id):
+        return redirect(url_for('index'))
+
+    total_price = "{:.2f}".format(offer.price * count)
+
+    if form.validate_on_submit():
+        if transaction_validator(g.user.id, offer_id, count):
+            return redirect(url_for('index'))
 
         t = Transaction(timestamp=datetime.utcnow(),
                         user_id=g.user.id,
@@ -189,14 +222,20 @@ def purchase_offer(offer_id):
         db.session.add(t)
         db.session.commit()
 
-        address = "/purchase_finalised/%i/%i/%s" % (t.user_id, t.offer_id, t.hash_link)
+        address = "/purchase/finalised/%i/%i/%s" % (t.user_id, t.offer_id, t.hash_link)
         return redirect(address)
 
-    return render_template('purchase.html',
-                           title='Zakup',
-                           form=form)
 
-@app.route('/purchase_finalised/<int:user_id>/<int:offer_id>/<string:hash_link>', methods=['GET', 'POST'])
+    return render_template('purchase_overview.html',
+                           title='Zakup',
+                           form=form, offer_name = offer.name,
+                           count=count, total_price=total_price,
+                           currency='zl', street=g.user.street,
+                           building_number=g.user.building_number,
+                           door_number=g.user.door_number,
+                           city=g.user.city, zipcode=g.user.zipcode)
+
+@app.route('/purchase/finalised/<int:user_id>/<int:offer_id>/<string:hash_link>', methods=['GET', 'POST'])
 @login_required
 def purchase_finalised(user_id, offer_id, hash_link):
 
