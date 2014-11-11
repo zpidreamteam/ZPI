@@ -9,6 +9,8 @@ SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 
 MAX_SEARCH_RESULTS = 50
 
-UPLOADS_FOLDER = os.path.realpath('.') + '/static/'
+APP_PATH = '/app'
+UPLOADS_BOOKS_IMAGES = '/static/img/books/'
+UPLOADS_FOLDER = os.path.realpath('.') + APP_PATH + UPLOADS_BOOKS_IMAGES
 DEFAULT_FILE_STORAGE = 'filesystem'
 FILE_SYSTEM_STORAGE_FILE_VIEW = 'static'

@@ -42,6 +42,7 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % (self.nickname)
 
+
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), index=True, unique=True)
@@ -61,7 +62,10 @@ class Offer(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), index=True)
+    title = db.Column(db.String(128))
+    book_author = db.Column(db.String(128))
     price = db.Column(db.Float)
+    shipping = db.Column(db.Float)
     count = db.Column(db.Integer)
     body = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime)
@@ -83,6 +87,10 @@ class Offer(db.Model):
     def __repr__(self):
         return '<Offer %r>' % (self.body)
 
+class Newsletter(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(128), index=True, unique=True)
+
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime)
@@ -98,6 +106,7 @@ class Transaction(db.Model):
 
     def __repr__(self):
         return '<Transaction %r>' % (self.id)
+
 
 whooshalchemy.whoosh_index(app, Offer)
 

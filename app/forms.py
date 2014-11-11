@@ -23,7 +23,10 @@ class RegisterForm(Form):
 
 class OfferForm(Form):
     name = StringField('name', validators=[DataRequired()])
+    title = StringField('title', validators=[DataRequired()])
+    book_author = StringField('book_author', validators=[DataRequired()])
     price = FloatField('price', validators=[DataRequired()])
+    shipping = FloatField('shipping', validators=[DataRequired()])
     count = IntegerField(validators=[DataRequired()])
     body = TextAreaField('body', validators=[DataRequired()])
     category_id = SelectField('category', coerce=int)
@@ -31,6 +34,11 @@ class OfferForm(Form):
 class SearchForm(Form):
     search = StringField('search', validators=[DataRequired()])
 
+class NewsletterForm(Form):
+    newsletter = StringField('newsletter', validators=[DataRequired(), Email(message="Prosze podac poprawny adres email")])
+
 class PurchaseForm(Form):
     number_of_books = IntegerField('number_of_books', default=1, validators=[DataRequired()])
 
+class PurchaseOverviewForm(Form):
+    number_of_books = IntegerField('number_of_books', default=1, validators=[DataRequired()])
