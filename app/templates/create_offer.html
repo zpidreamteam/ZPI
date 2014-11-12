@@ -3,7 +3,7 @@
 
 {% block content %}
     <h1>Dodaj nowe ogłoszenie</h1>
-    <form action="" method="post" name="offer/create" enctype="multipart/form-data">
+    <form action="" method="post" name="offer/create" enctype="multipart/form-s">
         {{ form.hidden_tag() }}
         <div class="input-group">
             Nazwa ogłoszenia:<br>
@@ -39,9 +39,10 @@
             Kategoria:<br>
 
             <select class="btn btn-default" id="category_id" name="category_id">
-                <option value="1">matematyka</option>
-                <option value="2">fizyka</option>
-            </select>
+                 {% for category in categories %}
+                     <option value="{{category[0]}}">{{category[1]}}</option> 
+                 {% endfor %}
+            </select> 
             
             {% for error in form.category_id.errors %}
                 <span style="color: red;">[{{ error }}]</span>
