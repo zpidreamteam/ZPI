@@ -257,6 +257,7 @@ def purchase_finalised(user_id, offer_id, hash_link):
 def create_offer():
     form = OfferForm()
     form.category_id.choices = [(c.id, c.name) for c in Category.query.all()]
+    categories = [(c.id, c.name) for c in Category.query.all()]
 
     if form.validate_on_submit():
         offer = Offer(name = form.name.data,
@@ -282,7 +283,8 @@ def create_offer():
 
     return render_template('create_offer.html',
                             title='Ogloszenie',
-                            form=form)
+                            form=form, 
+                            categories=categories)
 
 @app.route('/offer/read/<int:id>')
 def read_offer(id):
