@@ -86,6 +86,8 @@ def register():
     if form.validate_on_submit():
         user = User(email=form.email.data,
                     nickname=form.nickname.data,
+                    user_name=form.user_name.data,
+                    surname=form.surname.data,
                     street=form.street.data,
                     building_number=form.building_number.data,
                     door_number=form.door_number.data,
