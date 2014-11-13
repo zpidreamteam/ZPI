@@ -13,12 +13,12 @@
             {% endfor %}<br>
 			Tytuł:<br>
             {{ form.title }}
-            {% for error in form.name.errors %}
+            {% for error in form.title.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
 			Autor:<br>
             {{ form.book_author }}
-            {% for error in form.name.errors %}
+            {% for error in form.book_author.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
             Cena za sztukę:<br>

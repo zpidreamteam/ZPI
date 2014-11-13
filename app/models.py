@@ -10,6 +10,8 @@ class User(db.Model):
     email = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     offers = db.relationship('Offer', backref='author', lazy='dynamic')
+    user_name = db.Column(db.String(128))
+    surname = db.Column(db.String(128))
     street = db.Column(db.String(128))
     building_number = db.Column(db.String(16))
     door_number = db.Column(db.String(16))
