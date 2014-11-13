@@ -1,0 +1,92 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="oglos_area">
+					<div class="col-md-3 col-sm-3">
+						<div class="oglos_left">
+							<h3>Categories</h3>
+							<ul>
+								<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Analiza Matematyczna</a></li>
+								<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Algebra liniowa</a></li>
+								<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Architektura</a></li>
+								<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Biotechnologia</a></li>
+								<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Chemia</a></li>
+								<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Ekonomia</a></li>
+							</ul>
+						</div>
+						<div class="search_left">
+							<h3>Dodatkowe filtry</h3>
+							<input type="text" name="Search" placeholder="Tytuł..." />
+							<div class="cena_od">
+								<p>Cena od <input type="text" name="Cena" /></p>
+								<p class="do">do <input type="text" name="Cena" /></p>
+							</div>
+							<div class="takiyo_btn">
+								<p>Tylko nowe</p>
+								<img src="{{ url_for('.static', filename='img/on_off.png') }}" alt="On Off" />
+							</div>
+							<div class="takiyo_btn">
+								<p>Tylko używane</p>
+								<img src="{{ url_for('.static', filename='img/on_off.png') }}" alt="On Off" />
+							</div>
+							<button class="btn btn_submit">FILTRUJ</button>
+						</div>
+					</div>
+
+<div class="col-md-9 col-sm-9">
+		<div class="search_top_action">
+							<div class="row">
+								<div class="col-md-9 col-sm-9"></div>
+								<div class="col-md-3 col-sm-3">
+									<div class="dropdown">
+										  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+										    Sortowanie...
+										    <span class="caret"></span>
+										  </button>
+										  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+										    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Nazwa</a></li>
+										    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Cena</a></li>
+										    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Data dodania</a></li>
+										  </ul>
+										</div>
+								</div>
+							</div>
+		</div>
+		<div class="search_intro">
+							<div class="row">
+								<div class="col-md-7 col-sm-7">
+									<h4>Nazwa</h4>
+								</div>
+								<div class="col-md-2 col-sm-2">
+									<h4>Cena</h4>
+								</div>
+								<div class="col-md-3 col-sm-3">
+									<h4>Data dodania</h4>
+								</div>
+						</div>
+		</div>
+
+        {% for offer in offers %}
+            {% include 'offer_item.html' %}
+        {% endfor %}
+
+        <nav>
+		  <ul class="pagination pagination-lg">
+		    <li><a href="#">&laquo;</a></li>
+		    <li><a href="#">1</a></li>
+		    <li><a href="#">2</a></li>
+		    <li><a href="#">3</a></li>
+		    <li><a href="#">4</a></li>
+		    <li><a href="#">5</a></li>
+		    <li><a href="#">&raquo;</a></li>
+		  </ul>
+		</nav>
+
+</div>
+
+</div>
+
+{% endblock %}
