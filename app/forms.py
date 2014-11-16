@@ -1,5 +1,5 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, BooleanField, PasswordField, TextAreaField, FloatField, SelectField, IntegerField
+from wtforms import StringField, BooleanField, PasswordField, TextAreaField, FloatField, SelectField, IntegerField, TextField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
 from models import Category
 
@@ -44,3 +44,9 @@ class PurchaseForm(Form):
 
 class PurchaseOverviewForm(Form):
     number_of_books = IntegerField('number_of_books', default=1, validators=[DataRequired()])
+
+class ContactForm(Form):
+    name = TextField("name", validators=[DataRequired()])
+    email = TextField("email", validators=[DataRequired(), Email(message="Prosze podac poprawny adres email")])
+    subject = TextField("subject", validators=[DataRequired()])
+    message = TextAreaField("message", validators=[DataRequired()])
