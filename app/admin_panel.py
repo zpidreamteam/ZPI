@@ -4,6 +4,7 @@ from app import app, db, lm, admin_permission
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS
 
+@app.route('/admin')
 @app.route('/admin/dashboard')
 @login_required
 @admin_permission.require()
