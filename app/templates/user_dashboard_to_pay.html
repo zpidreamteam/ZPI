@@ -1,0 +1,10 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Oczekujące płatności:</h1>
+    <p>Transacion.id Transaction.name Transaction.user_id</p>
+    {% for transaction in transactions %}
+            <a href="/offer/read/{{transaction.offer_id}}">{{transaction.id}} {{transaction.name}}    {{transaction.user_id}} <br></a>
+    {% endfor %}
+{% endblock %}

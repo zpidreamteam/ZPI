@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
 from flask.ext.uploads import save, Upload
 from flask.ext.mail import Message
+from sqlalchemy.sql.expression import case
 
 @app.before_request
 def before_request():
@@ -352,3 +353,22 @@ def add_to_newsletter_confirm(email):
     flash("Zostales zapisany do newslettera")
 
     return redirect(url_for('index'))
+
+#User Dashboard
+@login_required
+@app.route('/user/dashboard/')
+def user_dashboard():
+
+    return render_template('user_dashboard.html')
+
+@login_required
+@app.route('/user/dashboard/to/pay')
+def user_dashboard_to_pay():
+    
+
+    transactions = db.session.query(Transaction.id, Transaction.user_id, Transaction.offer_id, Offer.name).\
+                               filter_by(user_id=g.user.id, is_finalised=0).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               order_by(Transaction.timestamp.desc())
+
+    return render_template('user_dashboard_to_pay.html', transactions=transactions)
