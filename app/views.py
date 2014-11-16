@@ -364,11 +364,33 @@ def user_dashboard():
 @login_required
 @app.route('/user/dashboard/to/pay')
 def user_dashboard_to_pay():
-    
-
-    transactions = db.session.query(Transaction.id, Transaction.user_id, Transaction.offer_id, Offer.name).\
+    transactions = db.session.query(Transaction.id, Transaction.user_id, 
+                                    Transaction.offer_id, Offer.name, Transaction.timestamp,
+                                    Transaction.count, Transaction.price,
+                                    Transaction.hash_link).\
                                filter_by(user_id=g.user.id, is_finalised=0).\
                                join(Offer, Offer.id==Transaction.offer_id).\
                                order_by(Transaction.timestamp.desc())
 
     return render_template('user_dashboard_to_pay.html', transactions=transactions)
+
+@login_required
+@app.route('/user/dashboard/to/send')
+def user_dashboard_to_send():
+    
+    transactions = db.session.query(Offer.id, Offer.name, Offer.price,
+                                    Transaction.user_id, User.street, Transaction.timestamp,
+                                    User.building_number, User.door_number,
+                                    User.city, User.zipcode).\
+                              filter_by(user_id=g.user.id).\
+                              join(Transaction, Transaction.offer_id==Offer.id).\
+                              filter_by(is_finalised=1).\
+                              join(User, User.id==Transaction.user_id)
+
+
+    return render_template('user_dashboard_to_send.html', transactions=transactions)
+
+
+
+
+

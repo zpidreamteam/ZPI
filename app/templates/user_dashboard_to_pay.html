@@ -2,9 +2,12 @@
 {% extends "base.html" %}
 
 {% block content %}
+	<a href="../">Wstecz</a>
     <h1>Oczekujące płatności:</h1>
-    <p>Transacion.id Transaction.name Transaction.user_id</p>
+    <p>TransactID --- Nazwa --- data --- Ilość egzemplarzy --- Całkowita płatność</p>
     {% for transaction in transactions %}
-            <a href="/offer/read/{{transaction.offer_id}}">{{transaction.id}} {{transaction.name}}    {{transaction.user_id}} <br></a>
+            <a href="/przelewy48/{{transaction.user_id}}/{{transaction.offer_id}}/{{transaction.hash_link}}">{{transaction.id}} --- {{transaction.name}} --- {{transaction.timestamp}} ---
+            {{transaction.count}} --- {{transaction.count*transaction.price}}</a>
+            <a href="offer/read/{{transaction.offer_id}}">Szczegóły oferty</a><br>
     {% endfor %}
 {% endblock %}
