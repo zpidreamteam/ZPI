@@ -1,0 +1,12 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+	<a href="../">Wstecz</a>
+    <h1>Moje oferty:</h1>
+    <p>OfferID --- Nazwa --- data dodania --- Ilość egzemplarzy --- Cena</p>
+    {% for transaction in offers %}
+            {{transaction.id}} --- {{transaction.name}} --- {{transaction.timestamp}} --- {{transaction.count}} --- {{transaction.price}}
+            <a href="offer/read/{{transaction.id}}">Zobacz ofertę</a><br>
+    {% endfor %}
+{% endblock %}

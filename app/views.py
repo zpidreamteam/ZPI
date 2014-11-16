@@ -377,7 +377,6 @@ def user_dashboard_to_pay():
 @login_required
 @app.route('/user/dashboard/to/send')
 def user_dashboard_to_send():
-    
     transactions = db.session.query(Offer.id, Offer.name, Offer.price,
                                     Transaction.user_id, User.street, Transaction.timestamp,
                                     User.building_number, User.door_number,
@@ -390,7 +389,14 @@ def user_dashboard_to_send():
 
     return render_template('user_dashboard_to_send.html', transactions=transactions)
 
+@login_required
+@app.route('/user/dashboard/my/offers')
+def user_dashboard_my_offers():
+    offers = db.session.query(Offer.id, Offer.name, Offer.timestamp, 
+                              Offer.price, Offer.count).\
+                              filter_by(user_id=g.user.id).\
+                              order_by(Offer.timestamp.desc())
 
-
+    return render_template('user_dashboard_my_offers.html', offers=offers)
 
 
