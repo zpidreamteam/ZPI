@@ -64,6 +64,25 @@ class TestCase(unittest.TestCase):
 
         assert len(Category.query.all()) == 2
 
+    def test_offer_valid(self):
+        u = User(email='john@example.com')
+        c1 = Category(name = 'matematyka')
+        c2 = Category(name = 'fizyka')
+        db.session.add(u)
+        db.session.add(c1)
+        db.session.add(c2)
+        db.session.commit()
+        o1 = Offer(name = 'Analiza matematycza 1.0', price = 24.0, count = 20,
+                  body = 'to jest przykladowy opis ksiazki', timestamp = datetime.utcnow(),
+                  author = u, category = c1
+            )
+        o2 = Offer(name = 'Analiza matematycza 1.0', price = 20.0, count = 0,
+                  body = 'to jest inny przykladowy opis ksiazki', timestamp = datetime.utcnow(),
+                  author = u, category = c1
+            )
+       
+        assert o1.is_valid() == True
+        assert o2.is_valid() == False
 
 if __name__ == '__main__':
     unittest.main()

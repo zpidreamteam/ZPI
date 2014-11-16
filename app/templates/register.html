@@ -2,67 +2,221 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Zarejestruj się</h1>
-    <form action="" method="post" name="register">
+ <!--    <form action="" method="post" name="register">
+        <div class="input-group">
         {{ form.hidden_tag() }}
         <p>
             Twój e-mail:<br>
-            {{ form.email }}
+            <input  class="form-control" id="email" name="email" type="text" value="">
             {% for error in form.email.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
-            Nickname:<br>
-            {{ form.nickname }}
+            Nazwa użytkownika:<br>
+            <input  class="form-control" id="nickname" name="nickname" type="text" value="">
             {% for error in form.nickname.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
             Hasło:<br>
-            {{ form.password }}
+            <input  class="form-control" id="password" name="password" type="text" value="">
             {% for error in form.password.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
             Powtórz hasło:<br>
-            {{ form.password_repeat }}
+            <input  class="form-control" id="password_repeat" name="password_repeat" type="text" value="">
             {% for error in form.password_repeat.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
             Ulica:<br>
-            {{ form.street }}
+            <input  class="form-control" id="street" name="street" type="text" value="">
             {% for error in form.street.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
 
             Numer budynku:<br>
-            {{ form.building_number }}
+            <input  class="form-control" id="building_number" name="building_number" type="text" value="">
             {% for error in form.building_number.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
             Numer lokalu:<br>
-            {{ form.door_number }}
+            <input  class="form-control" id="door_number" name="door_number" type="text" value="">
             {% for error in form.door_number.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
             Miasto:<br>
-            {{ form.city }}
+            <input  class="form-control" id="city" name="city" type="text" value="">
             {% for error in form.city.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
             Kod pocztowy:<br>
-            {{ form.zipcode }}
+            <input  class="form-control" id="zipcode" name="zipcode" type="text" value="">
             {% for error in form.zipcode.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
             Kraj:<br>
-            {{ form.country }}
+            <input  class="form-control" id="country" name="country" type="text" value="">
             {% for error in form.country.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
             Telefon:<br>
-            {{ form.phone }}
+            <input  class="form-control" id="phone" name="phone" type="text" value="">
             {% for error in form.phone.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
         </p>
-        <p><input type="submit" value="Zarejestruj się"></p>
-    </form>
+        <p><input class="btn btn-default btn-lg" type="submit" value="Zarejestruj się"></p>
+    </div>
+    </form>  -->
+    <div style="margin-top:30px;" id="signupbox" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">                    
+              <div class="panel panel-info">
+
+
+
+                        <div style="background-color:#e67e22; color:white;" class="panel-heading">
+                            <div class="panel-title">Zarejestruj się</div>
+                            <div style="float:right; font-size: 85%; position: relative; top:-10px"><a id="signinlink" style="color:white;" href="{{ url_for('login') }}">
+                                Masz już konto? Zaloguj się</a></div>
+                        </div>  
+                        <div class="panel-body">
+                            <form action="" method="post" name="register">
+                                {{ form.hidden_tag() }}
+
+                                <div class="form-group">
+                                    
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="text" class="form-control" id="email" name="email" placeholder="Adres E-mail">
+                                        {% for error in form.email.errors %}
+                                        <div class="alert-group">
+                                            <div style="padding:5px;" class="alert alert-danger alert-dismissable">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                            <span>{{ error }}</span>
+                                            </div>
+                                        </div>
+                                        {% endfor %}                         
+                                    </div>
+
+                                </div>
+                                    
+                                <div class="form-group">
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="text" class="form-control" id="nickname" name="nickname" placeholder="Nazwa użytkownika">
+                                         {% for error in form.nickname.errors %}
+                                        <div class="alert-group">
+                                            <div style="padding:5px;" class="alert alert-danger alert-dismissable">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                            <span>{{ error }}</span>
+                                            </div>
+                                        </div>
+                                         {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="password" class="form-control" id="password" name="password" placeholder="Hasło">
+                                        {% for error in form.password.errors %}
+                                             <span style="color: red;">[{{ error }}]</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="password" class="form-control" id="password_repeat" name="password_repeat" placeholder="Powtórz hasło">
+                                         {% for error in form.password_repeat.errors %}
+                                             <span style="color: red;">[{{ error }}]</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+								<div class="form-group">
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="text" class="form-control" id="street" name="user_name" placeholder="Imię">
+                                         {% for error in form.street.errors %}
+                                            <span style="color: red;">[{{ error }}]</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+								
+								<div class="form-group">
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="text" class="form-control" id="street" name="surname" placeholder="Nazwisko">
+                                         {% for error in form.street.errors %}
+                                            <span style="color: red;">[{{ error }}]</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+								
+                                <div class="form-group">
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="text" class="form-control" id="street" name="street" placeholder="Ulica">
+                                         {% for error in form.street.errors %}
+                                            <span style="color: red;">[{{ error }}]</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                               
+                                <div class="form-group">
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="text" class="form-control" id="building_number" name="building_number" placeholder="Numer budynku">
+                                        {% for error in form.building_number.errors %}
+                                            <span style="color: red;">[{{ error }}]</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="text" class="form-control" id="door_number" name="door_number" placeholder="Numer lokalu">
+                                        {% for error in form.door_number.errors %}
+                                            <span style="color: red;">[{{ error }}]</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="text" class="form-control" id="city" name="city" placeholder="Miasto">
+                                         {% for error in form.city.errors %}
+                                            <span style="color: red;">[{{ error }}]</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="text" class="form-control" id="zipcode" name="zipcode" placeholder="Kod pocztowy">
+                                        {% for error in form.zipcode.errors %}
+                                            <span style="color: red;">[{{ error }}]</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="text" class="form-control" id="country" name="country" placeholder="Kraj">
+                                         {% for error in form.country.errors %}
+                                            <span style="color: red;">[{{ error }}]</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div style="margin-bottom: 15px;" class="col-md-12">
+                                        <input type="text" class="form-control" id="phone" name="phone" placeholder="Telefon">
+                                        {% for error in form.phone.errors %}
+                                            <span style="color: red;">[{{ error }}]</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <!-- Button -->                                        
+                                    <div class="col-md-12">
+                                      <p><input class="btn btn-default btn-lg" type="submit" value="Zarejestruj się"></p>
+                                    </div>
+                                </div>           
+                                
+                            </form>
+                         </div>
+                    </div>
+        </div> 
 {% endblock %}

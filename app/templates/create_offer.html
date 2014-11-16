@@ -3,35 +3,61 @@
 
 {% block content %}
     <h1>Dodaj nowe ogłoszenie</h1>
-    <form action="" method="post" name="offer/create">
+    <form action="" method="post" name="offer/create" enctype="multipart/form-s">
         {{ form.hidden_tag() }}
-        <p>
+        <div class="input-group">
             Nazwa ogłoszenia:<br>
-            {{ form.name }}
+            <input  class="form-control" id="name" name="name" type="text" value="">
             {% for error in form.name.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
+			Tytuł:<br>
+            {{ form.title }}
+            {% for error in form.title.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+			Autor:<br>
+            {{ form.book_author }}
+            {% for error in form.book_author.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
             Cena za sztukę:<br>
-            {{ form.price }}
+            <input  class="form-control" id="price" name="price" type="text" value="">
             {% for error in form.price.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
+			Koszt przesyłki:<br>
+            {{ form.shipping }}
+            {% for error in form.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
             Liczba sztuk:<br>
-            {{ form.count }}
+            <input  class="form-control" id="count" name="count" type="text" value="">
             {% for error in form.count.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
             Kategoria:<br>
-            {{ form.category_id }}
+
+            <select class="btn btn-default" id="category_id" name="category_id">
+                 {% for category in categories %}
+                     <option value="{{category[0]}}">{{category[1]}}</option> 
+                 {% endfor %}
+            </select> 
+            
             {% for error in form.category_id.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
-            Opis:<br>
-            {{ form.body }}
+     
+            <label for="comment">Opis przedmiotu:</label>
+            <textarea class="form-control" rows="5" id="body" name="body"></textarea>
             {% for error in form.body.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
-        </p>
-        <p><input type="submit" value="Dodaj"></p>
+
+            Zdjęcie:
+            <input class="btn btn-default" name="upload" type="file">
+        
+        <p><input class="btn btn-default btn-lg" type="submit" value="Dodaj"></p>
+        </div>
     </form>
 {% endblock %}

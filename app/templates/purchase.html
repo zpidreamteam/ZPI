@@ -1,0 +1,18 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Zakup</h1>
+    <form action="" method="post" name="purchase">
+        {{ form.hidden_tag() }}
+        <p>
+            Ilość egzemplarzy:<br>
+            {{ form.number_of_books }}
+            {% for error in form.number_of_books.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+            <br>
+        </p>
+        <p><input type="submit" value="Kupuje"></p>
+    </form>
+{% endblock %}

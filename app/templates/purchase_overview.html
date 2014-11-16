@@ -1,0 +1,16 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Podsumowanie Twojego zamówienia</h1>
+    <form action="" method="post" name="purchase">
+        {{ form.hidden_tag() }}
+        <p>{{offer_name}}</p>
+        <p>Liczba egzemplarzy: {{count}}</p>
+        <p>Do zapłaty: {{total_price}} {{currency}}</p>
+        <p>Adres wysyłki:</p>
+        <p>{{street}} {{building_number}} {{door_number}}</p>
+        <p>{{zipcode}} {{city}}</p>
+        <p><input type="submit" value="Kupuje"></p>
+    </form>
+{% endblock %}

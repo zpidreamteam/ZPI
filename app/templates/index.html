@@ -2,5 +2,98 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hi, {{ user.nickname }}!</h1>
+   
+
+    	<div class="main_content_area">
+			<div class="main_top">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-4 col-sm-4 col-sm-4">
+							<div class="single_book_one">
+								<h3>MASZ KSIĄŻKĘ NA SPRZEDAŻ?</h3>
+								<h2>DODAJ OGŁOSZENIE. </h2>
+								<a href="{{ url_for('create_offer') }}"><button type="button" class="btn btn-default btn_wyastaw">WYSTAW</button></a>
+							</div>
+						</div>
+						<div class="col-md-4 col-sm-4 col-sm-4">
+							<div class="single_book_two">
+								<h3>PROBLEMY Z ZAMÓWIENIEM?</h3>
+								<h2>NAPISZ DO NAS. </h2>
+								<button type="button" class="btn btn-default btn_kontakt">KONTAKT</button>
+							</div>
+						</div>
+						<div class="col-md-4 col-sm-4 col-sm-4">
+							<div class="single_book_three">
+								<h3>MASZ JUŻ KONTO?</h3>
+								<h2>TO JE USUŃ. </h2>
+								<button type="button" class="btn btn-default btn_konto">USUŃ KONTO</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="main_middle">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-12 col-sm-12 col-sm-12">
+							<div class="middle_content">
+								<h2>WYRÓŻNIONE OGŁOSZENIA</h2>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="main_bottom">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-3 col-sm-3 col-sm-12">
+							<div class="single_book_info">
+								<img src="{{ url_for('.static', filename='img/book_info.jpg') }}" alt="Book Info" />
+								<h3>ALGEBRA LINIOWA 1</h3>
+								<h4>Gewert, Skoczylas</h4>
+								<div class="book_info_dl">
+									<button type="button" class="btn btn-default btn-xs btn_wiecej">Więcej</button>
+									<button type="button" class="btn btn-default btn-xs btn_zamawiam">Zamawiam</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-3 col-sm-12">
+							<div class="single_book_info">
+								<img src="{{ url_for('.static', filename='img/book_info2.jpg') }}" alt="Book Info" />
+								<h3>ALGEBRA LINIOWA 1</h3>
+								<h4>Gewert, Skoczylas</h4>
+								<div class="book_info_dl">
+									<button type="button" class="btn btn-default btn-xs btn_wiecej">Więcej</button>
+									<button type="button" class="btn btn-default btn-xs btn_zamawiam">Zamawiam</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-3 col-sm-12">
+							<div class="single_book_info">
+								<img src="{{ url_for('.static', filename='img/book_info3.jpg') }}" alt="Book Info" />
+								<h3>ALGEBRA LINIOWA 1</h3>
+								<h4>Gewert, Skoczylas</h4>
+								<div class="book_info_dl">
+									<button type="button" class="btn btn-default btn-xs btn_wiecej">Więcej</button>
+									<button type="button" class="btn btn-default btn-xs btn_zamawiam">Zamawiam</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-sm-3 col-sm-12">
+							<div class="single_book_info">
+								<img src="{{ url_for('.static', filename='img/book_info.jpg') }}" alt="Book Info" />
+								<h3>ALGEBRA LINIOWA 1</h3>
+								<h4>Gewert, Skoczylas</h4>
+								<div class="book_info_dl">
+									<button type="button" class="btn btn-default btn-xs btn_wiecej">Więcej</button>
+									<button type="button" class="btn btn-default btn-xs btn_zamawiam">Zamawiam</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 {% endblock %}
