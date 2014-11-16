@@ -358,7 +358,7 @@ def contact_us():
     form = ContactForm()
     if request.method == 'POST':
         if form.validate() == False:
-            flash('All fields are required.')
+            flash('Wymagane wszystkie pola.')
             return render_template('contact_us.html', form=form)
         else:
             msg = Message(form.subject.data, sender=("Formularz kontaktowy bookstree", form.email.data), recipients=['contact.bookstree@gmail.com'])
