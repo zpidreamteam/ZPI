@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from flask_principal import ActionNeed, AnonymousIdentity, Identity, identity_changed, identity_loaded, Permission, Principal, UserNeed, RoleNeed
 from app import app, db, lm, mail, Storage
-from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm
+from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, ContactForm
 from models import User, Offer, Category, Transaction, Newsletter
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
@@ -378,3 +378,25 @@ def add_to_newsletter_confirm(email):
     flash("Zostales zapisany do newslettera")
 
     return redirect(url_for('index'))
+	
+@app.route('/contact_us', methods=['GET', 'POST'])
+def contact_us():
+    form = ContactForm()
+    if request.method == 'POST':
+        if form.validate() == False:
+            flash('Wymagane wszystkie pola.')
+            return render_template('contact_us.html', form=form)
+        else:
+            msg = Message(form.subject.data, sender=("Formularz kontaktowy bookstree", form.email.data), recipients=['contact.bookstree@gmail.com'])
+            msg.body = """
+            %s <%s> napisal:
+            %s
+            """ % (form.name.data, form.email.data, form.message.data)
+            mail.send(msg)
+            flash('Wiadomosc zostala wyslana.')
+            return redirect(url_for('index'))
+ 
+    elif request.method == 'GET':
+        return render_template('contact_us.html', form=form)
+ 
+  
