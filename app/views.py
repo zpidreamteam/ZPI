@@ -215,7 +215,8 @@ def purchase_overview(user_id, offer_id, count):
                         offer_id=offer_id,
                         count=form.number_of_books.data,
                         price=offer.price,
-                        is_finalised=0)
+                        is_finalised=0,
+                        is_sent=0)
 
         t.hash_link = t.hash_generator()
 
@@ -377,26 +378,65 @@ def user_dashboard_to_pay():
 @login_required
 @app.route('/user/dashboard/to/send')
 def user_dashboard_to_send():
-    transactions = db.session.query(Offer.id, Offer.name, Offer.price,
+
+    transactions = db.session.query(Offer.id, Offer.name, Offer.price, Transaction.id.label("transact_id"),
                                     Transaction.user_id, User.street, Transaction.timestamp,
                                     User.building_number, User.door_number,
                                     User.city, User.zipcode).\
                               filter_by(user_id=g.user.id).\
                               join(Transaction, Transaction.offer_id==Offer.id).\
-                              filter_by(is_finalised=1).\
+                              filter_by(is_finalised=1, is_sent=0).\
                               join(User, User.id==Transaction.user_id)
 
 
     return render_template('user_dashboard_to_send.html', transactions=transactions)
 
 @login_required
-@app.route('/user/dashboard/my/offers')
-def user_dashboard_my_offers():
+@app.route('/user/dashboard/to/send/check/<int:transaction_id>', methods=['GET', 'POST'])
+def user_dashboard_to_send_check(transaction_id):
+    t = db.session.query(Offer.user_id, Transaction.id).\
+                              filter_by(user_id=g.user.id).\
+                              join(Transaction, Transaction.offer_id==Offer.id).\
+                              filter_by(is_finalised=1, is_sent=0, id=transaction_id).\
+                              join(User, User.id==Transaction.user_id).first()
+    if t is None:
+        flash('Nie ma takiej transakcji!')
+    else:
+        transaction = Transaction.query.filter_by(id=transaction_id).first()
+        transaction.is_sent = 1
+        db.session.add(transaction)
+        db.session.commit()
+        flash('Potwierdzono wyslanie zamowienia')
+
+    return redirect(url_for('user_dashboard_to_send'))
+
+@login_required
+@app.route('/user/dashboard/my/offers/current')
+def user_dashboard_my_offers_current():
     offers = db.session.query(Offer.id, Offer.name, Offer.timestamp, 
                               Offer.price, Offer.count).\
                               filter_by(user_id=g.user.id).\
+                              filter(Offer.count!=0).\
                               order_by(Offer.timestamp.desc())
 
-    return render_template('user_dashboard_my_offers.html', offers=offers)
+    return render_template('user_dashboard_my_offers_current.html', offers=offers)
+
+@login_required
+@app.route('/user/dashboard/my/offers/close/<int:offer_id>', methods=['GET', 'POST'])
+def offer_close(offer_id):
+    offer = Offer.query.filter_by(id=offer_id, user_id=g.user.id).first()
+
+    if offer is None:
+        flash('Nie ma takiej oferty')
+    elif offer.count == 0:
+        flash('Oferta jest juz zamknieta!')
+    else:
+        offer.count = 0
+        db.session.add(offer)
+        db.session.commit()
+        flash('Zamknieto oferte')
+
+    return redirect(url_for('user_dashboard_my_offers_current'))
+
 
 

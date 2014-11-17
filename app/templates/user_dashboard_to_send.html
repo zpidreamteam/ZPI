@@ -7,7 +7,11 @@
     <p>TransactID --- Nazwa --- data --- Ilość egzemplarzy --- Całkowita płatność</p>
     {% for transaction in transactions %}
             {{transaction.id}} --- {{transaction.name}} --- {{transaction.timestamp}}
-            <a href="offer/read/{{transaction.id}}">Zobacz ofertę</a><br>
+            <a href="offer/read/{{transaction.id}}">Zobacz ofertę</a>
+            <form action="/user/dashboard/to/send/check/{{transaction.transact_id}}">
+                <input type="submit" value="Wysłano!">
+            </form>
+            <br>
             <p>Adres wysyłki: <br>
                {{transaction.street}} {{transaction.building_number}} {{transaction.door_number}}<br>
 			   {{transaction.city}}, {{transaction.zipcode}}
