@@ -50,7 +50,7 @@
                                             <ul>
                                                 <li>Sprzedający: {{ g.user.nickname }} <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star_last"></i><i class="fa fa-star star_last"></i></li>
                                                 <li>Koszt wysyłki: 9 zł</li>
-                                                <li>Zadaj pytanie sprzedającemu</li>
+                                                <li><a href="{{ url_for('question', offer_id=offer.id, user_id=offer.user_id) }}">Zadaj pytanie sprzedającemu</a></li>
                                             </ul>
                                         </div>
                                     </div>
