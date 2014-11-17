@@ -285,7 +285,7 @@ def create_offer():
 
     return render_template('create_offer.html',
                             title='Ogloszenie',
-                            form=form, 
+                            form=form,
                             categories=categories)
 
 @app.route('/offer/read/<int:id>')
@@ -352,7 +352,7 @@ def add_to_newsletter_confirm(email):
     flash("Zostales zapisany do newslettera")
 
     return redirect(url_for('index'))
-	
+
 @app.route('/contact_us', methods=['GET', 'POST'])
 def contact_us():
     form = ContactForm()
@@ -369,11 +369,11 @@ def contact_us():
             mail.send(msg)
             flash('Wiadomosc zostala wyslana.')
             return redirect(url_for('index'))
- 
+
     elif request.method == 'GET':
         return render_template('contact_us.html', form=form)
- 
-@app.route('/question/<offer_id>/<user_id>', methods=['GET', 'POST'])
+
+@app.route('/question/<int:offer_id>/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def question(user_id,offer_id):
     form = QuestionForm()
@@ -391,8 +391,12 @@ def question(user_id,offer_id):
             %s
             """ % (g.user.nickname, g.user.email, form.message.data)
             mail.send(msg)
+
             flash('Wiadomosc zostala wyslana.')
-            return redirect(url_for('index'))
- 
+
+            address = "/offer/read/%i" % (offer_id)
+            return redirect(address)
+
     elif request.method == 'GET':
         return render_template('question.html', form=form)
+
