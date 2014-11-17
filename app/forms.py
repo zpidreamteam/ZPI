@@ -50,3 +50,7 @@ class ContactForm(Form):
     email = TextField("email", validators=[DataRequired(), Email(message="Prosze podac poprawny adres email")])
     subject = TextField("subject", validators=[DataRequired()])
     message = TextAreaField("message", validators=[DataRequired()])
+	
+class QuestionForm(Form):
+    subject = TextField("subject", validators=[DataRequired()])
+    message = TextAreaField("message", validators=[DataRequired()])

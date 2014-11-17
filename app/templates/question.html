@@ -1,0 +1,24 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Skontaktuj się ze sprzedającym</h1>
+    <form action="" method="post" name="question" enctype="multipart/form-s">
+        {{ form.hidden_tag() }}
+        <div class="input-group">
+			Temat:<br>
+			<input  class="form-control" id="subject" name="subject" type="text" value="">
+            {% for error in form.subject.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+
+            <label for="comment">Treść wiadomości:</label>
+            <textarea class="form-control" rows="5" id="message" name="message"></textarea>
+            {% for error in form.message.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+        
+        <p><input class="btn btn-default btn-lg" type="submit" value="Wyślij wiadomość"></p>
+        </div>
+    </form>
+{% endblock %}
