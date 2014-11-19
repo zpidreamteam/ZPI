@@ -16,6 +16,7 @@
                 </div>
             </div>
             {% endfor %}<br>
+
 			Tytuł książki:<br>
              <input  class="form-control" id="title" name="title" type="text" value="">
             {% for error in form.name.errors %}
@@ -35,6 +36,7 @@
                     <span>{{ error }}</span>
                 </div>
             </div>
+
             {% endfor %}<br>
             Cena za sztukę:<br>
             <input  class="form-control" id="price" name="price" type="text" value="">
