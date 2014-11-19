@@ -95,5 +95,8 @@
 				</div>
 			</div>
 		</div>
-
+								{% for offer in offers %}
+								{% include 'offer_item.html' %}
+								{% endfor %}
+		
 {% endblock %}
