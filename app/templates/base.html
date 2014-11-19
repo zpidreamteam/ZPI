@@ -5,16 +5,13 @@
 
     <meta name="viewport" content="width=1000, initial-scale=1.0, maximum-scale=1.0">
 
-    <!-- Loading Bootstrap -->
-    <link href="{{ url_for('.static', filename='css/vendor/bootstrap.min.css') }}" rel="stylesheet" media="screen">
-    <!-- Loading Flat UI -->
-    <link href="{{ url_for('.static', filename='css/flat-ui.css') }}" rel="stylesheet" media="screen">
     
     <title>microblog</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="{{ url_for('.static', filename='css/bootstrap.css') }}" rel="stylesheet" media="screen">
+    <link href="{{ url_for('.static', filename='css/plugins/dataTables.bootstrap.css') }}" rel="stylesheet" media="screen">
     <link href="{{ url_for('.static', filename='css/slicknav.css') }}" rel="stylesheet" media="screen">
     <link href="{{ url_for('.static', filename='css/normalize.css') }}" rel="stylesheet" media="screen">
     <link href="{{ url_for('.static', filename='css/font-awesome.min.css') }}" rel="stylesheet" media="screen">
@@ -80,7 +77,8 @@
 
                                  <form style="display: inline;" action="{{ url_for('search') }}" method="post" name="search">
                                  <div class="input-group">
-                                    {{ g.search_form.hidden_tag() }}{{ g.search_form.search(size=20) }}
+                                    {{ g.search_form.hidden_tag() }}
+                                    <input class="form-control" id="search" name="search" size="20" type="text" placeholder="Jakiej książki szukasz...?">
                                     <button type="submit" class="btn btn-default header_search_btn"><i class="fa fa-search"></i></button>
                                 </div>
                                 </form>
@@ -106,13 +104,16 @@
               <div class="row">
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}
-                <ul>
-                {% for message in messages %}
-                    <li>{{ message }} </li>
-                {% endfor %}
-                </ul>
+
+                <div class="alert alert-info">
+                    <a href="#" class="close" data-dismiss="alert">&times;</a>
+                    <strong>Uwaga!</strong>
+                    {% for message in messages %}{{ message }}{% endfor %}
+                 </div>
                 {% endif %}
                 {% endwith %}
+
+
 
                 {% block content %}{% endblock %}
              </div>
@@ -123,9 +124,10 @@
                     <div class="row">
                         <div class="col-md-12 col-sm-12 col-sm-12">
                             <div class="footer_search_from">
-                                <form action="{{ url_for('add_to_newsletter') }}" method="post" name="add_to_newsletter">{{ g.newsletter_form.hidden_tag() }}{{ g.newsletter_form.newsletter(size=20) }}
-<!--                                    <input type="text" class="form-control" placeholder="Zapisz się do naszego newslettera..."> -->
-                                    <button type="submit" class="btn btn-default btn_env_n"><i class="fa fa-envelope "></i></button>
+                                <form action="{{ url_for('add_to_newsletter') }}" method="post" name="add_to_newsletter">
+                                    {{ g.newsletter_form.hidden_tag() }}
+                                    <input class="form-control" id="newsletter" name="newsletter" size="20" type="text" value="" placeholder="Zapisz się do naszego newslettera! Wpisz swój adres e-mail.">
+                                    <button type="submit" class="btn btn-default btn_news"><i class="fa fa-envelope "></i></button>
                                 </form>
                             </div>
                         </div>
@@ -167,11 +169,26 @@
             </div>
         </div>
 
-
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.2.min.js"><\/script>')</script>
+    <script src="{{ url_for('.static', filename='js/plugins/dataTables/jquery.dataTables.js') }}"></script>
+    <script src="{{ url_for('.static', filename='js/plugins/dataTables/dataTables.bootstrap.js') }}"></script>
+
+    <!-- Page-Level Demo Scripts - Tables - Use for reference -->
+    <script>
+        $(document).ready(function() {
+            $('#dataTables-example').dataTable( {
+                "aoColumnDefs": [
+                  { "bSortable": false, "aTargets": [ 0 ] }
+            ] } );
+        });
+    </script>
+
+    
     <script src="{{ url_for('.static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('.static', filename='js/plugins.js') }}"></script>
     <script src="{{ url_for('.static', filename='js/main.js') }}"></script>
+
 
   </body>
 </html>
