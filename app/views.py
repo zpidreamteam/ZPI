@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm, mail, Storage
-from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm
+from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, YourInformationForm
 from models import User, Offer, Category, Transaction, Newsletter
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
@@ -451,8 +451,27 @@ def offer_close(offer_id):
     return redirect(url_for('user_dashboard_my_offers_current'))
 
 @login_required
-@app.route('/user/dashboard/about/me/')
+@app.route('/user/dashboard/about/me/', methods=['GET', 'POST'])
 def about_me():
+    user = User.query.get(g.user.id)
+    form = YourInformationForm()
+    if form.validate_on_submit():
+        user.user_name = form.user_name.data
+        user.surname = form.surname.data
+        user.street = form.street.data
+        user.building_number = form.building_number.data
+        user.door_number = form.door_number.data
+        user.city = form.city.data
+        user.zipcode = form.zipcode.data
+        user.country = form.country.data
+        user.phone = form.phone.data
 
-    return render_template('user_dashboard_about_me.html')
+        db.session.add(user)
+        db.session.commit()
+
+        flash("Dane zmieniono!")
+
+        return redirect(url_for('about_me'))
+
+    return render_template('user_dashboard_about_me.html', form=form, user=user)
 
