@@ -28,7 +28,8 @@
                                     <div class="oglos_right_content">
                                         <div class="oglos_right_content_frist">
                                             <h2>{{ offer.name }}</h2>
-                                            <p><span>Autorzy:</span> Tefffresa Jurlewicz, Zbigniew Skoczylas</p>
+                                            <p><span>Tytuł:</span> {{ offer.title }}</p>
+                                            <p><span>Autor/Autorzy:</span> {{ offer.book_author }}</p>
                                             <p><span>Dostępne sztuki:</span>  {{ offer.count }}</p>
                                         </div>
                                         <div class="oglos_right_content_sec">
@@ -49,7 +50,7 @@
                                         <div class="oglos_right_content_five">
                                             <ul>
                                                 <li>Sprzedający: {{ g.user.nickname }} <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star_last"></i><i class="fa fa-star star_last"></i></li>
-                                                <li>Koszt wysyłki: 9 zł</li>
+                                                <li>Koszt wysyłki: {{offer.shipping}} zł</li>
                                                 <li>Zadaj pytanie sprzedającemu</li>
                                             </ul>
                                         </div>
