@@ -3,7 +3,19 @@
 
 {% block content %}
     <h1>Twój profil:</h1>
-    	<a href="to/pay">To pay</a><br>
-    	<a href="to/send">To send</a><br>
-    	<a href="my/offers/current">My offers</a><br>
+    	<a href="to/pay">Do zapłaty 
+    		{% for number_of_transaction_to_pay_for in number_of_transactions_to_pay_for %}
+				{% if number_of_transaction_to_pay_for!=0 %}
+					({{number_of_transaction_to_pay_for}})
+				{% endif %}
+			{% endfor %}
+			</a><br>
+    	<a href="to/send">Do wysyłki 
+    		{% for number_of_transaction_to_send in number_of_transactions_to_send %}
+				{% if number_of_transaction_to_send.1!=0 %}
+					({{number_of_transaction_to_send.1}})
+				{% endif %}
+			{% endfor %}</a><br>
+    	<a href="my/offers/current">Moje oferty</a><br>    	    
+		<a href="about/me">Moje dane</a><br>    	    
 {% endblock %}

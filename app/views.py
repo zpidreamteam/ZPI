@@ -8,6 +8,7 @@ from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FIL
 from flask.ext.uploads import save, Upload
 from flask.ext.mail import Message
 from sqlalchemy.sql.expression import case
+from sqlalchemy import func
 
 @app.before_request
 def before_request():
@@ -360,7 +361,18 @@ def add_to_newsletter_confirm(email):
 @app.route('/user/dashboard/')
 def user_dashboard():
 
-    return render_template('user_dashboard.html')
+    number_of_transactions_to_pay_for = db.session.query(func.count(Transaction.id)).\
+                               filter_by(user_id=g.user.id, is_finalised=0).\
+                               first()
+
+    q = db.session.query(Offer.id, func.count(Transaction.id)).\
+                              filter_by(user_id=g.user.id).\
+                              join(Transaction, Transaction.offer_id==Offer.id).\
+                              filter_by(is_finalised=1, is_sent=0).\
+                              join(User, User.id==Transaction.user_id)
+
+    return render_template('user_dashboard.html', number_of_transactions_to_pay_for=number_of_transactions_to_pay_for,
+                           number_of_transactions_to_send=q)
 
 @login_required
 @app.route('/user/dashboard/to/pay')
@@ -438,5 +450,9 @@ def offer_close(offer_id):
 
     return redirect(url_for('user_dashboard_my_offers_current'))
 
+@login_required
+@app.route('/user/dashboard/about/me/')
+def about_me():
 
+    return render_template('user_dashboard_about_me.html')
 
