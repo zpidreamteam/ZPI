@@ -55,11 +55,11 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
 
         if user is None:
-            flash('User with email {email} not found.'.format(email=form.email.data))
+            flash('Uzytkownik z mailem {email} nie istnieje.'.format(email=form.email.data))
             return redirect(request.args.get("next") or url_for("index"))
 
         if user.verify_password(form.password.data) is False:
-            flash('Wrong password')
+            flash('Zle haslo.')
             return redirect(request.args.get("next") or url_for("index"))
 
         remember_me = False
@@ -214,8 +214,11 @@ def purchase(offer_id):
     if form.validate_on_submit():
         if transaction_validator(g.user.id, offer_id, form.number_of_books.data):
             return redirect(url_for('index'))
+
         address = "/purchase/overview/%i/%i/%s" % (g.user.id, offer_id, form.number_of_books.data)
+
         return redirect(address)
+
     return render_template('purchase.html',
                            title='Zakup',
                            form=form)
