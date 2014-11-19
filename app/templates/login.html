@@ -55,13 +55,25 @@
                                         <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                                         <input id="email" type="text" class="form-control" name="email" value="" placeholder="E-mail">
 
-
+                                    {% for error in form.email.errors %}
+                                        <div class="alert-group">
+                                            <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                            <span>{{ error }}</span>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
                             </div>
                             <div style="margin-bottom: 5px;" class="input-group">
                                         <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
                                         <input id="password" type="password" class="form-control" name="password" placeholder="Hasło">
                                         {% for error in form.password.errors %}
-                                        <span style="color: red; padding:15px;"> {{ error }}</span>
+                                        <div class="alert-group">
+                                            <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                            <span>{{ error }}</span>
+                                            </div>
+                                        </div>
                                         {% endfor %}
                             </div>
                                     

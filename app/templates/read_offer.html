@@ -3,61 +3,62 @@
 
 {% block content %}
 <div class="oglos_area">
-                    <div class="col-md-3 col-sm-3">
-                        <div class="oglos_left">
-                            <h3>Categories</h3>
+    <div class="col-md-3 col-sm-3">
+        <div class="oglos_left">
+            <h3>Categories</h3>
+            <ul>
+                <li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Analiza Matematyczna</a></li>
+                <li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Algebra liniowa</a></li>
+                <li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Architektura</a></li>
+                <li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Biotechnologia</a></li>
+                <li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Chemia</a></li>
+                <li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Ekonomia</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="oglos_right">
+            <div class="row">
+                <div class="col-md-4 col-sm-4">
+                    <div class="oglos_right_img">
+                        <img src="{{ photo_path }}" alt="" />
+                    </div>
+                </div>
+                <div class="col-md-8 col-sm-8">
+                    <div class="oglos_right_content">
+                        <div class="oglos_right_content_frist">
+                            <h2>{{ offer.name }}</h2>
+                            <p><span>Tytuł:</span> {{ offer.title }}</p>
+                            <p><span>Autor/Autorzy:</span> {{ offer.book_author }}</p>
+                            <p><span>Dostępne sztuki:</span>  {{ offer.count }}</p>
+                        </div>
+                        <div class="oglos_right_content_sec">
+                            <i class="fa fa-tag"></i>
+                            <h4>{{ offer.price }} zł</h4>
+                            <p>+ koszty wysyłki (patrz poniżej)</p>
+                        </div>
+                        <div class="oglos_right_content_thr">
+                            <p> {{ offer.body }} </p>
+                        </div>
+                        <div class="oglos_right_content_four">
+                          
+
+                            
+
+                            <a href="{{ url_for('purchase', offer_id = offer.id) }}"><button type="button" class="btn btn-default Zamawiam_btn">Zamawiam</button></a>
+                        </div>
+                        <div class="oglos_right_content_five">
                             <ul>
-                                <li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Analiza Matematyczna</a></li>
-                                <li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Algebra liniowa</a></li>
-                                <li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Architektura</a></li>
-                                <li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Biotechnologia</a></li>
-                                <li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Chemia</a></li>
-                                <li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Ekonomia</a></li>
+                                <li>Sprzedający: {{ g.user.nickname }} <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star_last"></i><i class="fa fa-star star_last"></i></li>
+                                <li>Koszt wysyłki: {{offer.shipping}} zł</li>
+                                <li><a href="{{ url_for('question', offer_id=offer.id, user_id=offer.user_id) }}">Zadaj pytanie sprzedającemu</a></li>
                             </ul>
                         </div>
                     </div>
-                    <div class="col-md-9">
-                        <div class="oglos_right">
-                            <div class="row">
-                                <div class="col-md-4 col-sm-4">
-                                    <div class="oglos_right_img">
-                                        <img src="{{ photo_path }}" alt="" />
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-sm-8">
-                                    <div class="oglos_right_content">
-                                        <div class="oglos_right_content_frist">
-                                            <h2>{{ offer.name }}</h2>
-                                            <p><span>Autorzy:</span> Tefffresa Jurlewicz, Zbigniew Skoczylas</p>
-                                            <p><span>Dostępne sztuki:</span>  {{ offer.count }}</p>
-                                        </div>
-                                        <div class="oglos_right_content_sec">
-                                            <i class="fa fa-tag"></i>
-                                            <h4>{{ offer.price }} zł</h4>
-                                            <p>+ koszty wysyłki (patrz poniżej)</p>
-                                        </div>
-                                        <div class="oglos_right_content_thr">
-                                            <p> {{ offer.body }} </p>
-                                        </div>
-                                        <div class="oglos_right_content_four">
-                                          
-
-                        
-
-                                        <a href="{{ url_for('purchase', offer_id = offer.id) }}"><button type="button" class="btn btn-default Zamawiam_btn">Zamawiam</button></a>
-                                        </div>
-                                        <div class="oglos_right_content_five">
-                                            <ul>
-                                                <li>Sprzedający: {{ g.user.nickname }} <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star_last"></i><i class="fa fa-star star_last"></i></li>
-                                                <li>Koszt wysyłki: 9 zł</li>
-                                                <li><a href="{{ url_for('question', offer_id=offer.id, user_id=offer.user_id) }}">Zadaj pytanie sprzedającemu</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 {% endblock %}
