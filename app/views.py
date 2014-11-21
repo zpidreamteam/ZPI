@@ -513,3 +513,9 @@ def change_password():
         else:
             flash("Obecne haslo nie jest poprawne")
     return render_template('user_dashboard_change_password.html', form=form)
+
+@login_required
+@app.route('/user/dashboard/comment/', methods=['GET', 'POST'])
+def comment():
+
+        return render_template('user_dashboard_comment.html')

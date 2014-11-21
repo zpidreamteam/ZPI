@@ -5,7 +5,7 @@
     <h1>Moje oferty:</h1>
     <p>OfferID --- Nazwa --- data dodania --- Ilość egzemplarzy --- Cena</p>
     {% for offer in offers %}
-            {{offer.id}} --- {{offer.name}} --- {{offer.timestamp}} --- {{offer.count}} --- {{offer.price}}
+            {{offer.id}} --- {{offer.name}} --- {{ offer.timestamp.year }}-{{ offer.timestamp.month }}-{{ offer.timestamp.day }} --- {{offer.count}} --- {{offer.price}}
             <a href="offer/read/{{offer.id}}">Zobacz ofertę</a>
 			<form action="/user/dashboard/my/offers/close/{{offer.id}}">
                 <input type="submit" value="Zamknij oferte">

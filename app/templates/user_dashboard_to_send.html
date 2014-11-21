@@ -6,7 +6,7 @@
     <h1>Oferty do wysyłki:</h1>
     <p>TransactID --- Nazwa --- data --- Ilość egzemplarzy --- Całkowita płatność</p>
     {% for transaction in transactions %}
-            {{transaction.id}} --- {{transaction.name}} --- {{transaction.timestamp}}
+            {{transaction.id}} --- {{transaction.name}} --- {{ transaction.timestamp.year }}-{{ transaction.timestamp.month }}-{{ transaction.timestamp.day }}
             <a href="offer/read/{{transaction.id}}">Zobacz ofertę</a>
             <form action="/user/dashboard/to/send/check/{{transaction.transact_id}}">
                 <input type="submit" value="Wysłano!">
