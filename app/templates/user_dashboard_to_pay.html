@@ -10,4 +10,8 @@
             {{transaction.count}} --- {{transaction.count*transaction.price}}</a>
             <a href="offer/read/{{transaction.offer_id}}">Szczegóły oferty</a><br>
     {% endfor %}
+
+    {% if transactions.count()==0 %}
+                Pusto i cicho
+            {% endif %}
 {% endblock %}

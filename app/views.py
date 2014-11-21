@@ -390,7 +390,6 @@ def user_dashboard_to_pay():
 @login_required
 @app.route('/user/dashboard/to/send')
 def user_dashboard_to_send():
-
     transactions = db.session.query(Offer.id, Offer.name, Offer.price, Transaction.id.label("transact_id"),
                                     Transaction.user_id, User.street, Transaction.timestamp,
                                     User.building_number, User.door_number,
@@ -399,7 +398,6 @@ def user_dashboard_to_send():
                               join(Transaction, Transaction.offer_id==Offer.id).\
                               filter_by(is_finalised=1, is_sent=0).\
                               join(User, User.id==Transaction.user_id)
-
 
     return render_template('user_dashboard_to_send.html', transactions=transactions)
 

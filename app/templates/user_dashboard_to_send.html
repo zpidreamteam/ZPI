@@ -17,4 +17,8 @@
 			   {{transaction.city}}, {{transaction.zipcode}}
             </p>
     {% endfor %}
+
+            {% if transactions.count()==0 %}
+                Pusto i cicho
+            {% endif %}
 {% endblock %}
