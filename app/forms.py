@@ -13,8 +13,8 @@ class RegisterForm(Form):
     email = StringField('email', validators=[DataRequired(), Email(message="Prosze podac poprawny adres email"), Length(max=128, message="Podany adres email jest za dlugi")])
     nickname = StringField('nickname', validators=[DataRequired(), Length(min=3, max=32, message="Nickname musi skladac sie z minimalnie 3 a maksymalnie 32 znakow")])
     password_repeat = PasswordField('password_repeat', validators=[DataRequired()])
-    user_name = StringField('user_name', validators=[DataRequired(), Length(max=128, message="Podane imie jest za dlugie")])
-    surname = StringField('surname', validators=[DataRequired(), Length(max=128, message="Podane nazwisko jest za dlugie")])
+    user_name = StringField('user_name', validators=[DataRequired(), Length(max=32, message="Podane imie jest za dlugie")])
+    surname = StringField('surname', validators=[DataRequired(), Length(max=32, message="Podane nazwisko jest za dlugie")])
     street = StringField('street', validators=[DataRequired(), Length(max=128, message="Podana nazwa ulicy jest za dluga")])
     building_number = StringField('building_number', validators=[DataRequired(), Length(max=16, message="Podany numer budynku jest za dlugi")])
     door_number = StringField('door_number', validators=[Optional(strip_whitespace=True), Length(max=16, message="Podany numer lokalu jest za dlugi")])
@@ -46,8 +46,8 @@ class PurchaseOverviewForm(Form):
     number_of_books = IntegerField('number_of_books', default=1, validators=[DataRequired()])
 
 class YourInformationForm(Form):
-    user_name = StringField('user_name', validators=[DataRequired(), Length(max=128, message="Podane imie jest za dlugie")])
-    surname = StringField('surname', validators=[DataRequired(), Length(max=128, message="Podane nazwisko jest za dlugie")])
+    user_name = StringField('user_name', validators=[DataRequired(), Length(max=32, message="Podane imie jest za dlugie")])
+    surname = StringField('surname', validators=[DataRequired(), Length(max=32, message="Podane nazwisko jest za dlugie")])
     street = StringField('street', validators=[DataRequired(), Length(max=128, message="Podana nazwa ulicy jest za dluga")])
     building_number = StringField('building_number', validators=[DataRequired(), Length(max=16, message="Podany numer budynku jest za dlugi")])
     door_number = StringField('door_number', validators=[Optional(strip_whitespace=True), Length(max=16, message="Podany numer lokalu jest za dlugi")])
