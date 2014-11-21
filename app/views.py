@@ -1,8 +1,8 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm, mail, Storage
-from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, ContactForm, QuestionForm
-from models import User, Offer, Category, Transaction, Newsletter
+from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, ContactForm, QuestionForm, CommentForm
+from models import User, Offer, Category, Transaction, Newsletter, Comment
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
 from flask.ext.uploads import save, Upload
@@ -400,3 +400,27 @@ def question(user_id,offer_id):
     elif request.method == 'GET':
         return render_template('question.html', form=form)
 
+@app.route('/comment/new/<int:trans_id>/<int:reciever>', methods=['GET', 'POST'])
+@login_required
+def new_comment(trans_id,reciever):
+    form = CommentForm()
+
+    if form.validate_on_submit():
+        comment = Comment(timestamp = datetime.utcnow(),
+                      id_from = g.user,
+                      id_to = reciever,
+                      transaction_id = trans_id,
+                      type = form.type.data,
+                      body = form.body.data)
+
+        db.session.add(comment)
+        db.session.commit()
+
+        flash("Poprawnie dodano Twoj komentarz")
+#proponuje przekierowanie do adresu panelu danego uzytkownika ale go poki co nie znam wiec daje index
+        address = "/offer/read/%i" % (offer.id)
+        return redirect(url_for('index'))
+
+    return render_template('new_comment.html',
+                            title='Comment',
+                            form=form)

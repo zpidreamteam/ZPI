@@ -1,5 +1,5 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, BooleanField, PasswordField, TextAreaField, FloatField, SelectField, IntegerField, TextField
+from wtforms import StringField, BooleanField, PasswordField, TextAreaField, FloatField, SelectField, IntegerField, TextField, RadioField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
 from models import Category
 
@@ -54,3 +54,7 @@ class ContactForm(Form):
 class QuestionForm(Form):
     subject = TextField("subject", validators=[DataRequired()])
     message = TextAreaField("message", validators=[DataRequired()])
+	
+class CommentForm(Form):
+    body = TextAreaField("body", validators=[DataRequired()])
+    type = RadioField('type', choices=[('true','pozytywny'),('false','negatywny')])

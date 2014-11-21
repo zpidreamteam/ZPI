@@ -1,0 +1,29 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Dodaj nowe ogłoszenie</h1>
+    <form action="" method="post" name="offer/create" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+
+			<p>
+             Typ komentarza:
+             {{form.type()}}
+         </p>
+     
+            <label for="comment">Treść komentarza:</label>
+            <textarea class="form-control" rows="5" id="body" name="body"></textarea>
+            {% for error in form.body.errors %}
+            <div class="alert-group">
+                <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+            {% endfor %}<br>
+        
+        <p><input class="btn btn-default btn-lg" type="submit" value="Wystaw komentarz"></p>
+        </div>
+    </form>
+{% endblock %}
