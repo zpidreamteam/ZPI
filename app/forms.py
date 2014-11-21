@@ -55,3 +55,9 @@ class YourInformationForm(Form):
     zipcode = StringField('zipcode', validators=[DataRequired(), Length(max=16, message="Podany kod pocztowy jest za dlugi")])
     country = StringField('country', validators=[DataRequired(), Length(max=32, message="Podana nazwa kraju jest za dluga")])
     phone = StringField('phone', validators=[DataRequired(), Length(max=16, message="Podany numer telefonu jest za dlugi")])
+
+class ChangePasswordForm(Form):
+    old_password = PasswordField('password', validators=[DataRequired(), Length(min=6, message="Podane haslo jest za krotkie")])
+    new_password_1 = PasswordField('password', validators=[DataRequired(), Length(min=6, message="Podane haslo jest za krotkie")])
+    new_password_2 = PasswordField('password', validators=[DataRequired(), Length(min=6, message="Podane haslo jest za krotkie"), EqualTo('new_password_2', message="Podane hasla musza byc takie same")])
+

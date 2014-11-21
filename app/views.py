@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm, mail, Storage
-from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, YourInformationForm
+from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, YourInformationForm, ChangePasswordForm
 from models import User, Offer, Category, Transaction, Newsletter
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
@@ -500,3 +500,18 @@ def archive():
 
     return render_template('user_dashboard_archive.html', transactions_bought=transactions_bought,
                            transactions_sold=transactions_sold)
+
+@login_required
+@app.route('/user/dashboard/change/password/', methods=['GET', 'POST'])
+def change_password():
+    user = User.query.get(g.user.id)
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if user.verify_password(form.old_password.data):
+            user.hash_password(form.new_password_1.data)
+            db.session.add(user)
+            db.session.commit()
+            flash("Haslo zostalo zmienione!")
+        else:
+            flash("Obecne haslo nie jest poprawne")
+    return render_template('user_dashboard_change_password.html', form=form)
