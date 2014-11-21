@@ -1,0 +1,14 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Archiwum transakcji:</h1>
+    <p>Zakupione:</p>
+    {% for transaction_bought in transactions_bought %}
+            {{transaction_bought.name}} | {{transaction_bought.timestamp}} | {{transaction_bought.count}} | {{transaction_bought.price}} | {{transaction_bought.nickname}}<br>
+    {% endfor %}
+    <p>Sprzedane:</p>
+    {% for transaction_sold in transactions_sold %}
+            {{transaction_sold.name}} | {{transaction_sold.timestamp}} | {{transaction_sold.count}} | {{transaction_sold.price}} | {{transaction_sold.nickname}}<br>
+    {% endfor %}
+{% endblock %}

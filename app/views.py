@@ -475,3 +475,28 @@ def about_me():
 
     return render_template('user_dashboard_about_me.html', form=form, user=user)
 
+@login_required
+@app.route('/user/dashboard/archive/')
+def archive():
+
+    transactions_bought = db.session.query(Transaction.id, Transaction.user_id, Offer.name,
+                                    Transaction.offer_id, Offer.name, Transaction.timestamp,
+                                    Transaction.count, Transaction.price,
+                                    Transaction.hash_link, User.nickname).\
+                               filter_by(user_id=g.user.id, is_finalised=1, is_sent=1).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               join(User, User.id==Offer.user_id).\
+                               order_by(Transaction.timestamp.desc())
+
+    transactions_sold = db.session.query(Offer.id, Offer.name, Transaction.id.label("transact_id"),
+                                    Transaction.user_id, Transaction.count, Transaction.price, User.street, Transaction.timestamp,
+                                    User.building_number, User.door_number,
+                                    User.city, User.zipcode, User.nickname).\
+                              filter_by(user_id=g.user.id).\
+                              join(Transaction, Transaction.offer_id==Offer.id).\
+                              filter_by(is_finalised=1, is_sent=1).\
+                              join(User, User.id==Transaction.user_id).\
+                              order_by(Transaction.timestamp.desc())
+
+    return render_template('user_dashboard_archive.html', transactions_bought=transactions_bought,
+                           transactions_sold=transactions_sold)
