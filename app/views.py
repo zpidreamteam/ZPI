@@ -317,6 +317,20 @@ def read_offers_by_category(category, page=1):
                             title='Ogloszenia',
                             offers = offers)
 
+@app.route('/offer/user_offers/<user_id>')
+@app.route('/offer/user_offers/<user_id>/<int:page>')
+def read_offers_by_user_id(user_id, page=1):
+    c = User.query.filter_by(id=user_id).first()
+    if c is None:
+        flash('Nie ma uzytkownika o numerze %s.' % user_id)
+        return redirect(url_for('index'))
+
+    offers = c.offers
+
+    return render_template('offers.html',
+                            title='Ogloszenia',
+                            offers = offers)
+
 @app.route('/offers')
 @app.route('/offers/<int:page>')
 def read_offers(page=1):
@@ -403,3 +417,16 @@ def question(user_id,offer_id):
     elif request.method == 'GET':
         return render_template('question.html', form=form)
 
+@app.route('/user/profile/comments/<user_id>')
+def show_comments(user_id):
+    c = User.query.filter_by(id=user_id).first()
+    if c is None:
+        flash('Nie ma uzytkownika o numerze %s.' % user_id)
+        return redirect(url_for('index'))
+
+    comments = c.comments
+
+    return render_template('comments.html',
+                            title='Komentarze',
+                            query=query
+                            comments = comments)
