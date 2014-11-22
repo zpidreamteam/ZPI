@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm, mail, Storage
 from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, ContactForm, QuestionForm
-from models import User, Offer, Category, Transaction, Newsletter
+from models import User, Offer, Category, Transaction, Newsletter, Comment
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
 from flask.ext.uploads import save, Upload
@@ -303,7 +303,7 @@ def read_offer(id):
                             offer = offer,
                             photo_path = photo_path)
 
-@app.route('/offer/<category>')
+@app.route('/user/offer/<category>')
 @app.route('/offer/<category>/<int:page>')
 def read_offers_by_category(category, page=1):
     c = Category.query.filter_by(name=category).first()
@@ -317,8 +317,8 @@ def read_offers_by_category(category, page=1):
                             title='Ogloszenia',
                             offers = offers)
 
-@app.route('/offer/user_offers/<user_id>')
-@app.route('/offer/user_offers/<user_id>/<int:page>')
+@app.route('/user/profile/offers/<user_id>')
+@app.route('/user/profile/offers/<user_id>/<int:page>')
 def read_offers_by_user_id(user_id, page=1):
     c = User.query.filter_by(id=user_id).first()
     if c is None:
@@ -419,14 +419,13 @@ def question(user_id,offer_id):
 
 @app.route('/user/profile/comments/<user_id>')
 def show_comments(user_id):
-    c = User.query.filter_by(id=user_id).first()
+    c = Comment.query.filter_by(id_to=user_id)
     if c is None:
         flash('Nie ma uzytkownika o numerze %s.' % user_id)
         return redirect(url_for('index'))
 
-    comments = c.comments
+    comments = c
 
     return render_template('comments.html',
                             title='Komentarze',
-                            query=query
-                            comments = comments)
+                            comments=comments)
