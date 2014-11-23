@@ -3,9 +3,10 @@ from flask.ext.login import login_user, logout_user, current_user, login_require
 from app import app, db, lm, admin_permission, views
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS
+from models import User
 
 @app.route('/admin')
-@app.route('/admin/dashboard')
+@app.route('/admin/index')
 @login_required
 @admin_permission.require()
 def admin_dashboard():
@@ -20,8 +21,8 @@ def admin_dashboard():
 @login_required
 @admin_permission.require()
 def admin_users():
-    user = g.user
+    users = User.query.all()
 
     return render_template('admin/users.html',
                            title='Zarzadzanie uzytkownikiami',
-                           user=user)
+                           users=users)
