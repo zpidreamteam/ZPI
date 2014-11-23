@@ -294,18 +294,38 @@ def create_offer():
 @app.route('/offer/read/<int:id>')
 def read_offer(id):
     offer = Offer.query.get(id)
-#    user = User.query.filter_by(id=offer.user_id)
+    user = User.query.filter_by(id=offer.user_id).first()
     photo = Upload.query.get_or_404(id) #TODO need to handle offers without pictures
 
     photo_path = UPLOADS_BOOKS_IMAGES + photo.name
 
+    comments = Comment.query.filter_by(id_to=user.id)
+    if comments is None:
+        percentage = 0
+        return redirect(url_for('index'))
+	
+    poz = 0
+    neg = 0
+    for c in comments:
+        if c.type:
+		    poz = poz + 1
+        else:
+            neg = neg + 1
+
+    tot = poz + neg
+    percentage = poz *100 / tot
+	
     return render_template('read_offer.html',
                             title='Ogloszenie',
                             offer = offer,
-#							user=user,
+                            user=user,
+                            poz=poz,
+                            neg=neg,
+                            tot=tot,
+                            percentage=percentage,
                             photo_path = photo_path)
 
-@app.route('/user/offer/<category>')
+@app.route('/offer/<category>')
 @app.route('/offer/<category>/<int:page>')
 def read_offers_by_category(category, page=1):
     c = Category.query.filter_by(name=category).first()
@@ -426,25 +446,25 @@ def show_profile(user_id):
         flash('Uzytkownik nie ma komentarzy.')
         return redirect(url_for('index'))
     
-    user = User.query.filter_by(id=user_id)
+    user = User.query.filter_by(id=user_id).first()
 	
     poz = 0
     neg = 0
     for c in comments:
         if c.type:
-		    print c.body
 		    poz = poz + 1
         else:
-            print c.body
             neg = neg + 1
 
-    tot=poz+neg
+    tot = poz + neg
+    percentage = poz *100 / tot
     return render_template('profile.html',
                             title='Profil',
 							user=user,
 							poz=poz,
 							neg=neg,
 							tot=tot,
+                            percentage=percentage,
 							user_id=user_id)		
 		
 @app.route('/user/profile/comments/<int:user_id>')

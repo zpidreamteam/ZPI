@@ -49,7 +49,18 @@
                         </div>
                         <div class="oglos_right_content_five">
                             <ul>
-                                <li><a href="{{ url_for('show_profile', user_id=offer.user_id) }}">Sprzedający: {{ offer.user_id }} <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star_last"></i><i class="fa fa-star star_last"></i></a></li>
+                                <li><a href="{{ url_for('show_profile', user_id=offer.user_id) }}">Sprzedający: {{ user.nickname }}
+								{% if percentage >= 90 %}
+								<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></li>
+								{% elif percentage >= 70 %}
+								<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star_last"></i></li>
+								{% elif percentage >= 50 %}
+								<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star_last"></i><i class="fa fa-star_last"></i></li>
+								{% elif percentage >= 25 %}
+								<i class="fa fa-star"></i><i class="fa fa-star_last"></i><i class="fa fa-star_last"></i><i class="fa fa-star_last"></i></li>
+								{% else %}
+								<i class="fa fa-star_last"></i><i class="fa fa-star_last"></i><i class="fa fa-star_last"></i><i class="fa fa-star_last_last"></i></li>			
+								{% endif %}
                                 <li>Koszt wysyłki: {{offer.shipping}} zł</li>
                                 <li><a href="{{ url_for('question', offer_id=offer.id, user_id=offer.user_id) }}">Zadaj pytanie sprzedającemu</a></li>
                             </ul>

@@ -6,8 +6,12 @@
 		<td>
 				<p>{{ comment.body }} </p>
 		</td>
-		<td><h3>{{ comment.type }}</h3></td>
-		<td><h3>{{ comment.timestamp.year }}-{{ comment.timestamp.month }}-{{ comment.timestamp.day }} </h3></td>
+		<td><h4> {% if comment.type %}
+				Pozytywny
+				{% else %}
+				Negatywny
+				{% endif %}</h4></td>
+		<td><h4>{{ comment.timestamp.year }}-{{ comment.timestamp.month }}-{{ comment.timestamp.day }} </h4></td>
 	</tr>
 
 
