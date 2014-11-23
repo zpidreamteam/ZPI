@@ -1,0 +1,41 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="oglos_area">
+    <div class="col-md-9">
+        <div class="oglos_right">
+            <div class="row">
+                <div class="col-md-4 col-sm-4">
+                    <div class="oglos_right_img">
+                        <img src="{{ photo_path }}" alt="" />
+                    </div>
+                </div>
+                <div class="col-md-8 col-sm-8">
+                    <div class="oglos_right_content">
+                        <div class="oglos_right_content_frist">
+                            <h2>{{ user.nickname }}</h2>
+                            <p><span>Nazwa użytkownika:</span> {{ user.nickname }}</p>
+                            <p><span>Ogólnie komentarzy:</span> {{ tot }}</p>
+                            <p><span>Komentarze pozytywne:</span>  {{ poz }}</p>
+							<p><span>Komentarze negatywne:</span>  {{ neg }}</p>
+						</div>
+                        <div class="oglos_right_content_thr">
+                            <p> {{ user.nickmane }} </p>
+                        </div>
+
+                        <div class="oglos_right_content_five">
+                            <ul>
+                                <li>Nasza ocena:  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star_last"></i><i class="fa fa-star star_last"></i></li>
+                                <li><a href="{{ url_for('read_offers_by_user_id', user_id=user_id) }}">Inne oferty użytkownika</a></li>
+                                <li><a href="{{ url_for('show_comments', user_id=user_id) }}">Pokaż wszystkie komentarze</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

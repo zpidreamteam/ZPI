@@ -294,6 +294,7 @@ def create_offer():
 @app.route('/offer/read/<int:id>')
 def read_offer(id):
     offer = Offer.query.get(id)
+#    user = User.query.filter_by(id=offer.user_id)
     photo = Upload.query.get_or_404(id) #TODO need to handle offers without pictures
 
     photo_path = UPLOADS_BOOKS_IMAGES + photo.name
@@ -301,6 +302,7 @@ def read_offer(id):
     return render_template('read_offer.html',
                             title='Ogloszenie',
                             offer = offer,
+#							user=user,
                             photo_path = photo_path)
 
 @app.route('/user/offer/<category>')
@@ -417,14 +419,40 @@ def question(user_id,offer_id):
     elif request.method == 'GET':
         return render_template('question.html', form=form)
 
-@app.route('/user/profile/comments/<user_id>')
-def show_comments(user_id):
-    c = Comment.query.filter_by(id_to=user_id)
-    if c is None:
-        flash('Nie ma uzytkownika o numerze %s.' % user_id)
+@app.route('/user/profile/<int:user_id>')
+def show_profile(user_id):
+    comments = Comment.query.filter_by(id_to=user_id)
+    if comments is None:
+        flash('Uzytkownik nie ma komentarzy.')
         return redirect(url_for('index'))
+    
+    user = User.query.filter_by(id=user_id)
+	
+    poz = 0
+    neg = 0
+    for c in comments:
+        if c.type:
+		    print c.body
+		    poz = poz + 1
+        else:
+            print c.body
+            neg = neg + 1
 
-    comments = c
+    tot=poz+neg
+    return render_template('profile.html',
+                            title='Profil',
+							user=user,
+							poz=poz,
+							neg=neg,
+							tot=tot,
+							user_id=user_id)		
+		
+@app.route('/user/profile/comments/<int:user_id>')
+def show_comments(user_id):
+    comments = Comment.query.filter_by(id_to=user_id)
+    if comments is None:
+        flash('Uzytkownik nie ma komentarzy.')
+        return redirect(url_for('index'))
 
     return render_template('comments.html',
                             title='Komentarze',
