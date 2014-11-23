@@ -3,7 +3,7 @@ from flask.ext.login import login_user, logout_user, current_user, login_require
 from app import app, db, lm, admin_permission, views
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS
-from models import User
+from models import User, Category
 
 @app.route('/admin')
 @app.route('/admin/index')
@@ -16,7 +16,6 @@ def admin_dashboard():
                            title='Strona glowna',
                            user=user)
 
-
 @app.route('/admin/users')
 @login_required
 @admin_permission.require()
@@ -26,3 +25,14 @@ def admin_users():
     return render_template('admin/users.html',
                            title='Zarzadzanie uzytkownikiami',
                            users=users)
+
+@app.route('/admin/categories')
+@login_required
+@admin_permission.require()
+def admin_categories():
+    categories = Category.query.all()
+
+    return render_template('admin/categories.html',
+                           title='Zarzadzanie uzytkownikiami',
+                           categories=categories)
+

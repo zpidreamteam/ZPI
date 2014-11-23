@@ -87,7 +87,7 @@
                             <a href="{{ url_for('admin_users') }}"><i class="fa fa-table fa-fw"></i> Użytkownicy</a>
                         </li>
                         <li>
-                            <a href="#"><i class="fa fa-edit fa-fw"></i> Kategorie</a>
+                            <a href="{{ url_for('admin_categories') }}"><i class="fa fa-edit fa-fw"></i> Kategorie</a>
                         </li>
 						<li>
                             <a href="#"><i class="fa fa-comments fa-fw"></i> Komentarze</a>
@@ -113,7 +113,10 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Dashboard, 16-11-2014</h1>
+                    <!-- TODO use moment.js lib -->
+                    <h1 class="page-header">
+                        Dzisiaj mamy 16-11-2014
+                    </h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
