@@ -99,6 +99,15 @@ class Newsletter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(128), index=True, unique=True)
 
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime)
+    id_from = db.Column(db.Integer, db.ForeignKey('user.id'))
+    id_to = db.Column(db.Integer, db.ForeignKey('user.id'))
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
+    type = db.Column(db.Boolean)
+    body = db.Column(db.String(140))
+
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime)

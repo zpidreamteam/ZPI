@@ -3,7 +3,7 @@ from flask.ext.login import login_user, logout_user, current_user, login_require
 from flask_principal import ActionNeed, AnonymousIdentity, Identity, identity_changed, identity_loaded, Permission, Principal, UserNeed, RoleNeed
 from app import app, db, lm, mail, Storage
 from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, ContactForm, QuestionForm
-from models import User, Offer, Category, Transaction, Newsletter
+from models import User, Offer, Category, Transaction, Newsletter, Comment
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
 from flask.ext.uploads import save, Upload
@@ -324,13 +324,35 @@ def create_offer():
 @app.route('/offer/read/<int:id>')
 def read_offer(id):
     offer = Offer.query.get(id)
+    user = User.query.filter_by(id=offer.user_id).first()
     photo = Upload.query.get_or_404(id) #TODO need to handle offers without pictures
 
     photo_path = UPLOADS_BOOKS_IMAGES + photo.name
 
+    comments = Comment.query.filter_by(id_to=user.id)
+    if comments is None:
+        percentage = 0
+        return redirect(url_for('index'))
+	
+    poz = 0
+    neg = 0
+    for c in comments:
+        if c.type:
+		    poz = poz + 1
+        else:
+            neg = neg + 1
+
+    tot = poz + neg
+    percentage = poz *100 / tot
+	
     return render_template('read_offer.html',
                             title='Ogloszenie',
                             offer = offer,
+                            user=user,
+                            poz=poz,
+                            neg=neg,
+                            tot=tot,
+                            percentage=percentage,
                             photo_path = photo_path)
 
 @app.route('/offer/<category>')
@@ -339,6 +361,20 @@ def read_offers_by_category(category, page=1):
     c = Category.query.filter_by(name=category).first()
     if c is None:
         flash('Nie ma takiej kategorii %s.' % category)
+        return redirect(url_for('index'))
+
+    offers = c.offers
+
+    return render_template('offers.html',
+                            title='Ogloszenia',
+                            offers = offers)
+
+@app.route('/user/profile/offers/<user_id>')
+@app.route('/user/profile/offers/<user_id>/<int:page>')
+def read_offers_by_user_id(user_id, page=1):
+    c = User.query.filter_by(id=user_id).first()
+    if c is None:
+        flash('Nie ma uzytkownika o numerze %s.' % user_id)
         return redirect(url_for('index'))
 
     offers = c.offers
@@ -432,3 +468,41 @@ def question(user_id,offer_id):
     elif request.method == 'GET':
         return render_template('question.html', form=form)
 
+@app.route('/user/profile/<int:user_id>')
+def show_profile(user_id):
+    comments = Comment.query.filter_by(id_to=user_id)
+    if comments is None:
+        flash('Uzytkownik nie ma komentarzy.')
+        return redirect(url_for('index'))
+    
+    user = User.query.filter_by(id=user_id).first()
+	
+    poz = 0
+    neg = 0
+    for c in comments:
+        if c.type:
+		    poz = poz + 1
+        else:
+            neg = neg + 1
+
+    tot = poz + neg
+    percentage = poz *100 / tot
+    return render_template('profile.html',
+                            title='Profil',
+							user=user,
+							poz=poz,
+							neg=neg,
+							tot=tot,
+                            percentage=percentage,
+							user_id=user_id)		
+		
+@app.route('/user/profile/comments/<int:user_id>')
+def show_comments(user_id):
+    comments = Comment.query.filter_by(id_to=user_id)
+    if comments is None:
+        flash('Uzytkownik nie ma komentarzy.')
+        return redirect(url_for('index'))
+
+    return render_template('comments.html',
+                            title='Komentarze',
+                            comments=comments)
