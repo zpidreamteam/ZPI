@@ -23,10 +23,13 @@ def load_user(id):
 @app.route('/index')
 def index():
     user = g.user
+    
+    recently_added = Offer.query.order_by(Offer.timestamp.desc()).limit(4)
 
     return render_template('index.html',
                            title='Strona glowna',
-                           user=user)
+                           user=user,
+						   recently_added=recently_added)
 
 @app.route('/search', methods=['POST'])
 def search():
