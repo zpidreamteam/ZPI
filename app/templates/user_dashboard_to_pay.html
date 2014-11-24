@@ -8,7 +8,7 @@
     {% for transaction in transactions %}
             <a href="/przelewy48/{{transaction.user_id}}/{{transaction.offer_id}}/{{transaction.hash_link}}">{{transaction.id}} --- {{transaction.name}} --- {{ transaction.timestamp.year }}-{{ transaction.timestamp.month }}-{{ transaction.timestamp.day }} ---
             {{transaction.count}} --- {{transaction.count*transaction.price}}</a>
-            <a href="offer/read/{{transaction.offer_id}}">Szczegóły oferty</a><br>
+            <a href="../../../offer/read/{{transaction.offer_id}}">Szczegóły oferty</a><br>
     {% endfor %}
 
     {% if transactions.count()==0 %}
