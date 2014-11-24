@@ -191,6 +191,7 @@ def purchase(offer_id):
         return redirect(address)
     return render_template('purchase.html',
                            title='Zakup',
+                           offer=offer,
                            form=form)
 
 @app.route('/purchase/overview/<int:user_id>/<int:offer_id>/<int:count>', methods=['GET', 'POST'])
