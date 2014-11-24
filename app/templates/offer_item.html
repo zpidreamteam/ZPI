@@ -1,7 +1,4 @@
 {% block content %}
-
-
-
 	<tr class="odd gradeX">
 		<td>
 			<img src="{{ url_for('.static', filename='img/small_book2.jpg') }}" alt="" />
@@ -17,10 +14,6 @@
 			</div>
 		</td>
 		<td><h3>{{ offer.price }},-</h3></td>
-		<td><h3>{{ offer.timestamp.year }}-{{ offer.timestamp.month }}-{{ offer.timestamp.day }} </h3></td>
+		<td><h3>{{ offer.timestamp.year }}-{{ offer.timestamp.month }}-{{ offer.timestamp.day }}</h3></td>
 	</tr>
-
-
-
-
 {% endblock %}

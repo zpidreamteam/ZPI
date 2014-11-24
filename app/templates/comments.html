@@ -1,0 +1,40 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="oglos_area">
+	
+	<div class="col-md-9 col-sm-9">
+		<div class="row">
+            <div class="col-lg-12">
+				<div class="panel-body">
+					<div class="table-responsive">
+						<table class="table table-striped table-bordered table-hover" id="dataTables-example">
+							<thead>
+								<tr>
+									<th>Treść</th>
+									<th>Typ</th>
+									<th>Data dodania</th>
+								</tr>
+							</thead>
+							<tbody>
+
+								{% for comment in comments %}
+								{% include 'comment.html' %}
+								{% endfor %}
+
+							</tbody>
+						</table>
+					</div>
+					<!-- /.table-responsive -->
+				</div>
+				<!-- /.panel-body -->
+			</div>
+		</div>
+	</div>
+
+</div>
+
+{% endblock %}

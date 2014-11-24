@@ -1,8 +1,9 @@
-from flask import render_template, flash, redirect, session, url_for, request, g
+from flask import render_template, flash, redirect, session, url_for, request, g, current_app
 from flask.ext.login import login_user, logout_user, current_user, login_required
+from flask_principal import ActionNeed, AnonymousIdentity, Identity, identity_changed, identity_loaded, Permission, Principal, UserNeed, RoleNeed
 from app import app, db, lm, mail, Storage
 from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, ContactForm, QuestionForm
-from models import User, Offer, Category, Transaction, Newsletter
+from models import User, Offer, Category, Transaction, Newsletter, Comment
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
 from flask.ext.uploads import save, Upload
@@ -22,10 +23,13 @@ def load_user(id):
 @app.route('/index')
 def index():
     user = g.user
+    
+    recently_added = Offer.query.order_by(Offer.timestamp.desc()).limit(4)
 
     return render_template('index.html',
                            title='Strona glowna',
-                           user=user)
+                           user=user,
+						   recently_added=recently_added)
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -52,30 +56,57 @@ def login():
         session['remember_me'] = form.remember_me.data
 
         user = User.query.filter_by(email=form.email.data).first()
+
         if user is None:
-            flash('User with email {email} not found.'.format(email=form.email.data))
+            flash('Uzytkownik z mailem {email} nie istnieje.'.format(email=form.email.data))
             return redirect(request.args.get("next") or url_for("index"))
 
         if user.verify_password(form.password.data) is False:
-            flash('Wrong password')
+            flash('Zle haslo.')
             return redirect(request.args.get("next") or url_for("index"))
 
         remember_me = False
         if 'remember_me' in session:
             remember_me = session['remember_me']
             session.pop('remember_me', None)
+
         login_user(user, remember=remember_me)
 
+         # Tell Flask-Principal the identity changed
+        identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
+
         return redirect(request.args.get("next") or url_for("index"))
+
     return render_template('login.html',
                            title='Logowanie',
                            form=form)
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
 
+    # Remove session keys set by Flask-Principal
+    for key in ('identity.name', 'identity.auth_type'):
+        session.pop(key, None)
+
+    # Tell Flask-Principal the user is anonymous
+    identity_changed.send(current_app._get_current_object(),
+                          identity=AnonymousIdentity())
+
     return redirect(url_for('index'))
+
+@identity_loaded.connect_via(app)
+def on_identity_loaded(sender, identity):
+
+    identity.user = current_user
+
+    if hasattr(current_user, 'id'):
+        identity.provides.add(UserNeed(current_user.id))
+
+    if hasattr(current_user, 'role'):
+        print current_user.role
+        identity.provides.add(RoleNeed(current_user.role.name))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -109,7 +140,6 @@ def register():
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404
-
 
 @app.errorhandler(500)
 def internal_error(error):
@@ -187,8 +217,11 @@ def purchase(offer_id):
     if form.validate_on_submit():
         if transaction_validator(g.user.id, offer_id, form.number_of_books.data):
             return redirect(url_for('index'))
+
         address = "/purchase/overview/%i/%i/%s" % (g.user.id, offer_id, form.number_of_books.data)
+
         return redirect(address)
+
     return render_template('purchase.html',
                            title='Zakup',
                            offer=offer,
@@ -292,13 +325,35 @@ def create_offer():
 @app.route('/offer/read/<int:id>')
 def read_offer(id):
     offer = Offer.query.get(id)
+    user = User.query.filter_by(id=offer.user_id).first()
     photo = Upload.query.get_or_404(id) #TODO need to handle offers without pictures
 
     photo_path = UPLOADS_BOOKS_IMAGES + photo.name
 
+    comments = Comment.query.filter_by(id_to=user.id)
+    if comments is None:
+        percentage = 0
+        return redirect(url_for('index'))
+	
+    poz = 0
+    neg = 0
+    for c in comments:
+        if c.type:
+		    poz = poz + 1
+        else:
+            neg = neg + 1
+
+    tot = poz + neg
+    percentage = poz *100 / tot
+	
     return render_template('read_offer.html',
                             title='Ogloszenie',
                             offer = offer,
+                            user=user,
+                            poz=poz,
+                            neg=neg,
+                            tot=tot,
+                            percentage=percentage,
                             photo_path = photo_path)
 
 @app.route('/offer/<category>')
@@ -307,6 +362,20 @@ def read_offers_by_category(category, page=1):
     c = Category.query.filter_by(name=category).first()
     if c is None:
         flash('Nie ma takiej kategorii %s.' % category)
+        return redirect(url_for('index'))
+
+    offers = c.offers
+
+    return render_template('offers.html',
+                            title='Ogloszenia',
+                            offers = offers)
+
+@app.route('/user/profile/offers/<user_id>')
+@app.route('/user/profile/offers/<user_id>/<int:page>')
+def read_offers_by_user_id(user_id, page=1):
+    c = User.query.filter_by(id=user_id).first()
+    if c is None:
+        flash('Nie ma uzytkownika o numerze %s.' % user_id)
         return redirect(url_for('index'))
 
     offers = c.offers
@@ -333,7 +402,6 @@ def przelewy48(user_id, offer_id, hash_link):
                            user_id=user_id,
                            offer_id=offer_id,
                            hash_link=hash_link)
-
 
 @app.route('/add_to_newsletter', methods=['GET', 'POST'])
 def add_to_newsletter():
@@ -401,3 +469,41 @@ def question(user_id,offer_id):
     elif request.method == 'GET':
         return render_template('question.html', form=form)
 
+@app.route('/user/profile/<int:user_id>')
+def show_profile(user_id):
+    comments = Comment.query.filter_by(id_to=user_id)
+    if comments is None:
+        flash('Uzytkownik nie ma komentarzy.')
+        return redirect(url_for('index'))
+    
+    user = User.query.filter_by(id=user_id).first()
+	
+    poz = 0
+    neg = 0
+    for c in comments:
+        if c.type:
+		    poz = poz + 1
+        else:
+            neg = neg + 1
+
+    tot = poz + neg
+    percentage = poz *100 / tot
+    return render_template('profile.html',
+                            title='Profil',
+							user=user,
+							poz=poz,
+							neg=neg,
+							tot=tot,
+                            percentage=percentage,
+							user_id=user_id)		
+		
+@app.route('/user/profile/comments/<int:user_id>')
+def show_comments(user_id):
+    comments = Comment.query.filter_by(id_to=user_id)
+    if comments is None:
+        flash('Uzytkownik nie ma komentarzy.')
+        return redirect(url_for('index'))
+
+    return render_template('comments.html',
+                            title='Komentarze',
+                            comments=comments)

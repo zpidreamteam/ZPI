@@ -19,6 +19,7 @@ class User(db.Model):
     zipcode = db.Column(db.String(16))
     country = db.Column(db.String(32))
     phone = db.Column(db.String(16))
+    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
@@ -89,9 +90,23 @@ class Offer(db.Model):
     def __repr__(self):
         return '<Offer %r>' % (self.body)
 
+class Role(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), index=True, unique=True)
+    users = db.relationship('User', backref='role', lazy='dynamic')
+
 class Newsletter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(128), index=True, unique=True)
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime)
+    id_from = db.Column(db.Integer, db.ForeignKey('user.id'))
+    id_to = db.Column(db.Integer, db.ForeignKey('user.id'))
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
+    type = db.Column(db.Boolean)
+    body = db.Column(db.String(140))
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -108,7 +123,6 @@ class Transaction(db.Model):
 
     def __repr__(self):
         return '<Transaction %r>' % (self.id)
-
 
 whooshalchemy.whoosh_index(app, Offer)
 
