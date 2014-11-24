@@ -403,25 +403,33 @@ def question(user_id,offer_id):
     elif request.method == 'GET':
         return render_template('question.html', form=form)
 
-@app.route('/comment/new/<int:trans_id>/<int:reciever>', methods=['GET', 'POST'])
+@app.route('/comment/new/<int:trans_id>/', methods=['GET', 'POST'])
 @login_required
-def new_comment(trans_id,reciever):
+def new_comment(trans_id):
     form = CommentForm()
 
+    transactions = db.session.query(Transaction.id, Transaction.offer_id, Offer.user_id).\
+                               filter_by(id=trans_id, user_id=g.user.id, is_finalised=1, is_sent=1).\
+                               join(Offer, Offer.id==Transaction.offer_id).first()
+    
+    if transactions is None:
+        flash('Nie ma mozesz dodac takiego komentarza!')
+        return redirect(url_for('index'))
+
     if form.validate_on_submit():
+        
+        is_positive = 1 if form.type.data=='true' else 0
         comment = Comment(timestamp = datetime.utcnow(),
-                      id_from = g.user,
-                      id_to = reciever,
+                      id_from = g.user.id,
+                      id_to = transactions.user_id,
                       transaction_id = trans_id,
-                      type = form.type.data,
+                      type = is_positive,
                       body = form.body.data)
 
         db.session.add(comment)
         db.session.commit()
-
+        #TODO przekierowanie do odpowiedniej storny
         flash("Poprawnie dodano Twoj komentarz")
-#proponuje przekierowanie do adresu panelu danego uzytkownika ale go poki co nie znam wiec daje index
-        address = "/offer/read/%i" % (offer.id)
         return redirect(url_for('index'))
 
     return render_template('new_comment.html',

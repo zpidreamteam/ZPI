@@ -11,6 +11,15 @@
              Typ komentarza:
              {{form.type()}}
          </p>
+
+         {% for error in form.type.errors %}
+            <div class="alert-group">
+                <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+            {% endfor %}<br>
      
             <label for="comment">Treść komentarza:</label>
             <textarea class="form-control" rows="5" id="body" name="body"></textarea>

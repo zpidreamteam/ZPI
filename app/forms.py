@@ -57,7 +57,7 @@ class QuestionForm(Form):
 	
 class CommentForm(Form):
     body = TextAreaField("body", validators=[DataRequired()])
-    type = RadioField('type', choices=[('true','pozytywny'),('false','negatywny')])
+    type = RadioField('type', validators=[DataRequired()], choices=[('true','pozytywny'),('false','negatywny')])
 
 class YourInformationForm(Form):
     user_name = StringField('user_name', validators=[DataRequired(), Length(max=32, message="Podane imie jest za dlugie")])
