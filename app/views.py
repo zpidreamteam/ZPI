@@ -2,12 +2,14 @@ from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from flask_principal import ActionNeed, AnonymousIdentity, Identity, identity_changed, identity_loaded, Permission, Principal, UserNeed, RoleNeed
 from app import app, db, lm, mail, Storage
-from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, ContactForm, QuestionForm
+from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, YourInformationForm, ChangePasswordForm, ContactForm, QuestionForm, CommentForm
 from models import User, Offer, Category, Transaction, Newsletter, Comment
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
 from flask.ext.uploads import save, Upload
 from flask.ext.mail import Message
+from sqlalchemy.sql.expression import case
+from sqlalchemy import func, exists, and_
 
 @app.before_request
 def before_request():
@@ -23,7 +25,7 @@ def load_user(id):
 @app.route('/index')
 def index():
     user = g.user
-    
+
     recently_added = Offer.query.order_by(Offer.timestamp.desc()).limit(4)
 
     return render_template('index.html',
@@ -247,7 +249,9 @@ def purchase_overview(user_id, offer_id, count):
                         offer_id=offer_id,
                         count=form.number_of_books.data,
                         price=offer.price,
-                        is_finalised=0)
+                        is_finalised=0,
+                        is_sent=0,
+                        is_commented=0)
 
         t.hash_link = t.hash_generator()
 
@@ -333,7 +337,7 @@ def read_offer(id):
     if comments is None:
         percentage = 0
         return redirect(url_for('index'))
-	
+
     poz = 0
     neg = 0
     for c in comments:
@@ -344,7 +348,7 @@ def read_offer(id):
 
     tot = poz + neg
     percentage = poz *100 / tot
-	
+
     return render_template('read_offer.html',
                             title='Ogloszenie',
                             offer = offer,
@@ -474,9 +478,9 @@ def show_profile(user_id):
     if comments is None:
         flash('Uzytkownik nie ma komentarzy.')
         return redirect(url_for('index'))
-    
+
     user = User.query.filter_by(id=user_id).first()
-	
+
     poz = 0
     neg = 0
     for c in comments:
@@ -494,8 +498,8 @@ def show_profile(user_id):
 							neg=neg,
 							tot=tot,
                             percentage=percentage,
-							user_id=user_id)		
-		
+							user_id=user_id)
+
 @app.route('/user/profile/comments/<int:user_id>')
 def show_comments(user_id):
     comments = Comment.query.filter_by(id_to=user_id)
@@ -506,3 +510,216 @@ def show_comments(user_id):
     return render_template('comments.html',
                             title='Komentarze',
                             comments=comments)
+
+@app.route('/comment/new/<int:trans_id>/', methods=['GET', 'POST'])
+@login_required
+def new_comment(trans_id):
+    form = CommentForm()
+
+    transactions = db.session.query(Transaction.id, Transaction.offer_id, Offer.user_id).\
+                               filter_by(id=trans_id, user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
+                               join(Offer, Offer.id==Transaction.offer_id).first()
+
+    if transactions is None:
+        flash('Nie ma mozesz dodac takiego komentarza!')
+        return redirect(url_for('index'))
+
+    if form.validate_on_submit():
+
+        is_positive = 1 if form.type.data=='true' else 0
+        comment = Comment(timestamp = datetime.utcnow(),
+                      id_from = g.user.id,
+                      id_to = transactions.user_id,
+                      transaction_id = trans_id,
+                      type = is_positive,
+                      body = form.body.data)
+
+        db.session.add(comment)
+
+        alter_transaction = Transaction.query.get(trans_id)
+        alter_transaction.is_commented = 1
+        db.session.add(alter_transaction)
+
+        db.session.commit()
+        #TODO przekierowanie do odpowiedniej storny
+        flash("Poprawnie dodano Twoj komentarz")
+        return redirect(url_for('comment'))
+
+    return render_template('new_comment.html',
+                            title='Comment',
+                            form=form)
+#User Dashboard
+@login_required
+@app.route('/user/dashboard/')
+def user_dashboard():
+
+    number_of_transactions_to_pay_for = db.session.query(func.count(Transaction.id)).\
+                               filter_by(user_id=g.user.id, is_finalised=0).\
+                               first()
+
+    q = db.session.query(Offer.id, func.count(Transaction.id)).\
+                              filter_by(user_id=g.user.id).\
+                              join(Transaction, Transaction.offer_id==Offer.id).\
+                              filter_by(is_finalised=1, is_sent=0).\
+                              join(User, User.id==Transaction.user_id)
+    transactions_to_comment = db.session.query(Transaction.id, func.count(Transaction.id), Transaction.timestamp,
+                                               Transaction.offer_id, Offer.name, Offer.user_id).\
+                               filter_by(user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               order_by(Transaction.timestamp.desc())
+
+    return render_template('user_dashboard.html', number_of_transactions_to_pay_for=number_of_transactions_to_pay_for,
+                           number_of_transactions_to_send=q, transactions_to_comment=transactions_to_comment)
+
+@login_required
+@app.route('/user/dashboard/to/pay')
+def user_dashboard_to_pay():
+    transactions = db.session.query(Transaction.id, Transaction.user_id,
+                                    Transaction.offer_id, Offer.name, Transaction.timestamp,
+                                    Transaction.count, Transaction.price,
+                                    Transaction.hash_link).\
+                               filter_by(user_id=g.user.id, is_finalised=0).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               order_by(Transaction.timestamp.desc())
+
+    return render_template('user_dashboard_to_pay.html', transactions=transactions)
+
+@login_required
+@app.route('/user/dashboard/to/send')
+def user_dashboard_to_send():
+    transactions = db.session.query(Offer.id, Offer.name, Offer.price, Transaction.id.label("transact_id"),
+                                    Transaction.user_id, User.street, Transaction.timestamp,
+                                    User.building_number, User.door_number,
+                                    User.city, User.zipcode).\
+                              filter_by(user_id=g.user.id).\
+                              join(Transaction, Transaction.offer_id==Offer.id).\
+                              filter_by(is_finalised=1, is_sent=0).\
+                              join(User, User.id==Transaction.user_id)
+
+    return render_template('user_dashboard_to_send.html', transactions=transactions)
+
+@login_required
+@app.route('/user/dashboard/to/send/check/<int:transaction_id>', methods=['GET', 'POST'])
+def user_dashboard_to_send_check(transaction_id):
+    t = db.session.query(Offer.user_id, Transaction.id).\
+                              filter_by(user_id=g.user.id).\
+                              join(Transaction, Transaction.offer_id==Offer.id).\
+                              filter_by(is_finalised=1, is_sent=0, id=transaction_id).\
+                              join(User, User.id==Transaction.user_id).first()
+    if t is None:
+        flash('Nie ma takiej transakcji!')
+    else:
+        transaction = Transaction.query.filter_by(id=transaction_id).first()
+        transaction.is_sent = 1
+        db.session.add(transaction)
+        db.session.commit()
+        flash('Potwierdzono wyslanie zamowienia')
+
+    return redirect(url_for('user_dashboard_to_send'))
+
+@login_required
+@app.route('/user/dashboard/my/offers/current')
+def user_dashboard_my_offers_current():
+    offers = db.session.query(Offer.id, Offer.name, Offer.timestamp,
+                              Offer.price, Offer.count).\
+                              filter_by(user_id=g.user.id).\
+                              filter(Offer.count!=0).\
+                              order_by(Offer.timestamp.desc())
+
+    return render_template('user_dashboard_my_offers_current.html', offers=offers)
+
+@login_required
+@app.route('/user/dashboard/my/offers/close/<int:offer_id>', methods=['GET', 'POST'])
+def offer_close(offer_id):
+    offer = Offer.query.filter_by(id=offer_id, user_id=g.user.id).first()
+
+    if offer is None:
+        flash('Nie ma takiej oferty')
+    elif offer.count == 0:
+        flash('Oferta jest juz zamknieta!')
+    else:
+        offer.count = 0
+        db.session.add(offer)
+        db.session.commit()
+        flash('Zamknieto oferte')
+
+    return redirect(url_for('user_dashboard_my_offers_current'))
+
+@login_required
+@app.route('/user/dashboard/about/me/', methods=['GET', 'POST'])
+def about_me():
+    user = User.query.get(g.user.id)
+    form = YourInformationForm()
+    if form.validate_on_submit():
+        user.user_name = form.user_name.data
+        user.surname = form.surname.data
+        user.street = form.street.data
+        user.building_number = form.building_number.data
+        user.door_number = form.door_number.data
+        user.city = form.city.data
+        user.zipcode = form.zipcode.data
+        user.country = form.country.data
+        user.phone = form.phone.data
+
+        db.session.add(user)
+        db.session.commit()
+
+        flash("Dane zmieniono!")
+
+        return redirect(url_for('about_me'))
+
+    return render_template('user_dashboard_about_me.html', form=form, user=user)
+
+@login_required
+@app.route('/user/dashboard/archive/')
+def archive():
+
+    transactions_bought = db.session.query(Transaction.id, Transaction.user_id, Offer.name,
+                                    Transaction.offer_id, Offer.name, Transaction.timestamp,
+                                    Transaction.count, Transaction.price,
+                                    Transaction.hash_link, User.nickname).\
+                               filter_by(user_id=g.user.id, is_finalised=1, is_sent=1).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               join(User, User.id==Offer.user_id).\
+                               order_by(Transaction.timestamp.desc())
+
+    transactions_sold = db.session.query(Offer.id, Offer.name, Transaction.id.label("transact_id"),
+                                    Transaction.user_id, Transaction.count, Transaction.price, User.street, Transaction.timestamp,
+                                    User.building_number, User.door_number,
+                                    User.city, User.zipcode, User.nickname).\
+                              filter_by(user_id=g.user.id).\
+                              join(Transaction, Transaction.offer_id==Offer.id).\
+                              filter_by(is_finalised=1, is_sent=1).\
+                              join(User, User.id==Transaction.user_id).\
+                              order_by(Transaction.timestamp.desc())
+
+    return render_template('user_dashboard_archive.html', transactions_bought=transactions_bought,
+                           transactions_sold=transactions_sold)
+
+@login_required
+@app.route('/user/dashboard/change/password/', methods=['GET', 'POST'])
+def change_password():
+    user = User.query.get(g.user.id)
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if user.verify_password(form.old_password.data):
+            user.hash_password(form.new_password_1.data)
+            db.session.add(user)
+            db.session.commit()
+            flash("Haslo zostalo zmienione!")
+        else:
+            flash("Obecne haslo nie jest poprawne")
+    return render_template('user_dashboard_change_password.html', form=form)
+
+@login_required
+@app.route('/user/dashboard/comment/', methods=['GET', 'POST'])
+def comment():
+
+    transactions_to_comment = db.session.query(Transaction.id, Transaction.timestamp,
+                                               Transaction.offer_id, Offer.name, Offer.user_id).\
+                               filter_by(user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               order_by(Transaction.timestamp.desc())
+
+
+    return render_template('user_dashboard_comment.html', transactions_to_comment=transactions_to_comment)

@@ -1,0 +1,17 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+	<a href="../">Wstecz</a>
+    <h1>Dodaj komentarz:</h1>
+    {% for transaction_to_comment in transactions_to_comment %}
+            {{transaction_to_comment.id}} --- {{transaction_to_comment.name}} --- {{ transaction_to_comment.timestamp.year }}-{{ transaction_to_comment.timestamp.month }}-{{ transaction_to_comment.timestamp.day }}</a>
+            <form action="/comment/new/{{transaction_to_comment.id}}">
+                <input type="submit" value="Skomentuj!!">
+            </form>
+            <br>
+    {% endfor %}
+    {% if transactions_to_comment.count()==0 %}
+                Pusto i cicho
+            {% endif %}
+{% endblock %}
