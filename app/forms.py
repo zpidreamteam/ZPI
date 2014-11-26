@@ -1,5 +1,5 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, BooleanField, PasswordField, TextAreaField, FloatField, SelectField, IntegerField
+from wtforms import StringField, BooleanField, PasswordField, TextAreaField, FloatField, SelectField, IntegerField, TextField, RadioField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
 from models import Category
 
@@ -45,6 +45,20 @@ class PurchaseForm(Form):
 class PurchaseOverviewForm(Form):
     number_of_books = IntegerField('number_of_books', default=1, validators=[DataRequired()])
 
+class ContactForm(Form):
+    name = TextField("name", validators=[DataRequired()])
+    email = TextField("email", validators=[DataRequired(), Email(message="Prosze podac poprawny adres email")])
+    subject = TextField("subject", validators=[DataRequired()])
+    message = TextAreaField("message", validators=[DataRequired()])
+	
+class QuestionForm(Form):
+    subject = TextField("subject", validators=[DataRequired()])
+    message = TextAreaField("message", validators=[DataRequired()])
+	
+class CommentForm(Form):
+    body = TextAreaField("body", validators=[DataRequired()])
+    type = RadioField('type', validators=[DataRequired()], choices=[('true','pozytywny'),('false','negatywny')])
+
 class YourInformationForm(Form):
     user_name = StringField('user_name', validators=[DataRequired(), Length(max=32, message="Podane imie jest za dlugie")])
     surname = StringField('surname', validators=[DataRequired(), Length(max=32, message="Podane nazwisko jest za dlugie")])
@@ -60,4 +74,3 @@ class ChangePasswordForm(Form):
     old_password = PasswordField('password', validators=[DataRequired(), Length(min=6, message="Podane haslo jest za krotkie")])
     new_password_1 = PasswordField('password', validators=[DataRequired(), Length(min=6, message="Podane haslo jest za krotkie")])
     new_password_2 = PasswordField('password', validators=[DataRequired(), Length(min=6, message="Podane haslo jest za krotkie"), EqualTo('new_password_2', message="Podane hasla musza byc takie same")])
-

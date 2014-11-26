@@ -9,19 +9,24 @@
 			<ul>
 				<li><a href="to/pay">Do zapłaty 
 					{% for number_of_transaction_to_pay_for in number_of_transactions_to_pay_for %}
-					{% if number_of_transaction_to_pay_for!=0 %}
-					({{number_of_transaction_to_pay_for}})
-					{% endif %}
+						{% if number_of_transaction_to_pay_for!=0 %}
+							({{number_of_transaction_to_pay_for}})
+						{% endif %}
 					{% endfor %}
 				</a></li>
 				<li><a href="to/send">Do wysyłki 
 					{% for number_of_transaction_to_send in number_of_transactions_to_send %}
-					{% if number_of_transaction_to_send.1!=0 %}
-					({{number_of_transaction_to_send.1}})
-					{% endif %}
+						{% if number_of_transaction_to_send.1!=0 %}
+							({{number_of_transaction_to_send.1}})
+						{% endif %}
 					{% endfor %}</a></li>
 					<li><a href="my/offers/current">Moje oferty</a></li>
-					<li><a href="comment">Skomentuj zakup</a></li>	    
+					<li><a href="comment">Skomentuj zakup
+					{% for transaction_to_comment in transactions_to_comment %}
+						{% if transaction_to_comment.1!=0 %}
+							({{transaction_to_comment.1}})
+						{% endif %}
+					{% endfor %}</a></li>	    
 					<li><a href="about/me">Moje dane</a></li>    	    
 					<li><a href="archive">Archiwum transakcji</a></li>  
 				</ul>

@@ -3,7 +3,41 @@
 
 {% block content %}
   <h1>Rezultat dla "{{ query }}":</h1>
-  {% for offer in results %}
-      {% include 'offer_item.html' %}
-  {% endfor %}
+
+{% for offer in offers %}
+<div class="single_search_book">
+	<div class="row">
+		<div class="col-md-7 col-sm-7">
+			<div class="row">
+				<div class="col-md-4 col-sm-4">
+					<div class="book_left_single_img">
+						<img src="{{ url_for('.static', filename='img/small_book2.jpg') }}" alt="" />
+					</div>
+				</div>
+				<div class="col-md-8 col-sm-8">
+					<div class="book_left_single_text">
+						<h4><a href="{{ url_for('read_offer', id = offer.id) }}">{{ offer.name }}</a></h4>
+						<h5> Liczba dostępnych sztuk: {{ offer.count }}</h5>
+						<p>{{ offer.body }} </p>
+						<a href="{{ url_for('read_offer', id = offer.id) }}">
+						<button type="submit" class="btn btn-default btn-sm search_bk_btn">Więcej</button>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-2 col-sm-2">
+			<div class="book_price">
+				<h3>{{ offer.price }},-</h3>
+			</div>
+		</div>
+		<div class="col-md-3 col-sm-3">
+			<div class="date_added">
+				<h3>{{ offer.timestamp.year }}-{{ offer.timestamp.month }}-{{ offer.timestamp.day }} </h3>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endfor %}
 {% endblock %}
