@@ -2,7 +2,105 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Archiwum transakcji:</h1>
+
+<div class="oglos_area">
+        <div class="col-md-3 col-sm-3">
+        <div class="oglos_left">
+            <h3>Menu</h3>
+            <ul>
+                <li><a href="pay">Do zapłaty 
+                    {% for number_of_transaction_to_pay_for in number_of_transactions_to_pay_for %}
+                    {% if number_of_transaction_to_pay_for!=0 %}
+                    ({{number_of_transaction_to_pay_for}})
+                    {% endif %}
+                    {% endfor %}
+                </a></li>
+                <li><a href="send">Do wysyłki 
+                    {% for number_of_transaction_to_send in number_of_transactions_to_send %}
+                    {% if number_of_transaction_to_send.1!=0 %}
+                    ({{number_of_transaction_to_send.1}})
+                    {% endif %}
+                    {% endfor %}</a></li>
+                    <li><a href="my/offers/current">Moje oferty</a></li>
+                    <li><a href="comment">Skomentuj zakup</a></li>      
+                    <li><a href="about/me">Moje dane</a></li>           
+                    <li><a href="archive">Archiwum transakcji</a></li>  
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9 col-sm-9">
+
+        
+
+<a href="../"><button class="btn btn_submit">WSTECZ</button></a>
+<h2>Zakupione:</h2>
+<div class="panel-body">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+            <thead>
+                <tr>
+                    <th>Nazwa</th>
+                    <th>Data</th>
+                    <th>Ilość</th>
+                    <th>Cena</th>
+                    <th>Sprzedawca</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction_bought in transactions_bought %}
+                <tr class="odd gradeX">
+                    <td>{{transaction_bought.name}}</td>
+                    <td>{{transaction_bought.name}}</td>
+                    <td>
+                    {{ transaction_bought.timestamp.year }}-{{ transaction_bought.timestamp.month }}-{{ transaction_bought.timestamp.day }}
+                    </td>
+                    <td>{{transaction_bought.price}}</td>
+                    <td>{{transaction_bought.nickname}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- /.table-responsive -->
+</div>
+ <!-- /.panel end -->
+<h2>Sprzedane:</h2>
+<div class="panel-body">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+            <thead>
+                <tr>
+                    <th>Nazwa</th>
+                    <th>Data</th>
+                    <th>Ilość</th>
+                    <th>Cena</th>
+                    <th>Sprzedawca</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction_sold in transactions_sold %}
+                <tr class="odd gradeX">
+                    <td>{{transaction_sold.name}}</td>
+                    <td>{{transaction_sold.name}}</td>
+                    <td>
+                    {{ transaction_sold.timestamp.year }}-{{ transaction_sold.timestamp.month }}-{{ transaction_sold.timestamp.day }}
+                    </td>
+                    <td>{{transaction_sold.price}}</td>
+                    <td>{{transaction_sold.nickname}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- /.table-responsive -->
+</div>
+ <!-- /.panel end -->
+
+</div>
+ <!-- /.column right end -->
+</div>
+
+  <!--   <h1>Archiwum transakcji:</h1>
     <p>Zakupione:</p>
     {% for transaction_bought in transactions_bought %}
             {{transaction_bought.name}} | {{ transaction_bought.timestamp.year }}-{{ transaction_bought.timestamp.month }}-{{ transaction_bought.timestamp.day }} | {{transaction_bought.count}} | {{transaction_bought.price}} | {{transaction_bought.nickname}}<br>
@@ -11,4 +109,5 @@
     {% for transaction_sold in transactions_sold %}
             {{transaction_sold.name}} | {{ transaction_sold.timestamp.year }}-{{ transaction_sold.timestamp.month }}-{{ transaction_sold.timestamp.day }} | {{transaction_sold.count}} | {{transaction_sold.price}} | {{transaction_sold.nickname}}<br>
     {% endfor %}
+    -->
 {% endblock %}

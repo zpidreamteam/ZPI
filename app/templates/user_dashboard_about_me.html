@@ -4,41 +4,36 @@
 {% block content %}
 	<a href="/user/dashboard/">Wstecz</a>
     <h1>Twoje dane:</h1>
-    <form action="" method="post" name="YourInformationForm">
+    <form action="" method="post" name="YourInformationForm" enctype="multipart/form-s">
         {{ form.hidden_tag() }}
         <p>
             Imię: <br>
-            {{ form.user_name(value=user.user_name) }}
+            <input class="form-control" id="user_name" name="user_name" type="text" value="{{ user.user_name }}">
             {% for error in form.user_name.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-            <br>
             Nazwisko: <br>
-            {{ form.surname(value=user.surname) }}
+            <input class="form-control" id="surname" name="surname" type="text" value="{{ user.surname }}">
             {% for error in form.surname.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-            <br>
             Ulica: <br>
-            {{ form.street(value=user.street) }}
+            <input class="form-control" id="street" name="street" type="text" value="{{ user.street }}">
             {% for error in form.street.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-            <br>
             Numer budynku: <br>
-            {{ form.building_number(value=user.building_number) }}
+            <input class="form-control" id="building_number" name="building_number" type="text" value="{{ user.building_number }}">
             {% for error in form.building_number.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-            <br>
             Numer lokalu: <br>
-            {{ form.door_number(value=user.door_number) }}
+            <input class="form-control" id="door_number" name="door_number" type="text" value="{{ user.door_number }}">
             {% for error in form.door_number.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-            <br>
             Miasto: <br>
-            {{ form.city(value=user.city) }}
+            <input class="form-control" id="city" name="city" type="text" value="{{ user.city }}">
             {% for error in form.city.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
