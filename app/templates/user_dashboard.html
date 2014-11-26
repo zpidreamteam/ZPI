@@ -1,0 +1,40 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="oglos_area">
+	<div class="col-md-3 col-sm-3">
+		<div class="oglos_left">
+			<h3>Menu</h3>
+			<ul>
+				<li><a href="to/pay">Do zapłaty 
+					{% for number_of_transaction_to_pay_for in number_of_transactions_to_pay_for %}
+						{% if number_of_transaction_to_pay_for!=0 %}
+							({{number_of_transaction_to_pay_for}})
+						{% endif %}
+					{% endfor %}
+				</a></li>
+				<li><a href="to/send">Do wysyłki 
+					{% for number_of_transaction_to_send in number_of_transactions_to_send %}
+						{% if number_of_transaction_to_send.1!=0 %}
+							({{number_of_transaction_to_send.1}})
+						{% endif %}
+					{% endfor %}</a></li>
+					<li><a href="my/offers/current">Moje oferty</a></li>
+					<li><a href="comment">Skomentuj zakup
+					{% for transaction_to_comment in transactions_to_comment %}
+						{% if transaction_to_comment.1!=0 %}
+							({{transaction_to_comment.1}})
+						{% endif %}
+					{% endfor %}</a></li>	    
+					<li><a href="about/me">Moje dane</a></li>    	    
+					<li><a href="archive">Archiwum transakcji</a></li>  
+				</ul>
+			</div>
+		</div>
+		<div class="col-md-9 col-sm-9">
+			<h2>Witaj, {{ g.user.nickname}}!</h2>
+			<p>Możesz wybrać interesującą się opcję z menu po lewej.</p>
+		</div>
+</div>
+{% endblock %}
