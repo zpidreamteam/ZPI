@@ -4,6 +4,7 @@ from app import app, db, lm, admin_permission, views
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS
 from models import User, Category, Newsletter, Offer
+from forms import CategoryForm
 
 @app.route('/admin')
 @app.route('/admin/index')
@@ -35,6 +36,26 @@ def admin_categories():
     return render_template('admin/categories.html',
                            title='Zarzadzanie kategoriamii',
                            categories=categories)
+
+@app.route('/admin/category/add', methods=['GET', 'POST'])
+@login_required
+@admin_permission.require()
+def add_category():
+    form = CategoryForm()
+
+    if form.validate_on_submit():
+        category = Category(name = form.name.data)
+
+        db.session.add(category)
+        db.session.commit()
+
+        flash("Poprawnie dodano kategorie")
+
+        return redirect('admin/categories')
+
+    return render_template('admin/add_category.html',
+                            title='Nowa kategoria',
+                            form=form)
 
 @app.route('/admin/newsletter')
 @login_required
