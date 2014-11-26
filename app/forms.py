@@ -54,3 +54,6 @@ class ContactForm(Form):
 class QuestionForm(Form):
     subject = TextField("subject", validators=[DataRequired()])
     message = TextAreaField("message", validators=[DataRequired()])
+	
+class CategoryForm(Form):
+    name = TextField("name", validators=[DataRequired()])
