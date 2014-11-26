@@ -3,7 +3,7 @@ from flask.ext.login import login_user, logout_user, current_user, login_require
 from app import app, db, lm, admin_permission, views
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS
-from models import User, Category, Newsletter, Offer
+from models import User, Category, Newsletter, Offer, Comment
 from forms import CategoryForm
 
 @app.route('/admin')
@@ -85,3 +85,12 @@ def admin_raports():
     return render_template('admin/raports.html',
                            title='Raporty')
 
+@app.route('/admin/comments')
+@login_required
+@admin_permission.require()
+def admin_comments():
+    comments = Comment.query.all()
+
+    return render_template('admin/comments.html',
+                           title='Komentarze',
+                           comments=comments)
