@@ -56,3 +56,11 @@ def admin_offers():
                            title='Zarzadzanie ofertami',
                            offers=offers)
 
+@app.route('/admin/raports')
+@login_required
+@admin_permission.require()
+def admin_raports():
+
+    return render_template('admin/raports.html',
+                           title='Raporty')
+
