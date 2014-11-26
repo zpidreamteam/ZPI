@@ -9,7 +9,8 @@ from flask.ext.uploads import save, Upload
 from flask.ext.mail import Message
 from sqlalchemy.sql.expression import case
 from sqlalchemy import func
-
+from sqlalchemy import exists
+from sqlalchemy import and_
 @app.before_request
 def before_request():
     g.user = current_user
@@ -217,7 +218,8 @@ def purchase_overview(user_id, offer_id, count):
                         count=form.number_of_books.data,
                         price=offer.price,
                         is_finalised=0,
-                        is_sent=0)
+                        is_sent=0,
+                        is_commented=0)
 
         t.hash_link = t.hash_generator()
 
@@ -409,7 +411,7 @@ def new_comment(trans_id):
     form = CommentForm()
 
     transactions = db.session.query(Transaction.id, Transaction.offer_id, Offer.user_id).\
-                               filter_by(id=trans_id, user_id=g.user.id, is_finalised=1, is_sent=1).\
+                               filter_by(id=trans_id, user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
                                join(Offer, Offer.id==Transaction.offer_id).first()
     
     if transactions is None:
@@ -427,10 +429,15 @@ def new_comment(trans_id):
                       body = form.body.data)
 
         db.session.add(comment)
+
+        alter_transaction = Transaction.query.get(trans_id)
+        alter_transaction.is_commented = 1
+        db.session.add(alter_transaction)
+
         db.session.commit()
         #TODO przekierowanie do odpowiedniej storny
         flash("Poprawnie dodano Twoj komentarz")
-        return redirect(url_for('index'))
+        return redirect(url_for('comment'))
 
     return render_template('new_comment.html',
                             title='Comment',
@@ -449,9 +456,14 @@ def user_dashboard():
                               join(Transaction, Transaction.offer_id==Offer.id).\
                               filter_by(is_finalised=1, is_sent=0).\
                               join(User, User.id==Transaction.user_id)
+    transactions_to_comment = db.session.query(Transaction.id, func.count(Transaction.id), Transaction.timestamp, 
+                                               Transaction.offer_id, Offer.name, Offer.user_id).\
+                               filter_by(user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               order_by(Transaction.timestamp.desc())
 
     return render_template('user_dashboard.html', number_of_transactions_to_pay_for=number_of_transactions_to_pay_for,
-                           number_of_transactions_to_send=q)
+                           number_of_transactions_to_send=q, transactions_to_comment=transactions_to_comment)
 
 @login_required
 @app.route('/user/dashboard/to/pay')
@@ -597,5 +609,12 @@ def change_password():
 @app.route('/user/dashboard/comment/', methods=['GET', 'POST'])
 def comment():
 
-        return render_template('user_dashboard_comment.html')
+    transactions_to_comment = db.session.query(Transaction.id, Transaction.timestamp, 
+                                               Transaction.offer_id, Offer.name, Offer.user_id).\
+                               filter_by(user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               order_by(Transaction.timestamp.desc())
+
+
+    return render_template('user_dashboard_comment.html', transactions_to_comment=transactions_to_comment)
 

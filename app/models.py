@@ -112,6 +112,7 @@ class Transaction(db.Model):
     hash_link = db.Column(db.String(128))
     is_finalised = db.Column(db.Boolean)
     is_sent = db.Column(db.Boolean)
+    is_commented = db.Column(db.Boolean)
 
     def hash_generator(self, size=32, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))

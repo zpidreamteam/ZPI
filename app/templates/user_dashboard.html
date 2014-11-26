@@ -17,7 +17,12 @@
 				{% endif %}
 			{% endfor %}</a><br>
     	<a href="my/offers/current">Moje oferty</a><br>
-    	<a href="comment">Skomentuj zakup</a><br>      	    
+    	<a href="comment">Skomentuj zakup
+    	{% for transaction_to_comment in transactions_to_comment %}
+				{% if transaction_to_comment.1!=0 %}
+					({{transaction_to_comment.1}})
+				{% endif %}
+			{% endfor %}</a><br>      	    
 		<a href="about/me">Moje dane</a><br>    	    
 		<a href="archive">Archiwum transakcji</a><br>   
 {% endblock %}
