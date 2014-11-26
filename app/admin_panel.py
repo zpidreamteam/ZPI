@@ -77,20 +77,20 @@ def send_newsletter():
     form = QuestionForm()
     if request.method == 'POST':
         recievers = Newsletter.query.order_by(Newsletter.id.desc()).all()
-        for reciever in recievers:
-            if form.validate() == False:
-                flash('Wymagane wszystkie pola.')
-                return render_template('admin/send_newsletter.html', form=form)
-            else:
-                msg = Message(sender=("no.reply.bookstree@gmail.com"),
-				recipients=[reciever.email])
-                msg.subject = " %s " % (form.subject.data)
-                msg.body = """
-                %s 
-                """ % (form.message.data)
-                mail.send(msg)
-                print 'Newsletter do %s zostal wyslany' % (reciever.email)
-        flash('Newsletter zostal wyslany.')
+        if form.validate() == False:
+            flash('Wymagane wszystkie pola.')
+            return render_template('admin/send_newsletter.html', form=form)
+        else:
+            msg = Message(sender=("no.reply.bookstree@gmail.com"))
+            for reciever in recievers:                    
+                msg.add_recipient(reciever.email)
+            msg.subject = " %s " % (form.subject.data)
+            msg.body = """
+            %s 
+            """ % (form.message.data)
+            mail.send(msg)
+            print 'Newsletter do %s zostal wyslany' % (msg.recipients)
+            flash('Newsletter zostal wyslany.')
         return redirect('/admin/newsletter')
     elif request.method == 'GET':
         print 'ok'
