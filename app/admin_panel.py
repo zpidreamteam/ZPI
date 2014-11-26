@@ -1,10 +1,11 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
-from app import app, db, lm, admin_permission, views
+from app import app, db, lm, admin_permission, views, mail
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS
 from models import User, Category, Newsletter, Offer
-from forms import CategoryForm
+from forms import CategoryForm, QuestionForm
+from flask.ext.mail import Message
 
 @app.route('/admin')
 @app.route('/admin/index')
@@ -67,6 +68,34 @@ def admin_newsletters():
                            title='Zarzadzanie newsletterem',
                            newsletters=newsletters)
 
+@app.route('/admin/newsletter/send', methods=['GET', 'POST'])
+@login_required
+@admin_permission.require()
+def send_newsletter():
+    form = QuestionForm()
+    if request.method == 'POST':
+        recievers = Newsletter.query.order_by(Newsletter.id.desc()).all()
+        for reciever in recievers:
+            if form.validate() == False:
+                flash('Wymagane wszystkie pola.')
+                return render_template('admin/send_newsletter.html', form=form)
+            else:
+                msg = Message(sender=("no.reply.bookstree@gmail.com"),
+				recipients=[reciever.email])
+                msg.subject = " %s " % (form.subject.data)
+                msg.body = """
+                %s 
+                """ % (form.message.data)
+                mail.send(msg)
+                print 'Newsletter do %s zostal wyslany' % (reciever.email)
+        flash('Newsletter zostal wyslany.')
+        return redirect('/admin/newsletter')
+    elif request.method == 'GET':
+        print 'ok'
+    return render_template('admin/send_newsletter.html',
+	                       form=form,
+                           title='Wysylanie newslettera')
+						   
 @app.route('/admin/offers')
 @login_required
 @admin_permission.require()
