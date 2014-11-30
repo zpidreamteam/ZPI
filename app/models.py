@@ -20,6 +20,8 @@ class User(db.Model):
     country = db.Column(db.String(32))
     phone = db.Column(db.String(16))
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
+    to_delete = db.Column(db.Boolean)
+
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
@@ -74,6 +76,7 @@ class Offer(db.Model):
     timestamp = db.Column(db.DateTime)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    to_delete = db.Column(db.Boolean)
 
     def is_valid(self):
         if self is not None and self.count > 0:
@@ -102,11 +105,12 @@ class Newsletter(db.Model):
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime)
-    id_from = db.Column(db.Integer, db.ForeignKey('user.id'))
-    id_to = db.Column(db.Integer, db.ForeignKey('user.id'))
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
+    id_from = db.Column(db.Integer)
+    id_to = db.Column(db.Integer)
+    transaction_id = db.Column(db.Integer)
     type = db.Column(db.Boolean)
     body = db.Column(db.String(140))
+    to_delete = db.Column(db.Boolean)
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -119,6 +123,7 @@ class Transaction(db.Model):
     is_finalised = db.Column(db.Boolean)
     is_sent = db.Column(db.Boolean)
     is_commented = db.Column(db.Boolean)
+    to_delete = db.Column(db.Boolean)
 
     def hash_generator(self, size=32, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
@@ -128,3 +133,47 @@ class Transaction(db.Model):
 
 whooshalchemy.whoosh_index(app, Offer)
 
+#Archive----------------------------------------------------------
+class Archive_transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    transaction_id = db.Column(db.Integer)
+    timestamp = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer)
+    offer_id = db.Column(db.Integer)
+    count = db.Column(db.Integer)
+    price = db.Column(db.Float)
+    hash_link = db.Column(db.String(128))
+    is_finalised = db.Column(db.Boolean)
+    is_sent = db.Column(db.Boolean)
+    is_commented = db.Column(db.Boolean)
+    
+class Archive_offer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    offer_id = db.Column(db.Integer)
+    name = db.Column(db.String(128))
+    title = db.Column(db.String(128))
+    book_author = db.Column(db.String(128))
+    price = db.Column(db.Float)
+    shipping = db.Column(db.Float)
+    count = db.Column(db.Integer)
+    body = db.Column(db.String(140))
+    timestamp = db.Column(db.DateTime)
+    category_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer)
+
+class Archive_user(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    nickname = db.Column(db.String(32))
+    email = db.Column(db.String(128))
+    password_hash = db.Column(db.String(128))
+    user_name = db.Column(db.String(128))
+    surname = db.Column(db.String(128))
+    street = db.Column(db.String(128))
+    building_number = db.Column(db.String(16))
+    door_number = db.Column(db.String(16))
+    city = db.Column(db.String(32))
+    zipcode = db.Column(db.String(16))
+    country = db.Column(db.String(32))
+    phone = db.Column(db.String(16))
+    role_id = db.Column(db.Integer)

@@ -85,7 +85,7 @@ class AdminOfferEdit(Form):
     book_author = StringField('book_author', validators=[DataRequired()])
     price = FloatField('price', validators=[DataRequired()])
     shipping = FloatField('shipping', validators=[DataRequired()])
-    count = IntegerField(validators=[DataRequired()])
+    count = IntegerField('count')
     body = TextAreaField('body', validators=[DataRequired()])
     category_id = SelectField('category', coerce=int)
     timestamp = DateTimeField('timestamp', format='%Y-%m-%d %H:%M:%S.%f', validators=[DataRequired()])

@@ -524,7 +524,7 @@ def new_comment(trans_id):
                                join(Offer, Offer.id==Transaction.offer_id).first()
 
     if transactions is None:
-        flash('Nie ma mozesz dodac takiego komentarza!')
+        flash('Nie mozesz dodac takiego komentarza!')
         return redirect(url_for('index'))
 
     if form.validate_on_submit():
