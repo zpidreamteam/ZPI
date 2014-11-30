@@ -4,7 +4,7 @@ from app import app, db, lm, admin_permission, views, mail
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS
 from models import User, Category, Newsletter, Offer
-from forms import CategoryForm, QuestionForm
+from forms import CategoryForm, QuestionForm, AdminOfferEdit
 from flask.ext.mail import Message
 from models import User, Category, Newsletter, Offer, Comment
 from forms import CategoryForm
@@ -108,15 +108,44 @@ def admin_offers():
                            title='Zarzadzanie ofertami',
                            offers=offers)
 
-@app.route('/admin/offers/edit/<int:transaction_id>', methods=['GET', 'POST'])
+@app.route('/admin/offers/edit/<int:offer_id>', methods=['GET', 'POST'])
 @login_required
 @admin_permission.require()
-def admin_offers_edit(transaction_id):
-    offer = Offer.query.get(transaction_id)
+def admin_offers_edit(offer_id):
+  offer = Offer.query.get(offer_id)
+  form = AdminOfferEdit()
+  categories = [(c.id, c.name) for c in Category.query.all()]
+  form.category_id.choices = categories
 
-    return render_template('admin/offers_edit.html',
+  if offer is None:
+    flash('Brak takiej transakcji!')
+    return redirect(url_for('admin_offers'))
+
+
+  if form.validate_on_submit():
+    offer.name = form.name.data
+    offer.title = form.title.data
+    offer.book_author = form.book_author.data
+    offer.price = form.price.data
+    offer.shipping = form.shipping.data
+    offer.count = form.count.data
+    offer.body = form.body.data
+    offer.timestamp = form.timestamp.data
+    offer.category_id = form.category_id.data
+    offer.user_id = form.user_id.data      
+
+    db.session.add(offer)
+    db.session.commit()
+      
+    flash('Zapisano zmiany')
+    return redirect(url_for('admin_offers_edit', offer_id=offer_id))
+    
+  return render_template('admin/offers_edit.html',
                            title='Zarzadzanie ofertami',
-                           offer=offer)
+                           offer=offer,
+                           form=form,
+                           categories=categories)
+
 
 @app.route('/admin/raports')
 @login_required

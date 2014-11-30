@@ -19,9 +19,75 @@
             <!-- /.panel-heading -->
             <div class="panel-body">
                 <div class="table-responsive">               
-                            <td>{{ offer.id }}</td>
-                            <td><a href="#">{{ offer.name }}</a></td>
-                            <td>{{ offer.user_id}}</a></td>
+                    <form action="" method="post" name="AdminOfferEdit" enctype="multipart/form-s">
+                    {{ form.hidden_tag() }}
+                    <p>
+                        Id: <br>
+                        <input class="form-control" id="offer_id" name="offer_id" type="text" value="{{ offer.id }}" readonly>
+                        {% for error in form.offer_id.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                        Timestamp: <br>
+                        <input class="form-control" id="timestamp" name="timestamp" type="text" value="{{ offer.timestamp }}">
+                        {% for error in form.timestamp.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                        Id użytkownika: <br>
+                        <input class="form-control" id="user_id" name="user_id" type="text" value="{{ offer.user_id }}">
+                        {% for error in form.user_id.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                        Nazwa ogłoszenia: <br>
+                        <input class="form-control" id="name" name="name" type="text" value="{{ offer.name }}">
+                        {% for error in form.name.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                        Tytuł książki: <br>
+                        <input class="form-control" id="title" name="title" type="text" value="{{ offer.title }}">
+                        {% for error in form.title.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                        Autor/autorzy: <br>
+                        <input class="form-control" id="book_author" name="book_author" type="text" value="{{ offer.book_author }}">
+                        {% for error in form.book_author.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                        Cena za sztukę: <br>
+                        <input class="form-control" id="price" name="price" type="text" value="{{ offer.price }}">
+                        {% for error in form.price.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                        Koszt przesyłki: <br>
+                        <input class="form-control" id="shipping" name="shipping" type="text" value="{{ offer.shipping }}">
+                        {% for error in form.shipping.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                        Liczba sztuk: <br>
+                        <input class="form-control" id="count" name="count" type="text" value="{{ offer.count }}">
+                        {% for error in form.count.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                        Kategoria:<br>
+                        <select class="btn btn-default" id="category_id" name="category_id">
+                             {% for category in categories %}
+                                <option value="{{category[0]}}" 
+                                {% if category[0]==offer.category_id %}
+                                    selected="555"
+                                {% endif %}
+                                >{{category[1]}}</option> 
+                             {% endfor %}
+                            {% for error in form.category_id.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                            {% endfor %}
+                        </select> <br>
+                        Opis:<br>
+                        <textarea class="form-control" rows="5" id="body" name="body">{{ offer.body }}</textarea><br>
+                        {% for error in form.body.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                            {% endfor %}
+                        <input class="btn btn-default btn-lg" type="submit" value="Zapisz zmiany">
+                    </p>
+                    </form>
                 </div>
                 <!-- /.table-responsive -->
             </div>
