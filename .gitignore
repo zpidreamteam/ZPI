@@ -7,3 +7,4 @@ whoosh_index
 uploads
 photos
 src/pip-delete-this-directory.txt
+*.jpg

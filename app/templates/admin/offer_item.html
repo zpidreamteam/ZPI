@@ -5,8 +5,12 @@
 
     <td class="center">
         <div class="tooltip-demo">
-            <button type="button" data-toggle="tooltip" data-placement="top" title="Wyświetl dane"><i class="fa fa-child fa-fw"></i> </button>
-            <button type="button" data-toggle="tooltip" data-placement="top" title="Edycja danych"><i class="fa fa-pencil fa-fw"></i> </button>
+            <a href="../offer/read/{{ offer.id }}">
+                <button type="button" data-toggle="tooltip" data-placement="top" title="Wyświetl dane"><i class="fa fa-child fa-fw"></i> </button>
+            </a>
+            <a href="./offers/edit/{{ offer.id }}">
+                <button type="button" data-toggle="tooltip" data-placement="top" title="Edycja danych"><i class="fa fa-pencil fa-fw"></i> </button>
+            </a>
             <button type="button" data-toggle="tooltip" data-placement="top" title="Usuń ogłoszenie"><i class="fa fa-times fa-fw"></i> </button>
         </div>
     </td>

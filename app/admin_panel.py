@@ -108,6 +108,16 @@ def admin_offers():
                            title='Zarzadzanie ofertami',
                            offers=offers)
 
+@app.route('/admin/offers/edit/<int:transaction_id>', methods=['GET', 'POST'])
+@login_required
+@admin_permission.require()
+def admin_offers_edit(transaction_id):
+    offer = Offer.query.get(transaction_id)
+
+    return render_template('admin/offers_edit.html',
+                           title='Zarzadzanie ofertami',
+                           offer=offer)
+
 @app.route('/admin/raports')
 @login_required
 @admin_permission.require()

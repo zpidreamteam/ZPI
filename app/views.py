@@ -347,7 +347,10 @@ def read_offer(id):
             neg = neg + 1
 
     tot = poz + neg
-    percentage = poz *100 / tot
+    if tot==0:
+        percentage=0
+    else:
+        percentage = poz *100 / tot
 
     return render_template('read_offer.html',
                             title='Ogloszenie',
