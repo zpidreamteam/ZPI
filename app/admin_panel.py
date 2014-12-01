@@ -201,7 +201,10 @@ def delete_user(user_id):
   if(user is None):
     flash('Uzytkownik nie istnieje! ')
     return redirect(url_for('admin_dashboard'))
-  
+  if(user_id==g.user.id):
+    flash('Nie mozesz usunac wlasnego konta! ')
+    return redirect(url_for('admin_dashboard'))
+
   offers = db.session.query(func.count(Offer.id)).\
                                filter(Offer.user_id==user_id).\
                                filter(Offer.count!=0).\
@@ -266,6 +269,39 @@ def delete_user(user_id):
   flash('Uzytkownik o id: ' + str(user_id) + ' zostal usuniety! ')
   return True
 
+def clean_transactions():
+  last_transaction = db.session.query(Transaction).order_by(Transaction.id.desc()).first()
+  transactions = Transaction.query.filter_by(to_delete=1).filter(Transaction.id!=last_transaction.id)
+
+  for transaction in transactions:
+    db.session.delete(transaction)
+  
+  db.session.commit()
+  flash('Wyczyszczono puste elementy! ')
+  return True
+
+def clean_offers():
+  last_offer = db.session.query(Offer).order_by(Offer.id.desc()).first()
+  offers = Offer.query.filter_by(to_delete=1).filter(Offer.id!=last_offer.id)
+
+  for offer in offers:
+    db.session.delete(offer)
+  
+  db.session.commit()
+  flash('Wyczyszczono puste elementy! ')
+  return True
+
+def clean_users():
+  last_user = db.session.query(User).order_by(User.id.desc()).first()
+  users = User.query.filter_by(to_delete=1).filter(User.id!=last_user.id)
+
+  for user in users:
+    db.session.delete(user)
+  
+  db.session.commit()
+  flash('Wyczyszczono puste elementy! ')
+  return True
+
 @app.route('/admin/offers/edit/<int:offer_id>', methods=['GET', 'POST'])
 @login_required
 @admin_permission.require()
@@ -327,6 +363,18 @@ def admin_comments():
 @login_required
 @admin_permission.require()
 def admin_offers_delete(offer_id):
-    delete_offer(offer_id, True)
-    
+    if delete_offer(offer_id, True)==True:
+      clean_transactions()
+      clean_offers()
+      clean_users()
     return redirect(url_for('admin_offers'))
+
+@app.route('/admin/user/delete/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+@admin_permission.require()
+def admin_user_delete(user_id):
+    if delete_user(user_id)==True:
+      clean_transactions()
+      clean_offers()
+      clean_users()
+    return redirect(url_for('admin_users'))

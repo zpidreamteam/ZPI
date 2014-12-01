@@ -19,7 +19,7 @@ class User(db.Model):
     zipcode = db.Column(db.String(16))
     country = db.Column(db.String(32))
     phone = db.Column(db.String(16))
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
+    role_id = db.Column(db.Integer, db.ForeignKey('role.id'), default=2)
     to_delete = db.Column(db.Boolean, default=0)
 
 
