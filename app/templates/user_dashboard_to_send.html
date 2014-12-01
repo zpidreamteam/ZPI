@@ -22,10 +22,10 @@
                     ({{number_of_transaction_to_send.1}})
                     {% endif %}
                     {% endfor %}</a></li>
-                    <li><a href="my/offers/current">Moje oferty</a></li>
-                    <li><a href="comment">Skomentuj zakup</a></li>      
-                    <li><a href="about/me">Moje dane</a></li>           
-                    <li><a href="archive">Archiwum transakcji</a></li>  
+                    <li><a href="../my/offers/current">Moje oferty</a></li>
+                    <li><a href="../comment">Skomentuj zakup</a></li>      
+                    <li><a href="../about/me">Moje dane</a></li>           
+                    <li><a href="../archive">Archiwum transakcji</a></li>  
                 </ul>
             </div>
         </div>
@@ -50,6 +50,11 @@
             <tbody>
                 {% for transaction in transactions %}
                 <tr class="odd gradeX">
+                    
+            {% if transactions.count()==0 %}
+               <td> Pusto i cicho</td>
+            {% endif %}
+
                     <td>{{transaction.id}}</td>
                     <td>{{transaction.name}}</td>
                     <td>
@@ -94,9 +99,5 @@
             </p>
     {% endfor %}
 -->
-
-            {% if transactions.count()==0 %}
-                Pusto i cicho
-            {% endif %}
 
 {% endblock %}
