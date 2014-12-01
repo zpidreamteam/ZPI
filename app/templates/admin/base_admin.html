@@ -69,19 +69,7 @@
                             <a class="active" href="{{ url_for('admin_dashboard') }}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                         </li>
                         <li>
-                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Raporty<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="flot.html">Dzienne</a>
-                                </li>
-                                <li>
-                                    <a href="morris.html">Tygodniowe</a>
-                                </li>
-								<li>
-                                    <a href="morris.html">Miesięczne</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="{{ url_for('admin_raports') }}"><i class="fa fa-bar-chart-o fa-fw"></i> Raporty</a>
                         </li>
                         <li>
                             <a href="{{ url_for('admin_users') }}"><i class="fa fa-table fa-fw"></i> Użytkownicy</a>
@@ -90,7 +78,7 @@
                             <a href="{{ url_for('admin_categories') }}"><i class="fa fa-edit fa-fw"></i> Kategorie</a>
                         </li>
 						<li>
-                            <a href="#"><i class="fa fa-comments fa-fw"></i> Komentarze</a>
+                            <a href="{{ url_for('admin_comments') }}"><i class="fa fa-comments fa-fw"></i> Komentarze</a>
                         </li>
                         <li>
                             <a href="{{ url_for('admin_offers') }}"><i class="fa fa-files-o fa-fw"></i> Ogłoszenia</a>
@@ -121,7 +109,7 @@
                 <!-- /.col-lg-12 -->
             </div>
             <!-- /.row -->
-              <div class="row">
+            <div class="row">
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}
 
@@ -134,7 +122,7 @@
                 {% endwith %}
 
                 {% block content %}{% endblock %}
-             </div>
+            </div>
 
             <!-- /.row -->
         </div>
@@ -154,6 +142,11 @@
 
     <!-- Custom Theme JavaScript -->
     <script src="{{ url_for('.static', filename='admin/js/sb-admin-2.js') }}"></script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="{{ url_for('.static', filename='admin/js/plugins/morris/raphael.min.js') }}"></script>
+    <script src="{{ url_for('.static', filename='admin/js/plugins/morris/morris.min.js') }}"></script>
+    <script src="{{ url_for('.static', filename='admin/js/plugins/morris/morris-data.min.js') }}"></script>
 
 </body>
 

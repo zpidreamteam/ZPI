@@ -9,9 +9,8 @@ from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FIL
 from flask.ext.uploads import save, Upload
 from flask.ext.mail import Message
 from sqlalchemy.sql.expression import case
-from sqlalchemy import func
-from sqlalchemy import exists
-from sqlalchemy import and_
+from sqlalchemy import func, exists, and_, or_
+
 @app.before_request
 def before_request():
     g.user = current_user
@@ -32,6 +31,10 @@ def index():
     r2 = recently_added[1]
     r3 = recently_added[2]
     r4 = recently_added[3]
+
+    #TODO sprawdzic poprawnosc po zmianie sposobu filtracji (bez elementow z to_delete==1)
+    recently_added = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).order_by(Offer.timestamp.desc()).limit(4)
+
     return render_template('index.html',
                            title='Strona glowna',
                            user=user,
@@ -49,7 +52,8 @@ def search():
 
 @app.route('/search_results/<query>')
 def search_results(query):
-    results = Offer.query.whoosh_search(query, MAX_SEARCH_RESULTS).all()
+    #TODO sprawdzic poprawnosc po zmianie sposobu filtracji (bez elementow z to_delete==1)
+    results = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).whoosh_search(query, MAX_SEARCH_RESULTS).all()
 
     return render_template('search_results.html',
                            query=query,
@@ -64,7 +68,7 @@ def login():
     if form.validate_on_submit():
         session['remember_me'] = form.remember_me.data
 
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter(or_(User.to_delete==0, User.to_delete==None)).filter_by(email=form.email.data).first()
 
         if user is None:
             flash('Uzytkownik z mailem {email} nie istnieje.'.format(email=form.email.data))
@@ -157,7 +161,7 @@ def internal_error(error):
 
 @app.route('/approve/<int:user_id>/<int:offer_id>/<string:hash_link>/<int:return_payment_code>', methods=['GET'])
 def approve(user_id, offer_id, hash_link, return_payment_code):
-    t = Transaction.query.filter_by(user_id=user_id, offer_id=offer_id, hash_link=hash_link).first()
+    t = Transaction.query.filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).filter_by(user_id=user_id, offer_id=offer_id, hash_link=hash_link).first()
     if t is None:
         flash('Podana transakcja nie istnieje!')
         return redirect(url_for('index'))
@@ -171,6 +175,7 @@ def approve(user_id, offer_id, hash_link, return_payment_code):
         db.session.add(t)
         db.session.commit()
 
+        #TO CHECK, zabezpieczenia powinny zapobiec wystapieniu nulla. Jezeli tak sie nie stanie, istnieje ryzyko bledu, gdy mail lub uzytkonik bedzie nullem.
         buyerMail = User.query.get(user_id).email
         sellerMail = User.query.get(Offer.query.get(offer_id).user_id).email
 
@@ -207,6 +212,9 @@ def transaction_validator(user_id, offer_id, count=None):
         error = True
     elif user_id != g.user.id:
         flash('Blad wewnetrzny. Proba Phishingu?')
+        error = True
+    elif offer.to_delete==1:
+        flash('Oferta zostala usunieta! ')
         error = True
     elif count is not None:
         if not offer.is_available(count):
@@ -286,7 +294,7 @@ def purchase_overview(user_id, offer_id, count):
 @login_required
 def purchase_finalised(user_id, offer_id, hash_link):
 
-    t = Transaction.query.filter_by(user_id=user_id, offer_id=offer_id, hash_link=hash_link).first()
+    t = Transaction.query.filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).filter_by(user_id=user_id, offer_id=offer_id, hash_link=hash_link).first()
     if t is None:
         flash('Podana transakcja nie istnieje!')
         #TODO redirect to 404 error page
@@ -336,6 +344,12 @@ def create_offer():
 @app.route('/offer/read/<int:id>')
 def read_offer(id):
     offer = Offer.query.get(id)
+
+    #added verification
+    if offer is None or offer.to_delete==1:
+        flash('Oferta zostala usunieta!')
+        return redirect(url_for('index'))
+
     user = User.query.filter_by(id=offer.user_id).first()
     photo = Upload.query.get_or_404(id) #TODO need to handle offers without pictures
 
@@ -345,7 +359,7 @@ def read_offer(id):
     if comments is None:
         percentage = 0
         return redirect(url_for('index'))
-	
+
     poz = 0
     neg = 0
     for c in comments:
@@ -355,8 +369,11 @@ def read_offer(id):
             neg = neg + 1
 
     tot = poz + neg
-    percentage = poz *100 / tot
-	
+    if tot==0:
+        percentage=0
+    else:
+        percentage = poz *100 / tot
+
     return render_template('read_offer.html',
                             title='Ogloszenie',
                             offer = offer,
@@ -371,6 +388,8 @@ def read_offer(id):
 @app.route('/offer/<category>/<int:page>')
 def read_offers_by_category(category, page=1):
     c = Category.query.filter_by(name=category).first()
+
+    #TODO CHECK WHAT HAPPENS WITH DELETED OFFERS
     if c is None:
         flash('Nie ma takiej kategorii %s.' % category)
         return redirect(url_for('index'))
@@ -384,7 +403,8 @@ def read_offers_by_category(category, page=1):
 @app.route('/user/profile/offers/<user_id>')
 @app.route('/user/profile/offers/<user_id>/<int:page>')
 def read_offers_by_user_id(user_id, page=1):
-    c = User.query.filter_by(id=user_id).first()
+    #added veryfication
+    c = User.query.filter(or_(User.to_delete==0, User.to_delete==None)).filter_by(id=user_id).first()
     if c is None:
         flash('Nie ma uzytkownika o numerze %s.' % user_id)
         return redirect(url_for('index'))
@@ -398,7 +418,8 @@ def read_offers_by_user_id(user_id, page=1):
 @app.route('/offers')
 @app.route('/offers/<int:page>')
 def read_offers(page=1):
-    offers = Offer.query.order_by(Offer.timestamp.desc()).all()
+    #added veryfication
+    offers = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).order_by(Offer.timestamp.desc()).all()
 
     return render_template('offers.html',
                             title='Ogloszenia',
@@ -432,6 +453,27 @@ def add_to_newsletter_confirm(email):
     flash("Zostales zapisany do newslettera")
 
     return redirect(url_for('index'))
+
+@app.route('/delete_from_newsletter', methods=['GET', 'POST'])
+def delete_from_newsletter():
+    form = NewsletterForm()
+    if form.validate_on_submit():
+        return redirect(url_for('delete_from_newsletter_confirm', email=form.newsletter.data))
+    
+    flash("Aby wypisac sie z newslettera musisz podac swojego prawidlowego maila")
+    return render_template('delete_from_newsletter.html',
+                           title='Usun z newslettera',
+                           form=form)
+
+@app.route('/delete_from_newsletter_confirm/<email>')
+def delete_from_newsletter_confirm(email):
+    Newsletter.query.filter_by(email=email).delete()
+
+    db.session.commit()
+
+    flash("Zostales wypisany z newslettera")
+
+    return redirect(url_for('index'))	
 
 @app.route('/contact_us', methods=['GET', 'POST'])
 def contact_us():
@@ -486,9 +528,13 @@ def show_profile(user_id):
     if comments is None:
         flash('Uzytkownik nie ma komentarzy.')
         return redirect(url_for('index'))
-    
-    user = User.query.filter_by(id=user_id).first()
-	
+
+    #added veryfication
+    user = User.query.filter(or_(User.to_delete==0, User.to_delete==None)).filter_by(id=user_id).first()
+    if user is None:
+        flash('Uzytkownik nie istnieje lub usunal konto!')
+        return redirect(url_for('index'))
+
     poz = 0
     neg = 0
     for c in comments:
@@ -506,10 +552,16 @@ def show_profile(user_id):
 							neg=neg,
 							tot=tot,
                             percentage=percentage,
-							user_id=user_id)		
-		
+							user_id=user_id)
+
 @app.route('/user/profile/comments/<int:user_id>')
 def show_comments(user_id):
+    #added veryfication
+    user = User.query.filter(or_(User.to_delete==0, User.to_delete==None)).filter_by(id=user_id).first()
+    if user is None:
+        flash('Uzytkownik nie istnieje lub usunal konto!')
+        return redirect(url_for('index'))
+
     comments = Comment.query.filter_by(id_to=user_id)
     if comments is None:
         flash('Uzytkownik nie ma komentarzy.')
@@ -523,17 +575,18 @@ def show_comments(user_id):
 @login_required
 def new_comment(trans_id):
     form = CommentForm()
-
+    #added veryfication
     transactions = db.session.query(Transaction.id, Transaction.offer_id, Offer.user_id).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
                                filter_by(id=trans_id, user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
                                join(Offer, Offer.id==Transaction.offer_id).first()
-    
+
     if transactions is None:
-        flash('Nie ma mozesz dodac takiego komentarza!')
+        flash('Nie mozesz dodac takiego komentarza!')
         return redirect(url_for('index'))
 
     if form.validate_on_submit():
-        
+
         is_positive = 1 if form.type.data=='true' else 0
         comment = Comment(timestamp = datetime.utcnow(),
                       id_from = g.user.id,
@@ -560,18 +613,23 @@ def new_comment(trans_id):
 @login_required
 @app.route('/user/dashboard/')
 def user_dashboard():
-
+    #added veryfication
     number_of_transactions_to_pay_for = db.session.query(func.count(Transaction.id)).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
                                filter_by(user_id=g.user.id, is_finalised=0).\
                                first()
-
+    #added veryfication                           
     q = db.session.query(Offer.id, func.count(Transaction.id)).\
+                              filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                              filter(or_(Offer.to_delete==0, Offer.to_delete==None)).\
                               filter_by(user_id=g.user.id).\
                               join(Transaction, Transaction.offer_id==Offer.id).\
                               filter_by(is_finalised=1, is_sent=0).\
                               join(User, User.id==Transaction.user_id)
-    transactions_to_comment = db.session.query(Transaction.id, func.count(Transaction.id), Transaction.timestamp, 
+    #added veryfication                             
+    transactions_to_comment = db.session.query(Transaction.id, func.count(Transaction.id), Transaction.timestamp,
                                                Transaction.offer_id, Offer.name, Offer.user_id).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
                                filter_by(user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
                                join(Offer, Offer.id==Transaction.offer_id).\
                                order_by(Transaction.timestamp.desc())
@@ -582,10 +640,12 @@ def user_dashboard():
 @login_required
 @app.route('/user/dashboard/to/pay')
 def user_dashboard_to_pay():
-    transactions = db.session.query(Transaction.id, Transaction.user_id, 
+    #added veryfication
+    transactions = db.session.query(Transaction.id, Transaction.user_id,
                                     Transaction.offer_id, Offer.name, Transaction.timestamp,
                                     Transaction.count, Transaction.price,
                                     Transaction.hash_link).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
                                filter_by(user_id=g.user.id, is_finalised=0).\
                                join(Offer, Offer.id==Transaction.offer_id).\
                                order_by(Transaction.timestamp.desc())
@@ -595,10 +655,12 @@ def user_dashboard_to_pay():
 @login_required
 @app.route('/user/dashboard/to/send')
 def user_dashboard_to_send():
+    #added veryfication
     transactions = db.session.query(Offer.id, Offer.name, Offer.price, Transaction.id.label("transact_id"),
                                     Transaction.user_id, User.street, Transaction.timestamp,
                                     User.building_number, User.door_number,
                                     User.city, User.zipcode).\
+                              filter(or_(Offer.to_delete==0, Offer.to_delete==None)).\
                               filter_by(user_id=g.user.id).\
                               join(Transaction, Transaction.offer_id==Offer.id).\
                               filter_by(is_finalised=1, is_sent=0).\
@@ -609,7 +671,10 @@ def user_dashboard_to_send():
 @login_required
 @app.route('/user/dashboard/to/send/check/<int:transaction_id>', methods=['GET', 'POST'])
 def user_dashboard_to_send_check(transaction_id):
+    #added veryfication
     t = db.session.query(Offer.user_id, Transaction.id).\
+                              filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                              filter(or_(Offer.to_delete==0, Offer.to_delete==None)).\
                               filter_by(user_id=g.user.id).\
                               join(Transaction, Transaction.offer_id==Offer.id).\
                               filter_by(is_finalised=1, is_sent=0, id=transaction_id).\
@@ -628,8 +693,10 @@ def user_dashboard_to_send_check(transaction_id):
 @login_required
 @app.route('/user/dashboard/my/offers/current')
 def user_dashboard_my_offers_current():
-    offers = db.session.query(Offer.id, Offer.name, Offer.timestamp, 
+    #added veryfication
+    offers = db.session.query(Offer.id, Offer.name, Offer.timestamp,
                               Offer.price, Offer.count).\
+                              filter(or_(Offer.to_delete==0, Offer.to_delete==None)).\
                               filter_by(user_id=g.user.id).\
                               filter(Offer.count!=0).\
                               order_by(Offer.timestamp.desc())
@@ -639,7 +706,8 @@ def user_dashboard_my_offers_current():
 @login_required
 @app.route('/user/dashboard/my/offers/close/<int:offer_id>', methods=['GET', 'POST'])
 def offer_close(offer_id):
-    offer = Offer.query.filter_by(id=offer_id, user_id=g.user.id).first()
+    #added veryfication
+    offer = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).filter_by(id=offer_id, user_id=g.user.id).first()
 
     if offer is None:
         flash('Nie ma takiej oferty')
@@ -681,20 +749,22 @@ def about_me():
 @login_required
 @app.route('/user/dashboard/archive/')
 def archive():
-
+    #added veryfication
     transactions_bought = db.session.query(Transaction.id, Transaction.user_id, Offer.name,
                                     Transaction.offer_id, Offer.name, Transaction.timestamp,
                                     Transaction.count, Transaction.price,
                                     Transaction.hash_link, User.nickname).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
                                filter_by(user_id=g.user.id, is_finalised=1, is_sent=1).\
                                join(Offer, Offer.id==Transaction.offer_id).\
                                join(User, User.id==Offer.user_id).\
                                order_by(Transaction.timestamp.desc())
-
+    #added veryfication
     transactions_sold = db.session.query(Offer.id, Offer.name, Transaction.id.label("transact_id"),
                                     Transaction.user_id, Transaction.count, Transaction.price, User.street, Transaction.timestamp,
                                     User.building_number, User.door_number,
                                     User.city, User.zipcode, User.nickname).\
+                              filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
                               filter_by(user_id=g.user.id).\
                               join(Transaction, Transaction.offer_id==Offer.id).\
                               filter_by(is_finalised=1, is_sent=1).\
@@ -708,6 +778,7 @@ def archive():
 @app.route('/user/dashboard/change/password/', methods=['GET', 'POST'])
 def change_password():
     user = User.query.get(g.user.id)
+
     form = ChangePasswordForm()
     if form.validate_on_submit():
         if user.verify_password(form.old_password.data):
@@ -723,8 +794,9 @@ def change_password():
 @app.route('/user/dashboard/comment/', methods=['GET', 'POST'])
 def comment():
 
-    transactions_to_comment = db.session.query(Transaction.id, Transaction.timestamp, 
+    transactions_to_comment = db.session.query(Transaction.id, Transaction.timestamp,
                                                Transaction.offer_id, Offer.name, Offer.user_id).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
                                filter_by(user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
                                join(Offer, Offer.id==Transaction.offer_id).\
                                order_by(Transaction.timestamp.desc())
