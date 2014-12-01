@@ -2,6 +2,76 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<div class="oglos_area">
+        <div class="col-md-3 col-sm-3">
+        <div class="oglos_left">
+            <h3>Menu</h3>
+            <ul>
+                <li><a href="pay">Do zapłaty 
+                    {% for number_of_transaction_to_pay_for in number_of_transactions_to_pay_for %}
+                    {% if number_of_transaction_to_pay_for!=0 %}
+                    ({{number_of_transaction_to_pay_for}})
+                    {% endif %}
+                    {% endfor %}
+                </a></li>
+                <li><a href="send">Do wysyłki 
+                    {% for number_of_transaction_to_send in number_of_transactions_to_send %}
+                    {% if number_of_transaction_to_send.1!=0 %}
+                    ({{number_of_transaction_to_send.1}})
+                    {% endif %}
+                    {% endfor %}</a></li>
+                    <li><a href="../../my/offers/current">Moje oferty</a></li>
+                    <li><a href="../../comment">Skomentuj zakup</a></li>      
+                    <li><a href="../../about/me">Moje dane</a></li>           
+                    <li><a href="../../archive">Archiwum transakcji</a></li>  
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9 col-sm-9">
+
+        
+
+<a href="{{ url_for('user_dashboard') }}"><button class="btn btn_submit">WSTECZ</button></a>
+<h1>Oczekujące płatności:</h1>
+<div class="panel-body">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+            <thead>
+                <tr>
+                    <th>Nazwa</th>
+                    <th>Data wystawienia</th>
+                    <th>Ilość egzemplarzy</th>
+                    <th>Cena</th>
+                    <th>Akcja</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for offer in offers %}
+                <tr class="odd gradeX">
+                    <td>{{offer.name}}</td>
+                    <td>
+                    {{ offer.timestamp.year }}-{{ offer.timestamp.month }}-{{ offer.timestamp.day }}
+                    </td>
+                    <td>{{offer.count}}</td>
+                    <td>{{offer.price}}</td>
+                    <td>
+                     <form action="/user/dashboard/my/offers/close/{{offer.id}}">
+                        <input type="submit" value="Zamknij oferte">
+                    </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- /.table-responsive -->
+</div>
+</div>
+ <!-- /.column right end -->
+</div>
+
+<!--
     <h1>Moje oferty:</h1>
     <p>OfferID --- Nazwa --- data dodania --- Ilość egzemplarzy --- Cena</p>
     {% for offer in offers %}
@@ -12,4 +82,6 @@
             </form>
             <br>
     {% endfor %}
+
+-->
 {% endblock %}

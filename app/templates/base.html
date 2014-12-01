@@ -51,7 +51,7 @@
                                     <li><a href="{{ url_for('index') }}">Strona Główna</a></li>
                                     <li><a href="{{ url_for('read_offers') }}">Przeglądaj Ogłoszenia</a></li>
                                     <li><a href="{{ url_for('create_offer') }}">Dodaj Ogłoszenie</a></li>
-                                    <li><a href="">Moje Konto</a></li>
+                                    <li><a href="{{ url_for('user_dashboard') }}">Moje Konto</a></li>
                                     <li><a href="{{ url_for('logout') }}">Wyloguj</a></li>
                                     
                                     {% else %}

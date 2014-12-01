@@ -2,16 +2,74 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<a href="../">Wstecz</a>
-    <h1>Oczekujące płatności:</h1>
-    <p>TransactID --- Nazwa --- data --- Ilość egzemplarzy --- Całkowita płatność</p>
-    {% for transaction in transactions %}
-            <a href="/przelewy48/{{transaction.user_id}}/{{transaction.offer_id}}/{{transaction.hash_link}}">{{transaction.id}} --- {{transaction.name}} --- {{ transaction.timestamp.year }}-{{ transaction.timestamp.month }}-{{ transaction.timestamp.day }} ---
-            {{transaction.count}} --- {{transaction.count*transaction.price}}</a>
-            <a href="../../../offer/read/{{transaction.offer_id}}">Szczegóły oferty</a><br>
-    {% endfor %}
+
+<div class="oglos_area">
+        <div class="col-md-3 col-sm-3">
+        <div class="oglos_left">
+            <h3>Menu</h3>
+            <ul>
+                <li><a href="pay">Do zapłaty 
+                    {% for number_of_transaction_to_pay_for in number_of_transactions_to_pay_for %}
+                    {% if number_of_transaction_to_pay_for!=0 %}
+                    ({{number_of_transaction_to_pay_for}})
+                    {% endif %}
+                    {% endfor %}
+                </a></li>
+                <li><a href="send">Do wysyłki 
+                    {% for number_of_transaction_to_send in number_of_transactions_to_send %}
+                    {% if number_of_transaction_to_send.1!=0 %}
+                    ({{number_of_transaction_to_send.1}})
+                    {% endif %}
+                    {% endfor %}</a></li>
+                    <li><a href="../my/offers/current">Moje oferty</a></li>
+                    <li><a href="../comment">Skomentuj zakup</a></li>      
+                    <li><a href="../about/me">Moje dane</a></li>           
+                    <li><a href="../archive">Archiwum transakcji</a></li>  
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9 col-sm-9">
+
+        
+
+<a href="../"><button class="btn btn_submit">WSTECZ</button></a>
+<h1>Oczekujące płatności:</h1>
+<div class="panel-body">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+            <thead>
+                <tr>
+                    <th>ID Transakcji</th>
+                    <th>Nazwa</th>
+                    <th>Data</th>
+                    <th>Ilość egzemplarzy</th>
+                    <th>Całkowita płatność</th>
+                    <th>Szczegóły oferty</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                <tr class="odd gradeX">
+                    <td>{{transaction.id}}</td>
+                    <td>{{transaction.name}}</td>
+                    <td>
+                    {{ transaction.timestamp.year }}-{{ transaction.timestamp.month }}-{{ transaction.timestamp.day }}
+                    </td>
+                    <td>{{transaction.count}}</td>
+                    <td>{{transaction.count*transaction.price}}</td>
+                    <td><a href="offer/read/{{transaction.offer_id}}">ZAPŁAĆ</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- /.table-responsive -->
+</div>
+</div>
+ <!-- /.column right end -->
+</div>
 
     {% if transactions.count()==0 %}
                 Pusto i cicho
-            {% endif %}
+    {% endif %}
 {% endblock %}
