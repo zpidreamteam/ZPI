@@ -1,0 +1,23 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Wypisz sie z newslettera</h1>
+    <form action="" method="post" name="delete_drom_newsletter" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            Twój e-mail:<br>
+            <input  class="form-control" id="newsletter" name="newsletter" type="email" value="">
+            {% for error in form.newsletter.errors %}
+            <div class="alert-group">
+                <div style="padding:5px;margin:15px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+            {% endfor %}<br>
+
+        <p><input class="btn btn-default btn-lg" type="submit" value="Wypisz się"></p>
+        </div>
+    </form>
+{% endblock %}

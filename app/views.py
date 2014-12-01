@@ -444,6 +444,27 @@ def add_to_newsletter_confirm(email):
 
     return redirect(url_for('index'))
 
+@app.route('/delete_from_newsletter', methods=['GET', 'POST'])
+def delete_from_newsletter():
+    form = NewsletterForm()
+    if form.validate_on_submit():
+        return redirect(url_for('delete_from_newsletter_confirm', email=form.newsletter.data))
+    
+    flash("Aby wypisac sie z newslettera musisz podac swojego prawidlowego maila")
+    return render_template('delete_from_newsletter.html',
+                           title='Usun z newslettera',
+                           form=form)
+
+@app.route('/delete_from_newsletter_confirm/<email>')
+def delete_from_newsletter_confirm(email):
+    Newsletter.query.filter_by(email=email).delete()
+
+    db.session.commit()
+
+    flash("Zostales wypisany z newslettera")
+
+    return redirect(url_for('index'))	
+
 @app.route('/contact_us', methods=['GET', 'POST'])
 def contact_us():
     form = ContactForm()
