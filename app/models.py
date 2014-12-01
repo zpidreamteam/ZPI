@@ -20,7 +20,7 @@ class User(db.Model):
     country = db.Column(db.String(32))
     phone = db.Column(db.String(16))
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
-    to_delete = db.Column(db.Boolean)
+    to_delete = db.Column(db.Boolean, default=0)
 
 
     def hash_password(self, password):
@@ -76,7 +76,7 @@ class Offer(db.Model):
     timestamp = db.Column(db.DateTime)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    to_delete = db.Column(db.Boolean)
+    to_delete = db.Column(db.Boolean, default=0)
 
     def is_valid(self):
         if self is not None and self.count > 0:
@@ -110,7 +110,7 @@ class Comment(db.Model):
     transaction_id = db.Column(db.Integer)
     type = db.Column(db.Boolean)
     body = db.Column(db.String(140))
-    to_delete = db.Column(db.Boolean)
+    to_delete = db.Column(db.Boolean, default=0)
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -123,7 +123,7 @@ class Transaction(db.Model):
     is_finalised = db.Column(db.Boolean)
     is_sent = db.Column(db.Boolean)
     is_commented = db.Column(db.Boolean)
-    to_delete = db.Column(db.Boolean)
+    to_delete = db.Column(db.Boolean, default=0)
 
     def hash_generator(self, size=32, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))

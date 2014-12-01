@@ -26,7 +26,7 @@ def admin_dashboard():
 @login_required
 @admin_permission.require()
 def admin_users():
-    users = User.query.all()
+    users = User.query.filter(or_(User.to_delete==0, User.to_delete==None))
 
     return render_template('admin/users.html',
                            title='Zarzadzanie uzytkownikiami',
@@ -104,7 +104,7 @@ def send_newsletter():
 @login_required
 @admin_permission.require()
 def admin_offers():
-    offers = Offer.query.all()
+    offers = Offer.query.filter(or_(Offer.to_delete==0,Offer.to_delete==None))
 
     return render_template('admin/offers.html',
                            title='Zarzadzanie ofertami',
