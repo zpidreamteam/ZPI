@@ -5,7 +5,7 @@
 {% block content %}
 
 <div class="oglos_area">
-	
+
 	<div class="col-md-3 col-sm-3">
 		<div class="oglos_left">
 			<h3>Kategorie</h3>
@@ -53,11 +53,9 @@
 								</tr>
 							</thead>
 							<tbody>
-
 								{% for offer in offers %}
-								{% include 'offer_item.html' %}
+									{% include 'offer_item.html' %}
 								{% endfor %}
-
 							</tbody>
 						</table>
 					</div>

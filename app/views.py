@@ -1,12 +1,15 @@
-from flask import render_template, flash, redirect, session, url_for, request, g
+from flask import render_template, flash, redirect, session, url_for, request, g, current_app
 from flask.ext.login import login_user, logout_user, current_user, login_required
+from flask_principal import ActionNeed, AnonymousIdentity, Identity, identity_changed, identity_loaded, Permission, Principal, UserNeed, RoleNeed
 from app import app, db, lm, mail, Storage
-from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, ContactForm, QuestionForm
+from forms import LoginForm, RegisterForm, OfferForm, SearchForm, PurchaseForm, NewsletterForm, PurchaseOverviewForm, YourInformationForm, ChangePasswordForm, ContactForm, QuestionForm, CommentForm
 from models import User, Offer, Category, Transaction, Newsletter, Comment
 from datetime import datetime, timedelta
 from config import MAX_SEARCH_RESULTS, UPLOADS_FOLDER, DEFAULT_FILE_STORAGE, FILE_SYSTEM_STORAGE_FILE_VIEW, UPLOADS_BOOKS_IMAGES
 from flask.ext.uploads import save, Upload
 from flask.ext.mail import Message
+from sqlalchemy.sql.expression import case
+from sqlalchemy import func, exists, and_, or_
 
 @app.before_request
 def before_request():
@@ -22,8 +25,9 @@ def load_user(id):
 @app.route('/index')
 def index():
     user = g.user
-    
-    recently_added = Offer.query.order_by(Offer.timestamp.desc()).limit(4)
+
+    #TODO sprawdzic poprawnosc po zmianie sposobu filtracji (bez elementow z to_delete==1)
+    recently_added = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).order_by(Offer.timestamp.desc()).limit(4)
 
     return render_template('index.html',
                            title='Strona glowna',
@@ -39,7 +43,8 @@ def search():
 
 @app.route('/search_results/<query>')
 def search_results(query):
-    results = Offer.query.whoosh_search(query, MAX_SEARCH_RESULTS).all()
+    #TODO sprawdzic poprawnosc po zmianie sposobu filtracji (bez elementow z to_delete==1)
+    results = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).whoosh_search(query, MAX_SEARCH_RESULTS).all()
 
     return render_template('search_results.html',
                            query=query,
@@ -54,31 +59,58 @@ def login():
     if form.validate_on_submit():
         session['remember_me'] = form.remember_me.data
 
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter(or_(User.to_delete==0, User.to_delete==None)).filter_by(email=form.email.data).first()
+
         if user is None:
-            flash('User with email {email} not found.'.format(email=form.email.data))
+            flash('Uzytkownik z mailem {email} nie istnieje.'.format(email=form.email.data))
             return redirect(request.args.get("next") or url_for("index"))
 
         if user.verify_password(form.password.data) is False:
-            flash('Wrong password')
+            flash('Zle haslo.')
             return redirect(request.args.get("next") or url_for("index"))
 
         remember_me = False
         if 'remember_me' in session:
             remember_me = session['remember_me']
             session.pop('remember_me', None)
+
         login_user(user, remember=remember_me)
 
+         # Tell Flask-Principal the identity changed
+        identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
+
         return redirect(request.args.get("next") or url_for("index"))
+
     return render_template('login.html',
                            title='Logowanie',
                            form=form)
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
 
+    # Remove session keys set by Flask-Principal
+    for key in ('identity.name', 'identity.auth_type'):
+        session.pop(key, None)
+
+    # Tell Flask-Principal the user is anonymous
+    identity_changed.send(current_app._get_current_object(),
+                          identity=AnonymousIdentity())
+
     return redirect(url_for('index'))
+
+@identity_loaded.connect_via(app)
+def on_identity_loaded(sender, identity):
+
+    identity.user = current_user
+
+    if hasattr(current_user, 'id'):
+        identity.provides.add(UserNeed(current_user.id))
+
+    if hasattr(current_user, 'role'):
+        print current_user.role
+        identity.provides.add(RoleNeed(current_user.role.name))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -113,7 +145,6 @@ def register():
 def not_found_error(error):
     return render_template('404.html'), 404
 
-
 @app.errorhandler(500)
 def internal_error(error):
     db.session.rollback()
@@ -121,7 +152,7 @@ def internal_error(error):
 
 @app.route('/approve/<int:user_id>/<int:offer_id>/<string:hash_link>/<int:return_payment_code>', methods=['GET'])
 def approve(user_id, offer_id, hash_link, return_payment_code):
-    t = Transaction.query.filter_by(user_id=user_id, offer_id=offer_id, hash_link=hash_link).first()
+    t = Transaction.query.filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).filter_by(user_id=user_id, offer_id=offer_id, hash_link=hash_link).first()
     if t is None:
         flash('Podana transakcja nie istnieje!')
         return redirect(url_for('index'))
@@ -135,6 +166,7 @@ def approve(user_id, offer_id, hash_link, return_payment_code):
         db.session.add(t)
         db.session.commit()
 
+        #TO CHECK, zabezpieczenia powinny zapobiec wystapieniu nulla. Jezeli tak sie nie stanie, istnieje ryzyko bledu, gdy mail lub uzytkonik bedzie nullem.
         buyerMail = User.query.get(user_id).email
         sellerMail = User.query.get(Offer.query.get(offer_id).user_id).email
 
@@ -172,6 +204,9 @@ def transaction_validator(user_id, offer_id, count=None):
     elif user_id != g.user.id:
         flash('Blad wewnetrzny. Proba Phishingu?')
         error = True
+    elif offer.to_delete==1:
+        flash('Oferta zostala usunieta! ')
+        error = True
     elif count is not None:
         if not offer.is_available(count):
             flash('Nie ma takiej liczby dostepnych egzemplarzy')
@@ -190,8 +225,11 @@ def purchase(offer_id):
     if form.validate_on_submit():
         if transaction_validator(g.user.id, offer_id, form.number_of_books.data):
             return redirect(url_for('index'))
+
         address = "/purchase/overview/%i/%i/%s" % (g.user.id, offer_id, form.number_of_books.data)
+
         return redirect(address)
+
     return render_template('purchase.html',
                            title='Zakup',
                            form=form)
@@ -217,7 +255,9 @@ def purchase_overview(user_id, offer_id, count):
                         offer_id=offer_id,
                         count=form.number_of_books.data,
                         price=offer.price,
-                        is_finalised=0)
+                        is_finalised=0,
+                        is_sent=0,
+                        is_commented=0)
 
         t.hash_link = t.hash_generator()
 
@@ -244,7 +284,7 @@ def purchase_overview(user_id, offer_id, count):
 @login_required
 def purchase_finalised(user_id, offer_id, hash_link):
 
-    t = Transaction.query.filter_by(user_id=user_id, offer_id=offer_id, hash_link=hash_link).first()
+    t = Transaction.query.filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).filter_by(user_id=user_id, offer_id=offer_id, hash_link=hash_link).first()
     if t is None:
         flash('Podana transakcja nie istnieje!')
         #TODO redirect to 404 error page
@@ -294,6 +334,12 @@ def create_offer():
 @app.route('/offer/read/<int:id>')
 def read_offer(id):
     offer = Offer.query.get(id)
+
+    #added verification
+    if offer is None or offer.to_delete==1:
+        flash('Oferta zostala usunieta!')
+        return redirect(url_for('index'))
+
     user = User.query.filter_by(id=offer.user_id).first()
     photo = Upload.query.get_or_404(id) #TODO need to handle offers without pictures
 
@@ -303,7 +349,7 @@ def read_offer(id):
     if comments is None:
         percentage = 0
         return redirect(url_for('index'))
-	
+
     poz = 0
     neg = 0
     for c in comments:
@@ -313,8 +359,11 @@ def read_offer(id):
             neg = neg + 1
 
     tot = poz + neg
-    percentage = poz *100 / tot
-	
+    if tot==0:
+        percentage=0
+    else:
+        percentage = poz *100 / tot
+
     return render_template('read_offer.html',
                             title='Ogloszenie',
                             offer = offer,
@@ -329,6 +378,8 @@ def read_offer(id):
 @app.route('/offer/<category>/<int:page>')
 def read_offers_by_category(category, page=1):
     c = Category.query.filter_by(name=category).first()
+
+    #TODO CHECK WHAT HAPPENS WITH DELETED OFFERS
     if c is None:
         flash('Nie ma takiej kategorii %s.' % category)
         return redirect(url_for('index'))
@@ -342,7 +393,8 @@ def read_offers_by_category(category, page=1):
 @app.route('/user/profile/offers/<user_id>')
 @app.route('/user/profile/offers/<user_id>/<int:page>')
 def read_offers_by_user_id(user_id, page=1):
-    c = User.query.filter_by(id=user_id).first()
+    #added veryfication
+    c = User.query.filter(or_(User.to_delete==0, User.to_delete==None)).filter_by(id=user_id).first()
     if c is None:
         flash('Nie ma uzytkownika o numerze %s.' % user_id)
         return redirect(url_for('index'))
@@ -356,7 +408,8 @@ def read_offers_by_user_id(user_id, page=1):
 @app.route('/offers')
 @app.route('/offers/<int:page>')
 def read_offers(page=1):
-    offers = Offer.query.order_by(Offer.timestamp.desc()).all()
+    #added veryfication
+    offers = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).order_by(Offer.timestamp.desc()).all()
 
     return render_template('offers.html',
                             title='Ogloszenia',
@@ -371,7 +424,6 @@ def przelewy48(user_id, offer_id, hash_link):
                            user_id=user_id,
                            offer_id=offer_id,
                            hash_link=hash_link)
-
 
 @app.route('/add_to_newsletter', methods=['GET', 'POST'])
 def add_to_newsletter():
@@ -391,6 +443,27 @@ def add_to_newsletter_confirm(email):
     flash("Zostales zapisany do newslettera")
 
     return redirect(url_for('index'))
+
+@app.route('/delete_from_newsletter', methods=['GET', 'POST'])
+def delete_from_newsletter():
+    form = NewsletterForm()
+    if form.validate_on_submit():
+        return redirect(url_for('delete_from_newsletter_confirm', email=form.newsletter.data))
+    
+    flash("Aby wypisac sie z newslettera musisz podac swojego prawidlowego maila")
+    return render_template('delete_from_newsletter.html',
+                           title='Usun z newslettera',
+                           form=form)
+
+@app.route('/delete_from_newsletter_confirm/<email>')
+def delete_from_newsletter_confirm(email):
+    Newsletter.query.filter_by(email=email).delete()
+
+    db.session.commit()
+
+    flash("Zostales wypisany z newslettera")
+
+    return redirect(url_for('index'))	
 
 @app.route('/contact_us', methods=['GET', 'POST'])
 def contact_us():
@@ -445,9 +518,13 @@ def show_profile(user_id):
     if comments is None:
         flash('Uzytkownik nie ma komentarzy.')
         return redirect(url_for('index'))
-    
-    user = User.query.filter_by(id=user_id).first()
-	
+
+    #added veryfication
+    user = User.query.filter(or_(User.to_delete==0, User.to_delete==None)).filter_by(id=user_id).first()
+    if user is None:
+        flash('Uzytkownik nie istnieje lub usunal konto!')
+        return redirect(url_for('index'))
+
     poz = 0
     neg = 0
     for c in comments:
@@ -465,10 +542,16 @@ def show_profile(user_id):
 							neg=neg,
 							tot=tot,
                             percentage=percentage,
-							user_id=user_id)		
-		
+							user_id=user_id)
+
 @app.route('/user/profile/comments/<int:user_id>')
 def show_comments(user_id):
+    #added veryfication
+    user = User.query.filter(or_(User.to_delete==0, User.to_delete==None)).filter_by(id=user_id).first()
+    if user is None:
+        flash('Uzytkownik nie istnieje lub usunal konto!')
+        return redirect(url_for('index'))
+
     comments = Comment.query.filter_by(id_to=user_id)
     if comments is None:
         flash('Uzytkownik nie ma komentarzy.')
@@ -477,3 +560,236 @@ def show_comments(user_id):
     return render_template('comments.html',
                             title='Komentarze',
                             comments=comments)
+
+@app.route('/comment/new/<int:trans_id>/', methods=['GET', 'POST'])
+@login_required
+def new_comment(trans_id):
+    form = CommentForm()
+    #added veryfication
+    transactions = db.session.query(Transaction.id, Transaction.offer_id, Offer.user_id).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                               filter_by(id=trans_id, user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
+                               join(Offer, Offer.id==Transaction.offer_id).first()
+
+    if transactions is None:
+        flash('Nie mozesz dodac takiego komentarza!')
+        return redirect(url_for('index'))
+
+    if form.validate_on_submit():
+
+        is_positive = 1 if form.type.data=='true' else 0
+        comment = Comment(timestamp = datetime.utcnow(),
+                      id_from = g.user.id,
+                      id_to = transactions.user_id,
+                      transaction_id = trans_id,
+                      type = is_positive,
+                      body = form.body.data)
+
+        db.session.add(comment)
+
+        alter_transaction = Transaction.query.get(trans_id)
+        alter_transaction.is_commented = 1
+        db.session.add(alter_transaction)
+
+        db.session.commit()
+        #TODO przekierowanie do odpowiedniej storny
+        flash("Poprawnie dodano Twoj komentarz")
+        return redirect(url_for('comment'))
+
+    return render_template('new_comment.html',
+                            title='Comment',
+                            form=form)
+#User Dashboard
+@login_required
+@app.route('/user/dashboard/')
+def user_dashboard():
+    #added veryfication
+    number_of_transactions_to_pay_for = db.session.query(func.count(Transaction.id)).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                               filter_by(user_id=g.user.id, is_finalised=0).\
+                               first()
+    #added veryfication                           
+    q = db.session.query(Offer.id, func.count(Transaction.id)).\
+                              filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                              filter(or_(Offer.to_delete==0, Offer.to_delete==None)).\
+                              filter_by(user_id=g.user.id).\
+                              join(Transaction, Transaction.offer_id==Offer.id).\
+                              filter_by(is_finalised=1, is_sent=0).\
+                              join(User, User.id==Transaction.user_id)
+    #added veryfication                             
+    transactions_to_comment = db.session.query(Transaction.id, func.count(Transaction.id), Transaction.timestamp,
+                                               Transaction.offer_id, Offer.name, Offer.user_id).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                               filter_by(user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               order_by(Transaction.timestamp.desc())
+
+    return render_template('user_dashboard.html', number_of_transactions_to_pay_for=number_of_transactions_to_pay_for,
+                           number_of_transactions_to_send=q, transactions_to_comment=transactions_to_comment)
+
+@login_required
+@app.route('/user/dashboard/to/pay')
+def user_dashboard_to_pay():
+    #added veryfication
+    transactions = db.session.query(Transaction.id, Transaction.user_id,
+                                    Transaction.offer_id, Offer.name, Transaction.timestamp,
+                                    Transaction.count, Transaction.price,
+                                    Transaction.hash_link).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                               filter_by(user_id=g.user.id, is_finalised=0).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               order_by(Transaction.timestamp.desc())
+
+    return render_template('user_dashboard_to_pay.html', transactions=transactions)
+
+@login_required
+@app.route('/user/dashboard/to/send')
+def user_dashboard_to_send():
+    #added veryfication
+    transactions = db.session.query(Offer.id, Offer.name, Offer.price, Transaction.id.label("transact_id"),
+                                    Transaction.user_id, User.street, Transaction.timestamp,
+                                    User.building_number, User.door_number,
+                                    User.city, User.zipcode).\
+                              filter(or_(Offer.to_delete==0, Offer.to_delete==None)).\
+                              filter_by(user_id=g.user.id).\
+                              join(Transaction, Transaction.offer_id==Offer.id).\
+                              filter_by(is_finalised=1, is_sent=0).\
+                              join(User, User.id==Transaction.user_id)
+
+    return render_template('user_dashboard_to_send.html', transactions=transactions)
+
+@login_required
+@app.route('/user/dashboard/to/send/check/<int:transaction_id>', methods=['GET', 'POST'])
+def user_dashboard_to_send_check(transaction_id):
+    #added veryfication
+    t = db.session.query(Offer.user_id, Transaction.id).\
+                              filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                              filter(or_(Offer.to_delete==0, Offer.to_delete==None)).\
+                              filter_by(user_id=g.user.id).\
+                              join(Transaction, Transaction.offer_id==Offer.id).\
+                              filter_by(is_finalised=1, is_sent=0, id=transaction_id).\
+                              join(User, User.id==Transaction.user_id).first()
+    if t is None:
+        flash('Nie ma takiej transakcji!')
+    else:
+        transaction = Transaction.query.filter_by(id=transaction_id).first()
+        transaction.is_sent = 1
+        db.session.add(transaction)
+        db.session.commit()
+        flash('Potwierdzono wyslanie zamowienia')
+
+    return redirect(url_for('user_dashboard_to_send'))
+
+@login_required
+@app.route('/user/dashboard/my/offers/current')
+def user_dashboard_my_offers_current():
+    #added veryfication
+    offers = db.session.query(Offer.id, Offer.name, Offer.timestamp,
+                              Offer.price, Offer.count).\
+                              filter(or_(Offer.to_delete==0, Offer.to_delete==None)).\
+                              filter_by(user_id=g.user.id).\
+                              filter(Offer.count!=0).\
+                              order_by(Offer.timestamp.desc())
+
+    return render_template('user_dashboard_my_offers_current.html', offers=offers)
+
+@login_required
+@app.route('/user/dashboard/my/offers/close/<int:offer_id>', methods=['GET', 'POST'])
+def offer_close(offer_id):
+    #added veryfication
+    offer = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).filter_by(id=offer_id, user_id=g.user.id).first()
+
+    if offer is None:
+        flash('Nie ma takiej oferty')
+    elif offer.count == 0:
+        flash('Oferta jest juz zamknieta!')
+    else:
+        offer.count = 0
+        db.session.add(offer)
+        db.session.commit()
+        flash('Zamknieto oferte')
+
+    return redirect(url_for('user_dashboard_my_offers_current'))
+
+@login_required
+@app.route('/user/dashboard/about/me/', methods=['GET', 'POST'])
+def about_me():
+    user = User.query.get(g.user.id)
+    form = YourInformationForm()
+    if form.validate_on_submit():
+        user.user_name = form.user_name.data
+        user.surname = form.surname.data
+        user.street = form.street.data
+        user.building_number = form.building_number.data
+        user.door_number = form.door_number.data
+        user.city = form.city.data
+        user.zipcode = form.zipcode.data
+        user.country = form.country.data
+        user.phone = form.phone.data
+
+        db.session.add(user)
+        db.session.commit()
+
+        flash("Dane zmieniono!")
+
+        return redirect(url_for('about_me'))
+
+    return render_template('user_dashboard_about_me.html', form=form, user=user)
+
+@login_required
+@app.route('/user/dashboard/archive/')
+def archive():
+    #added veryfication
+    transactions_bought = db.session.query(Transaction.id, Transaction.user_id, Offer.name,
+                                    Transaction.offer_id, Offer.name, Transaction.timestamp,
+                                    Transaction.count, Transaction.price,
+                                    Transaction.hash_link, User.nickname).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                               filter_by(user_id=g.user.id, is_finalised=1, is_sent=1).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               join(User, User.id==Offer.user_id).\
+                               order_by(Transaction.timestamp.desc())
+    #added veryfication
+    transactions_sold = db.session.query(Offer.id, Offer.name, Transaction.id.label("transact_id"),
+                                    Transaction.user_id, Transaction.count, Transaction.price, User.street, Transaction.timestamp,
+                                    User.building_number, User.door_number,
+                                    User.city, User.zipcode, User.nickname).\
+                              filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                              filter_by(user_id=g.user.id).\
+                              join(Transaction, Transaction.offer_id==Offer.id).\
+                              filter_by(is_finalised=1, is_sent=1).\
+                              join(User, User.id==Transaction.user_id).\
+                              order_by(Transaction.timestamp.desc())
+
+    return render_template('user_dashboard_archive.html', transactions_bought=transactions_bought,
+                           transactions_sold=transactions_sold)
+
+@login_required
+@app.route('/user/dashboard/change/password/', methods=['GET', 'POST'])
+def change_password():
+    user = User.query.get(g.user.id)
+
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if user.verify_password(form.old_password.data):
+            user.hash_password(form.new_password_1.data)
+            db.session.add(user)
+            db.session.commit()
+            flash("Haslo zostalo zmienione!")
+        else:
+            flash("Obecne haslo nie jest poprawne")
+    return render_template('user_dashboard_change_password.html', form=form)
+
+@login_required
+@app.route('/user/dashboard/comment/', methods=['GET', 'POST'])
+def comment():
+
+    transactions_to_comment = db.session.query(Transaction.id, Transaction.timestamp,
+                                               Transaction.offer_id, Offer.name, Offer.user_id).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                               filter_by(user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               order_by(Transaction.timestamp.desc())
+
+
+    return render_template('user_dashboard_comment.html', transactions_to_comment=transactions_to_comment)
