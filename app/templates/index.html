@@ -37,7 +37,7 @@
 					<div class="row">
 						<div class="col-md-12 col-sm-12 col-sm-12">
 							<div class="middle_content">
-								<h2>WYRÓŻNIONE OGŁOSZENIA</h2>
+								<h2>NAJNOWSZE OGŁOSZENIA</h2>
 								
 							</div>
 						</div>
@@ -50,8 +50,11 @@
 						<div class="col-md-3 col-sm-3 col-sm-12">
 							<div class="single_book_info">
 								<img src="{{ url_for('.static', filename='img/book_info.jpg') }}" alt="Book Info" />
-								<h3>ALGEBRA LINIOWA 1</h3>
-								<h4>Gewert, Skoczylas</h4>
+								<h3>
+
+								{{r1.title}}
+								</h3>
+								<h4>{{r1.book_author}}</h4>
 								<div class="book_info_dl">
 									<button type="button" class="btn btn-default btn-xs btn_wiecej">Więcej</button>
 									<button type="button" class="btn btn-default btn-xs btn_zamawiam">Zamawiam</button>
@@ -61,8 +64,12 @@
 						<div class="col-md-3 col-sm-3 col-sm-12">
 							<div class="single_book_info">
 								<img src="{{ url_for('.static', filename='img/book_info2.jpg') }}" alt="Book Info" />
-								<h3>ALGEBRA LINIOWA 1</h3>
-								<h4>Gewert, Skoczylas</h4>
+								<h3>
+								 
+								{{r2.title}}
+
+								</h3>
+								<h4>{{r2.book_author}}</h4>
 								<div class="book_info_dl">
 									<button type="button" class="btn btn-default btn-xs btn_wiecej">Więcej</button>
 									<button type="button" class="btn btn-default btn-xs btn_zamawiam">Zamawiam</button>
@@ -72,8 +79,10 @@
 						<div class="col-md-3 col-sm-3 col-sm-12">
 							<div class="single_book_info">
 								<img src="{{ url_for('.static', filename='img/book_info3.jpg') }}" alt="Book Info" />
-								<h3>ALGEBRA LINIOWA 1</h3>
-								<h4>Gewert, Skoczylas</h4>
+								<h3>
+										{{r3.title}}
+								</h3>
+								<h4>{{r3.book_author}}</h4>
 								<div class="book_info_dl">
 									<button type="button" class="btn btn-default btn-xs btn_wiecej">Więcej</button>
 									<button type="button" class="btn btn-default btn-xs btn_zamawiam">Zamawiam</button>
@@ -83,8 +92,10 @@
 						<div class="col-md-3 col-sm-3 col-sm-12">
 							<div class="single_book_info">
 								<img src="{{ url_for('.static', filename='img/book_info.jpg') }}" alt="Book Info" />
-								<h3>ALGEBRA LINIOWA 1</h3>
-								<h4>Gewert, Skoczylas</h4>
+								<h3>
+									{{r4.title}}
+								</h3>
+								<h4>{{r4.book_author}}</h4>
 								<div class="book_info_dl">
 									<button type="button" class="btn btn-default btn-xs btn_wiecej">Więcej</button>
 									<button type="button" class="btn btn-default btn-xs btn_zamawiam">Zamawiam</button>

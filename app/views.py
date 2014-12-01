@@ -27,11 +27,17 @@ def index():
     user = g.user
     
     recently_added = Offer.query.order_by(Offer.timestamp.desc()).limit(4)
-
+    r1 = recently_added[0]
+    r2 = recently_added[1]
+    r3 = recently_added[2]
+    r4 = recently_added[3]
     return render_template('index.html',
                            title='Strona glowna',
                            user=user,
-						   recently_added=recently_added)
+                           r1=r1,
+                           r2=r2,
+                           r3=r3,
+                           r4=r4)
 
 @app.route('/search', methods=['POST'])
 def search():
