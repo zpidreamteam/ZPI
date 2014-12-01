@@ -88,7 +88,8 @@ def send_newsletter():
                 msg.add_recipient(reciever.email)
             msg.subject = " %s " % (form.subject.data)
             msg.body = """
-            %s 
+            %s
+            Aby wypisac sie z tego newslettera wejdz w zakladke pomoc na naszej stronie.
             """ % (form.message.data)
             mail.send(msg)
             print 'Newsletter do %s zostal wyslany' % (msg.recipients)
