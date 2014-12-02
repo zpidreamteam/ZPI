@@ -6,7 +6,7 @@ from config import MAX_SEARCH_RESULTS
 from models import User, Category, Newsletter, Offer, Transaction, Archive_transaction, Archive_user
 from forms import CategoryForm, QuestionForm, AdminOfferEdit
 from flask.ext.mail import Message
-from models import User, Category, Newsletter, Offer, Comment, Archive_offer, Archive_transaction
+from models import User, Category, Newsletter, Offer, Comment, Archive_offer, Archive_transaction, Transaction
 from forms import CategoryForm
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy import func, exists, and_, or_
@@ -84,7 +84,7 @@ def send_newsletter():
             return render_template('admin/send_newsletter.html', form=form)
         else:
             msg = Message(sender=("no.reply.bookstree@gmail.com"))
-            for reciever in recievers:                    
+            for reciever in recievers:
                 msg.add_recipient(reciever.email)
             msg.subject = " %s " % (form.subject.data)
             msg.body = """
@@ -100,7 +100,7 @@ def send_newsletter():
     return render_template('admin/send_newsletter.html',
 	                       form=form,
                            title='Wysylanie newslettera')
-						   
+
 @app.route('/admin/offers')
 @login_required
 @admin_permission.require()
@@ -276,7 +276,7 @@ def clean_transactions():
 
   for transaction in transactions:
     db.session.delete(transaction)
-  
+
   db.session.commit()
   flash('Wyczyszczono puste elementy! ')
   return True
@@ -287,7 +287,7 @@ def clean_offers():
 
   for offer in offers:
     db.session.delete(offer)
-  
+
   db.session.commit()
   flash('Wyczyszczono puste elementy! ')
   return True
@@ -298,7 +298,7 @@ def clean_users():
 
   for user in users:
     db.session.delete(user)
-  
+
   db.session.commit()
   flash('Wyczyszczono puste elementy! ')
   return True
@@ -327,14 +327,14 @@ def admin_offers_edit(offer_id):
     offer.body = form.body.data
     offer.timestamp = form.timestamp.data
     offer.category_id = form.category_id.data
-    offer.user_id = form.user_id.data      
+    offer.user_id = form.user_id.data
 
     db.session.add(offer)
     db.session.commit()
-      
+
     flash('Zapisano zmiany')
     return redirect(url_for('admin_offers_edit', offer_id=offer_id))
-    
+
   return render_template('admin/offers_edit.html',
                            title='Zarzadzanie ofertami',
                            offer=offer,
@@ -355,7 +355,7 @@ def admin_raports():
 @admin_permission.require()
 def admin_comments():
     comments = Comment.query.all()
-    
+
     return render_template('admin/comments.html',
                            title='Komentarze',
                            comments=comments)
@@ -379,3 +379,13 @@ def admin_user_delete(user_id):
       clean_offers()
       clean_users()
     return redirect(url_for('admin_users'))
+
+@app.route('/admin/transactions')
+@login_required
+@admin_permission.require()
+def admin_transactions():
+    transactions = Transaction.query.all()
+
+    return render_template('admin/transactions.html',
+                           title='Komentarze',
+                           transactions=transactions)
