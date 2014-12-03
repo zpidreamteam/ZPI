@@ -398,10 +398,12 @@ def read_offers_by_category(category, page=1):
 
     categories = Category.query.filter().order_by(Category.name.asc()).all()
     offers = c.offers
+    photos_path = map(lambda offer: UPLOADS_BOOKS_IMAGES + Upload.query.get_or_404(offer.id).name, offers)
+    offers_with_photo = zip(offers, photos_path)
 
     return render_template('offers.html',
                             title='Ogloszenia',
-                            offers = offers,
+                            offers_with_photo = offers_with_photo,
 							categories = categories)
 
 @app.route('/user/profile/offers/<user_id>')
@@ -414,10 +416,12 @@ def read_offers_by_user_id(user_id, page=1):
 
     categories = Category.query.filter().order_by(Category.name.asc()).all()
     offers = c.offers
+    photos_path = map(lambda offer: UPLOADS_BOOKS_IMAGES + Upload.query.get_or_404(offer.id).name, offers)
+    offers_with_photo = zip(offers, photos_path)
 
     return render_template('offers.html',
                             title='Ogloszenia',
-                            offers = offers,
+                            offers_with_photo = offers_with_photo,
 							categories = categories)
 
 @app.route('/offers')
