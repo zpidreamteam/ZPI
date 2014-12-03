@@ -270,6 +270,30 @@ def delete_user(user_id):
   flash('Uzytkownik o id: ' + str(user_id) + ' zostal usuniety! ')
   return True
 
+def delete_category(category_id, commit):
+  category = Category.query.get(category_id)
+  if(category is None):
+    flash('Kategoria nie istnieje! ')
+    return False
+
+  offers = db.session.query(func.count(Offer.id)).\
+                               filter(Offer.category_id==category_id).\
+                               filter(or_(Offer.to_delete==0, Offer.to_delete==None)).\
+                               filter(Offer.count!=0).\
+                               first()
+
+  if int(offers[0])!=0:
+    flash('Istnieja niezakonczone oferty dla danej kategorii! ')
+    return False
+
+  db.session.delete(category)
+
+  if commit:
+    db.session.commit()
+  flash('Kategoria o id: ' + str(category_id) + ' zostala usunieta! ')
+  return True
+
+
 def clean_transactions():
   last_transaction = db.session.query(Transaction).order_by(Transaction.id.desc()).first()
   transactions = Transaction.query.filter_by(to_delete=1).filter(Transaction.id!=last_transaction.id)
@@ -394,3 +418,11 @@ def admin_transactions_delete(transaction_id):
     if delete_transaction(transaction_id, True)==True:
       clean_transactions()
     return redirect(url_for('admin_transactions'))
+
+@app.route('/admin/category/delete/<int:category_id>', methods=['GET', 'POST'])
+@login_required
+@admin_permission.require()
+def admin_category_delete(category_id):
+    delete_category(category_id, True)
+      
+    return redirect(url_for('admin_categories'))
