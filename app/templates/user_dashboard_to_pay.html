@@ -57,7 +57,9 @@
                     </td>
                     <td>{{transaction.count}}</td>
                     <td>{{transaction.count*transaction.price}}</td>
-                    <td><a href="offer/read/{{transaction.offer_id}}">ZAPŁAĆ</a></td>
+                    <td>
+                        <a href="../../../offer/read/{{transaction.offer_id}}"><button class="btn btn-default">WIĘCEJ</button></a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

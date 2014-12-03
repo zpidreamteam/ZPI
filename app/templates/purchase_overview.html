@@ -65,12 +65,12 @@
                   <h2 class="narrow text-center">Podsumowanie Twojego zamówienia</h2>
     <form action="" method="post" name="purchase">
         {{ form.hidden_tag() }}
-        <p class="narrow text-center"><span>Liczba egzemplarzy:</span> {{count}}</p>
-        <p class="narrow text-center"><span>Do zapłaty:</span> {{total_price}} zł</p>
+        <p class="narrow text-center"><strong><span>Liczba egzemplarzy:</span></strong> {{count}}</p>
+        <p class="narrow text-center"><strong><span>Do zapłaty:</span></strong> {{total_price_plus_shipping}} zł</p>
         <p class="narrow text-center"><strong>Adres wysyłki:</strong></p>
         <p class="narrow text-center"><span>{{street}}, {{building_number}}, {{door_number}}</p>
         <p class="narrow text-center"><span>{{zipcode}}, {{city}}</span></p>
-        <p class="narrow text-center"><input class="btn btn-success btn-outline-rounded green" type="submit" value="Kupuje"></p>
+        <p class="narrow text-center"><input style="margin-top:-5px;" class="btn btn-success btn-outline-rounded green" type="submit" value="Kupuje"></p>
     </form>
             </p>
 

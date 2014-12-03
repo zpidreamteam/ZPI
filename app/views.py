@@ -263,7 +263,7 @@ def purchase_overview(user_id, offer_id, count):
                         user_id=g.user.id,
                         offer_id=offer_id,
                         count=form.number_of_books.data,
-                        price=offer.price,
+                        price=(offer.price * count)+offer.shipping,
                         is_finalised=0,
                         is_sent=0,
                         is_commented=0)
@@ -287,7 +287,7 @@ def purchase_overview(user_id, offer_id, count):
                            currency='zl', street=g.user.street,
                            building_number=g.user.building_number,
                            door_number=g.user.door_number,
-                           city=g.user.city, zipcode=g.user.zipcode)
+                           city=g.user.city, zipcode=g.user.zipcode, total_price_plus_shipping=(offer.price * count)+offer.shipping)
 
 @app.route('/purchase/finalised/<int:user_id>/<int:offer_id>/<string:hash_link>', methods=['GET', 'POST'])
 @login_required

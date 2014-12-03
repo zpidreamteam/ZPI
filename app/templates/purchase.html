@@ -4,7 +4,7 @@
 {% block content %}
 
 <div class="oglos_area">
-  
+
   <section style="background:#efefe9;">
     <div class="container">
       <div class="row">
@@ -14,19 +14,19 @@
             <ul class="nav nav-tabs" id="myTab">
               <div class="liner"></div>
               <li class="active">
-               <a href="#home" data-toggle="tab" title="welcome">
+               <a href="#" data-toggle="tab" title="welcome">
                 <span class="round-tabs one">
                   <i style="margin-top:20px;" class="glyphicon glyphicon-home"></i>
                 </span> 
               </a></li>
-              <li><a href="#messages" data-toggle="tab" title="bootsnipp goodies">
+              <li><a href="#" data-toggle="tab" title="bootsnipp goodies">
                <span class="round-tabs three">
                 <i style="margin-top:20px;" class="glyphicon glyphicon-gift"></i>
               </span> </a>
             </li>
 
 
-            <li><a href="#doner" data-toggle="tab" title="completed">
+            <li><a href="#" data-toggle="tab" title="completed">
              <span class="round-tabs five">
               <i style="margin-top:20px;" class="glyphicon glyphicon-ok"></i>
             </span> </a>
@@ -39,27 +39,42 @@
 
 
             <h3 style="margin:0px;"class="head text-center">KROK 1 Z 3 - POTWIERDŹ ZAKUP</h3>
-            <p class="narrow text-center">
-              Dane Aukcji:
-            </p>
-            <h2 class="narrow text-center">{{ offer.name }}</h2>
-            <p class="narrow text-center"><span>Tytuł:</span> {{ offer.title }}</p>
-            <p class="narrow text-center"><span>Autor/Autorzy:</span> {{ offer.book_author }}</p>
-            <p class="narrow text-center"><span>Dostępne sztuki:</span>  {{ offer.count }}</p>
+            <h2 style="text-align:center;"> Dane Aukcji: </h2>
 
-               <p class="narrow text-center">
-            <form action="" method="post" name="purchase">
-              {{ form.hidden_tag() }}
-                Ilość egzemplarzy:<br>
-                <input style="width:50px;" class="form-control" id="number_of_books" name="number_of_books" type="text" value="1">
+            <h2 class="narrow text-center">{{ offer.name }}</h2>
+            <p class="narrow text-center"><span><strong>Tytuł:</strong>{{ offer.title }}</span> </p>
+            <p class="narrow text-center"><span><strong>Autor/Autorzy:</strong> {{ offer.book_author }}</span></p>
+            <p class="narrow text-center"><span><strong>Dostępne sztuki:</strong>  {{ offer.count }}</span></p>
+
+              <form action="" method="post" name="purchase">
+                 <div class="form-group">
+                {{ form.hidden_tag() }}
+
+                
+                <p class="narrow text-center">
+                  <label for="concept" class="control-label"> Ilość egzemplarzy:</label>
+                  <input class="form-control" id="number_of_books" name="number_of_books" type="text" value="1">
+                </p>
+                
+            
+
                 {% for error in form.number_of_books.errors %}
-                <span style="color: red;">[{{ error }}]</span>
+                <div class="alert-group">
+                <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span>{{ error }}</span>
+                </div>
+               </div>
                 {% endfor %}
-            <input class="btn btn-success btn-outline-rounded green" type="submit" value="Kupuje"> </p>
-            </form>
-                            
- 
+
+                
+                  <input style="margin-top:-5px;"class="btn btn-success btn-outline-rounded green" type="submit" value="Kupuje"> 
+                
+                </div>
+              </form>
+
           </div>
+
           <div class="tab-pane fade" id="messages">
             <h3 class="head text-center">KROK 2 Z 3 - DANE WYSYŁKI</h3>
             <p class="narrow text-center">
@@ -96,7 +111,7 @@
     </div>
   </div>
 </section>
-                   
+
 
 
 
@@ -132,6 +147,6 @@
                    
                 </div> 
 
--->
-</div>
-{% endblock %}
+              -->
+            </div>
+            {% endblock %}
