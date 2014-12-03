@@ -10,12 +10,9 @@
 		<div class="oglos_left">
 			<h3>Kategorie</h3>
 			<ul>
-				<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Analiza Matematyczna</a></li>
-				<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Algebra liniowa</a></li>
-				<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Architektura</a></li>
-				<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Biotechnologia</a></li>
-				<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Chemia</a></li>
-				<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Ekonomia</a></li>
+				{% for category in categories %}
+					<li><a href="./{{category.name}}">{{category.name}}</a></li>
+				{% endfor %}
 			</ul>
 		</div>
 	</div>
