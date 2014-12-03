@@ -552,7 +552,10 @@ def show_profile(user_id):
             neg = neg + 1
 
     tot = poz + neg
-    percentage = poz *100 / tot
+    if tot==0:
+        percentage=0
+    else:
+        percentage = poz *100 / tot
     return render_template('profile.html',
                             title='Profil',
 							user=user,
