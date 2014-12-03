@@ -18,23 +18,6 @@
 				<li><a href="{{ url_for('read_offers_by_category', category='fizyka') }}">Ekonomia</a></li>
 			</ul>
 		</div>
-		<div class="search_left">
-			<h3>Dodatkowe filtry</h3>
-			<input type="text" name="Search" placeholder="Tytuł..." />
-			<div class="cena_od">
-				<p>Cena od <input type="text" name="Cena" /></p>
-				<p class="do">do <input type="text" name="Cena" /></p>
-			</div>
-			<div class="takiyo_btn">
-				<p>Tylko nowe</p>
-				<img src="{{ url_for('.static', filename='img/on_off.png') }}" alt="On Off" />
-			</div>
-			<div class="takiyo_btn">
-				<p>Tylko używane</p>
-				<img src="{{ url_for('.static', filename='img/on_off.png') }}" alt="On Off" />
-			</div>
-			<button class="btn btn_submit">FILTRUJ</button>
-		</div>
 	</div>
 
 
