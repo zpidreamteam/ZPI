@@ -8,7 +8,7 @@
            <h3>Kategorie</h3>
             <ul>
                 {% for category in categories %}
-                    <li><a href="../{{category.name}}">{{category.name}}</a></li>
+                    <li><a href="{{ url_for('read_offers_by_category', category = category.name) }}">{{category.name}}</a></li>
                 {% endfor %}
             </ul>
         </div>
