@@ -423,13 +423,14 @@ def read_offers_by_user_id(user_id, page=1):
 @app.route('/offers')
 @app.route('/offers/<int:page>')
 def read_offers(page=1):
-    #added veryfication (veryfikejszyn is kul :])
     offers = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).order_by(Offer.timestamp.desc()).all()
     categories = Category.query.filter().order_by(Category.name.asc()).all()
+    photos_path = map(lambda offer: UPLOADS_BOOKS_IMAGES + Upload.query.get_or_404(offer.id).name, offers)
+    offers_with_photo = zip(offers, photos_path)
 
     return render_template('offers.html',
                             title='Ogloszenia',
-                            offers = offers,
+                            offers_with_photo = offers_with_photo,
 							categories = categories)
 
 @app.route('/przelewy48/<int:user_id>/<int:offer_id>/<string:hash_link>')
@@ -566,7 +567,6 @@ def show_profile(user_id):
 
 @app.route('/user/profile/comments/<int:user_id>')
 def show_comments(user_id):
-    #added veryfication
     user = User.query.filter(or_(User.to_delete==0, User.to_delete==None)).filter_by(id=user_id).first()
     if user is None:
         flash('Uzytkownik nie istnieje lub usunal konto!')
@@ -585,7 +585,6 @@ def show_comments(user_id):
 @login_required
 def new_comment(trans_id):
     form = CommentForm()
-    #added veryfication
     transactions = db.session.query(Transaction.id, Transaction.offer_id, Offer.user_id).\
                                filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
                                filter_by(id=trans_id, user_id=g.user.id, is_finalised=1, is_sent=1, is_commented=0).\
