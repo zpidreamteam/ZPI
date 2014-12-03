@@ -1,19 +1,26 @@
 {% block content %}
 	<tr class="odd gradeX">
-		<td>
+		<td width="10%">
 			<img src="{{ url_for('.static', filename='img/small_book2.jpg') }}" alt="" />
 		</td>
-		<td>
+		<td width="50%">
 			<div class="book_left_single_text">
-				<h3><a href="{{ url_for('read_offer', id = offer.id) }}">{{ offer.name }}</a></h3>
+				<h4><a href="{{ url_for('read_offer', id = offer.id) }}">{{ offer.name }}</a></h4>
 				<h5>{{ offer.book_author }}</h5>
-				<p>{{ offer.body }} </p>
+				<p>Opis oferty:{{ offer.body }} </p>
 				<a href="{{ url_for('read_offer', id = offer.id) }}">
 					<button type="submit" class="btn btn-default btn-sm search_bk_btn">Więcej</button>
 				</a>
 			</div>
 		</td>
-		<td><h3>{{ offer.price }},-</h3></td>
-		<td><h3>{{ offer.timestamp.year }}-{{ offer.timestamp.month }}-{{ offer.timestamp.day }}</h3></td>
+
+		<td width="10%" style="vertical-align: middle;text-align:center; ">
+			<div class="book_price"><h3 style="margin:0px;">{{ offer.price }},-</h3><div>
+		</td>
+
+		<td width="20%" style="vertical-align: middle;text-align:center;">
+			<h4>{{ offer.timestamp.year }}-{{ offer.timestamp.month }}-{{ offer.timestamp.day }}</h4>
+		</td>
+
 	</tr>
 {% endblock %}

@@ -24,9 +24,9 @@
 						</div>
 						<div class="col-md-4 col-sm-4 col-sm-4">
 							<div class="single_book_three">
-								<h3>MASZ JUŻ KONTO?</h3>
-								<h2>TO JE USUŃ. </h2>
-								<button type="button" class="btn btn-default btn_konto">USUŃ KONTO</button>
+								<h3>NIE MASZ KONTA?</h3>
+								<h2>ZAREJESTRUJ SIĘ! </h2>
+								<a href="{{ url_for('register') }}"><button type="button" class="btn btn-default btn_konto">REJESTRACJA</button></a>
 							</div>
 						</div>
 					</div>
@@ -56,8 +56,9 @@
 								</h3>
 								<h4>{{r1.book_author}}</h4>
 								<div class="book_info_dl">
+									<a href="{{ url_for('read_offer', id = r1.id) }}">
 									<button type="button" class="btn btn-default btn-xs btn_wiecej">Więcej</button>
-									<button type="button" class="btn btn-default btn-xs btn_zamawiam">Zamawiam</button>
+									</a>
 								</div>
 							</div>
 						</div>
@@ -71,8 +72,9 @@
 								</h3>
 								<h4>{{r2.book_author}}</h4>
 								<div class="book_info_dl">
+									<a href="{{ url_for('read_offer', id = r2.id) }}">
 									<button type="button" class="btn btn-default btn-xs btn_wiecej">Więcej</button>
-									<button type="button" class="btn btn-default btn-xs btn_zamawiam">Zamawiam</button>
+									</a>
 								</div>
 							</div>
 						</div>
@@ -84,8 +86,9 @@
 								</h3>
 								<h4>{{r3.book_author}}</h4>
 								<div class="book_info_dl">
+									<a href="{{ url_for('read_offer', id = r3.id) }}">
 									<button type="button" class="btn btn-default btn-xs btn_wiecej">Więcej</button>
-									<button type="button" class="btn btn-default btn-xs btn_zamawiam">Zamawiam</button>
+									</a>
 								</div>
 							</div>
 						</div>
@@ -97,8 +100,9 @@
 								</h3>
 								<h4>{{r4.book_author}}</h4>
 								<div class="book_info_dl">
+									<a href="{{ url_for('read_offer', id = r4.id) }}">
 									<button type="button" class="btn btn-default btn-xs btn_wiecej">Więcej</button>
-									<button type="button" class="btn btn-default btn-xs btn_zamawiam">Zamawiam</button>
+									</a>
 								</div>
 							</div>
 						</div>

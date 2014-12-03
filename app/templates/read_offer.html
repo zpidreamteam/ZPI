@@ -40,16 +40,17 @@
                         <div class="oglos_right_content_thr">
                             <p> {{ offer.body }} </p>
                         </div>
+                        <br />
                         <div class="oglos_right_content_four">
                           
 
                             
 
-                            <a href="{{ url_for('purchase', offer_id = offer.id) }}"><button type="button" class="btn btn-default Zamawiam_btn">Zamawiam</button></a>
+                            <a href="{{ url_for('purchase', offer_id = offer.id) }}"><button type="button" class="btn btn-default Zamawiam_btn">ZAMAWIAM</button></a>
                         </div>
                         <div class="oglos_right_content_five">
                             <ul>
-                                <li><a href="{{ url_for('show_profile', user_id=offer.user_id) }}">Sprzedający: {{ user.nickname }}
+                                <li><a href="{{ url_for('show_profile', user_id=offer.user_id) }}">Sprzedający: {{ user.nickname }}</a>
 								{% if percentage >= 90 %}
 								<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></li>
 								{% elif percentage >= 70 %}

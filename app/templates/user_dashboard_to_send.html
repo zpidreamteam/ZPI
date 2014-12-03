@@ -65,9 +65,9 @@
                    {{transaction.city}}, {{transaction.zipcode}}
                     </td>
                     <td>
-                    <a href="offer/read/{{transaction.id}}">Zobacz ofertę</a>
+                    <a href="../../../offer/read/{{transaction.id}}">Zobacz ofertę</a>
                     <form action="/user/dashboard/to/send/check/{{transaction.transact_id}}">
-                        <input type="submit" value="Wysłano!">
+                        <input class="btn btn-default" type="submit" value="Wysłano!">
                     </form>
                     </td>
                 </tr>
