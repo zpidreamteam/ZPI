@@ -278,7 +278,6 @@ def clean_transactions():
     db.session.delete(transaction)
 
   db.session.commit()
-  flash('Wyczyszczono puste elementy! ')
   return True
 
 def clean_offers():
@@ -289,7 +288,6 @@ def clean_offers():
     db.session.delete(offer)
 
   db.session.commit()
-  flash('Wyczyszczono puste elementy! ')
   return True
 
 def clean_users():
@@ -300,7 +298,6 @@ def clean_users():
     db.session.delete(user)
 
   db.session.commit()
-  flash('Wyczyszczono puste elementy! ')
   return True
 
 @app.route('/admin/offers/edit/<int:offer_id>', methods=['GET', 'POST'])
@@ -389,3 +386,11 @@ def admin_transactions():
     return render_template('admin/transactions.html',
                            title='Komentarze',
                            transactions=transactions)
+
+@app.route('/admin/transactions/delete/<int:transaction_id>', methods=['GET', 'POST'])
+@login_required
+@admin_permission.require()
+def admin_transactions_delete(transaction_id):
+    if delete_transaction(transaction_id, True)==True:
+      clean_transactions()
+    return redirect(url_for('admin_transactions'))
