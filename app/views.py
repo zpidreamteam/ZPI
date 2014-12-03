@@ -52,7 +52,6 @@ def search():
 
 @app.route('/search_results/<query>')
 def search_results(query):
-    #TODO sprawdzic poprawnosc po zmianie sposobu filtracji (bez elementow z to_delete==1)
     results = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).whoosh_search(query, MAX_SEARCH_RESULTS).all()
 
     return render_template('search_results.html',
