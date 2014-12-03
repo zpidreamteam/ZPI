@@ -388,7 +388,7 @@ def read_offer(id):
 @app.route('/offer/<category>/<int:page>')
 def read_offers_by_category(category, page=1):
     c = Category.query.filter_by(name=category).first()
-    categories = Category.query.filter(or_(Category.to_delete==0, Category.to_delete==None)).order_by(Category.name.desc()).all()
+    categories = Category.query.filter().order_by(Category.name.desc()).all()
 
     #TODO CHECK WHAT HAPPENS WITH DELETED OFFERS
     if c is None:
@@ -407,7 +407,7 @@ def read_offers_by_category(category, page=1):
 def read_offers_by_user_id(user_id, page=1):
     #added veryfication
     c = User.query.filter(or_(User.to_delete==0, User.to_delete==None)).filter_by(id=user_id).first()
-    categories = Category.query.filter(or_(Category.to_delete==0, Category.to_delete==None)).order_by(Category.name.desc()).all()
+    categories = Category.query.filter().order_by(Category.name.desc()).all()
     if c is None:
         flash('Nie ma uzytkownika o numerze %s.' % user_id)
         return redirect(url_for('index'))
@@ -424,7 +424,7 @@ def read_offers_by_user_id(user_id, page=1):
 def read_offers(page=1):
     #added veryfication (veryfikejszyn is kul :])
     offers = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).order_by(Offer.timestamp.desc()).all()
-    categories = Category.query.filter(or_(Category.to_delete==0, Category.to_delete==None)).order_by(Category.name.desc()).all()
+    categories = Category.query.filter().order_by(Category.name.desc()).all()
     return render_template('offers.html',
                             title='Ogloszenia',
                             offers = offers,
