@@ -52,11 +52,13 @@ def search():
 
 @app.route('/search_results/<query>')
 def search_results(query):
-    results = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).whoosh_search(query, MAX_SEARCH_RESULTS).all()
+    offers = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).whoosh_search(query, MAX_SEARCH_RESULTS).all()
+    photos_path = map(lambda offer: UPLOADS_BOOKS_IMAGES + Upload.query.get_or_404(offer.id).name, offers)
+    offers_with_photo = zip(offers, photos_path)
 
     return render_template('search_results.html',
                            query=query,
-                           results=results)
+                           offers_with_photo=offers_with_photo)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
