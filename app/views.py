@@ -25,7 +25,7 @@ def load_user(id):
 @app.route('/index')
 def index():
     user = g.user
-    
+
     recently_added = Offer.query.order_by(Offer.timestamp.desc()).limit(4)
     r1 = recently_added[0]
     r2 = recently_added[1]
@@ -344,13 +344,13 @@ def create_offer():
 @app.route('/offer/read/<int:id>')
 def read_offer(id):
     offer = Offer.query.get(id)
-    categories = Category.query.filter().order_by(Category.name.asc()).all()
 
     #added verification
     if offer is None or offer.to_delete==1:
         flash('Oferta zostala usunieta!')
         return redirect(url_for('index'))
 
+    categories = Category.query.filter().order_by(Category.name.asc()).all()
     user = User.query.filter_by(id=offer.user_id).first()
     photo = Upload.query.get_or_404(id) #TODO need to handle offers without pictures
 
@@ -390,13 +390,13 @@ def read_offer(id):
 @app.route('/offer/<category>/<int:page>')
 def read_offers_by_category(category, page=1):
     c = Category.query.filter_by(name=category).first()
-    categories = Category.query.filter().order_by(Category.name.asc()).all()
 
     #TODO CHECK WHAT HAPPENS WITH DELETED OFFERS
     if c is None:
         flash('Nie ma takiej kategorii %s.' % category)
         return redirect(url_for('index'))
 
+    categories = Category.query.filter().order_by(Category.name.asc()).all()
     offers = c.offers
 
     return render_template('offers.html',
@@ -407,13 +407,12 @@ def read_offers_by_category(category, page=1):
 @app.route('/user/profile/offers/<user_id>')
 @app.route('/user/profile/offers/<user_id>/<int:page>')
 def read_offers_by_user_id(user_id, page=1):
-    #added veryfication
     c = User.query.filter(or_(User.to_delete==0, User.to_delete==None)).filter_by(id=user_id).first()
-    categories = Category.query.filter().order_by(Category.name.asc()).all()
     if c is None:
         flash('Nie ma uzytkownika o numerze %s.' % user_id)
         return redirect(url_for('index'))
 
+    categories = Category.query.filter().order_by(Category.name.asc()).all()
     offers = c.offers
 
     return render_template('offers.html',
@@ -467,7 +466,7 @@ def delete_from_newsletter():
     form = NewsletterForm()
     if form.validate_on_submit():
         return redirect(url_for('delete_from_newsletter_confirm', email=form.newsletter.data))
-    
+
     flash("Aby wypisac sie z newslettera musisz podac swojego prawidlowego maila")
     return render_template('delete_from_newsletter.html',
                            title='Usun z newslettera',
@@ -481,7 +480,7 @@ def delete_from_newsletter_confirm(email):
 
     flash("Zostales wypisany z newslettera")
 
-    return redirect(url_for('index'))	
+    return redirect(url_for('index'))
 
 @app.route('/contact_us', methods=['GET', 'POST'])
 def contact_us():
@@ -629,7 +628,7 @@ def user_dashboard():
                                filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
                                filter_by(user_id=g.user.id, is_finalised=0).\
                                first()
-    #added veryfication                           
+    #added veryfication
     q = db.session.query(Offer.id, func.count(Transaction.id)).\
                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
                               filter(or_(Offer.to_delete==0, Offer.to_delete==None)).\
@@ -637,7 +636,7 @@ def user_dashboard():
                               join(Transaction, Transaction.offer_id==Offer.id).\
                               filter_by(is_finalised=1, is_sent=0).\
                               join(User, User.id==Transaction.user_id)
-    #added veryfication                             
+    #added veryfication
     transactions_to_comment = db.session.query(Transaction.id, func.count(Transaction.id), Transaction.timestamp,
                                                Transaction.offer_id, Offer.name, Offer.user_id).\
                                filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
