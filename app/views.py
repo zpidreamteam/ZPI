@@ -536,6 +536,7 @@ def question(user_id,offer_id):
         return render_template('question.html', form=form)
 
 @app.route('/user/profile/<int:user_id>')
+@login_required
 def show_profile(user_id):
     comments = Comment.query.filter_by(id_to=user_id)
     if comments is None:
@@ -571,6 +572,7 @@ def show_profile(user_id):
 							user_id=user_id)
 
 @app.route('/user/profile/comments/<int:user_id>')
+@login_required
 def show_comments(user_id):
     user = User.query.filter(or_(User.to_delete==0, User.to_delete==None)).filter_by(id=user_id).first()
     if user is None:
