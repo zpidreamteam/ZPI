@@ -106,11 +106,14 @@
                 <div class="col-lg-12">
                     <!-- TODO use moment.js lib -->
                     <h1 class="page-header">
-                        Dzisiaj mamy <p id="date"></p>
-						<script>
-						var d = new Date();
-						document.getElementById("date").innerHTML = d;
-						</script>
+                        Witaj! Dzisiaj mamy <span id="date"></span>
+                        <script type="text/javascript">
+
+                        var czas = new Date();
+                        var element = document.getElementById('date');
+                        element.innerHTML += "" + czas.getDate() + "." + (czas.getMonth()+1) + "." + czas.getFullYear();
+
+                        </script>
                     </h1>
                 </div>
                 <!-- /.col-lg-12 -->
