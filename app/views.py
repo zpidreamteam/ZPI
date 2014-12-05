@@ -478,6 +478,11 @@ def delete_from_newsletter():
                            title='Usun z newslettera',
                            form=form)
 
+@app.route('/help')
+def faq():
+    return render_template('help.html',
+                           title='Pomoc')
+
 @app.route('/delete_from_newsletter_confirm/<email>')
 def delete_from_newsletter_confirm(email):
     Newsletter.query.filter_by(email=email).delete()

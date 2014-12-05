@@ -1,0 +1,36 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Najczęściej zadawane pytania</h1>
+    <ol>
+    <li>
+    Co to za portal? <br />
+BooksTree jest portalem na którym możesz kupować i sprzedawać podręczniki. Skupiamy się przede wszystkim na podręcznikach akademickich.
+    </li>
+    <li>
+    Jak mogę zakupić książkę? <br />
+Aby zakupić książkę najpierw musisz się zarejestrować. Po zarejestrowaniu wybierz interesującą się pozycję i kliknij "Zamawiam". Następnie przejdź przez 3 proste
+kroki płatności.
+    </li>
+    <li>
+        Jak mogę sprzedać książkę? <br />
+Aby sprzedać książkę najpierw musisz się zarejestrować. Następnie z menu na górze strony wybrać pozycję "Dodaj Ofertę". Przy dodawaniu oferty zachęcamy
+również do dodania zdjęcia przedmiotu - doświadczenie pokazuję, iż książki ze zdjęciem są chętniej kupowane.
+
+    </li>
+    <li>
+Czy mogę się wypisać z newslettera? <br />
+Tak, wystarczy przejść na tę stronę: <a href="{{ url_for('delete_from_newsletter') }}">Wypisz mnie</a>
+    </li>
+    <li>
+        Jakie systemy płatności obsługujecie?<br />
+Wszystkie.
+    </li>
+    <li>
+        Czy korzystanie z portalu jest darmowe?<br />
+Tak, nie pobieramy żadnych prowizji. Możesz zapomnieć o allegro.pl
+    </li>
+
+    </ol>
+{% endblock %}
