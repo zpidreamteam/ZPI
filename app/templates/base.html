@@ -1,7 +1,7 @@
 <html>
   <head>
     
-      <meta name="description" content="Flat UI Kit Free is a Twitter Bootstrap Framework design and Theme, this responsive framework includes a PSD and HTML version."/>
+      <meta name="description" content="Super portal."/>
 
     <meta name="viewport" content="width=1000, initial-scale=1.0, maximum-scale=1.0">
 
@@ -16,9 +16,6 @@
     <link href="{{ url_for('.static', filename='css/normalize.css') }}" rel="stylesheet" media="screen">
     <link href="{{ url_for('.static', filename='css/font-awesome.min.css') }}" rel="stylesheet" media="screen">
     <link href="{{ url_for('.static', filename='style.css') }}" rel="stylesheet" media="screen">
-    <!--
-    <link href="{{ url_for('.static', filename='css/animate.css') }}" rel="stylesheet" media="screen">
--->
 
     <link href='http://fonts.googleapis.com/css?family=Lato:400,700,300' rel='stylesheet' type='text/css'>
 
@@ -181,25 +178,18 @@
     <script>
     $(document).ready(function() {
         $('#dataTables-example').dataTable( {
+                "bProcessing" : true,
+    "bServerSide" : true,
+    "sAjaxSource" : "/getbuildings.json?sEcho=0",  
+    "sEcho": 0,
             "oLanguage": {
                 "sLengthMenu": "Wyświetl _MENU_ rekordów na stronę",
             }
+
         } );
     } );
     </script>
 
-
-
-    <script src="{{ url_for('.static', filename='js/plugins/jquery.fittext.js') }}"></script>
-    <script src="{{ url_for('.static', filename='js/plugins/jquery.lettering.js') }}"></script>
-    <script src="{{ url_for('.static', filename='js/plugins/jquery.textillate.js') }}"></script>
-
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>
-    $(function () {
-        $('.tlt').textillate();
-    })
-    </script>
 
     <script src="{{ url_for('.static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('.static', filename='js/plugins.js') }}"></script>
