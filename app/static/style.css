@@ -619,7 +619,6 @@ li.active:after {
     content: " ";
     position: absolute;
     left: 45%;
-   opacity:1;
     margin: 0 auto;
     bottom: 0px;
     border: 10px solid transparent;

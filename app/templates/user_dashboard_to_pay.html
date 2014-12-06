@@ -58,7 +58,11 @@
                     <td>{{transaction.count}}</td>
                     <td>{{transaction.count*transaction.price}}</td>
                     <td>
-                        <a href="../../../offer/read/{{transaction.offer_id}}"><button class="btn btn-default">WIĘCEJ</button></a>
+                        <a href="/przelewy48/{{transaction.user_id}}/{{transaction.offer_id}}/{{transaction.hash_link}}">
+                            <button class="btn btn-default">ZAPŁAĆ</button>
+                        </a>
+                        <a href="../../../offer/read/{{transaction.offer_id}}"><button class="btn btn-default">WIĘCEJ
+                        </button></a>
                     </td>
                 </tr>
                 {% endfor %}
