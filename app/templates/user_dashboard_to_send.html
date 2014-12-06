@@ -34,14 +34,13 @@
         
 
 <a href="../"><button class="btn btn_submit">WSTECZ</button></a>
-<h1>Oczekujące płatności:</h1>
+<h1>Książki do wysłania:</h1>
 <div class="panel-body">
     <div class="table-responsive">
         <table class="table table-striped table-bordered table-hover" id="dataTables-example">
             <thead>
                 <tr>
-                    <th>ID Transakcji</th>
-                    <th>Nazwa</th>
+                    <th>Nazwa Ogłoszenia</th>
                     <th>Data</th>
                     <th>Adres wysyłki</th>
                     <th>Potwierdź wysyłkę</th>
@@ -55,7 +54,6 @@
                <td> Pusto i cicho</td>
             {% endif %}
 
-                    <td>{{transaction.id}}</td>
                     <td>{{transaction.name}}</td>
                     <td>
                     {{ transaction.timestamp.year }}-{{ transaction.timestamp.month }}-{{ transaction.timestamp.day }}
@@ -65,7 +63,7 @@
                    {{transaction.city}}, {{transaction.zipcode}}
                     </td>
                     <td>
-                    <a href="../../../offer/read/{{transaction.id}}">Zobacz ofertę</a>
+                    <a href="../../../offer/read/{{transaction.id}}"> <button class="btn btn-default">Zobacz Ofertę</button></a>
                     <form action="/user/dashboard/to/send/check/{{transaction.transact_id}}">
                         <input class="btn btn-default" type="submit" value="Wysłano!">
                     </form>

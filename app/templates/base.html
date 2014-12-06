@@ -188,6 +188,19 @@
     </script>
 
 
+    <script>
+    $(document).ready(function() {
+        $('#sold').dataTable( {
+            
+            "oLanguage": {
+                "sLengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+            }
+            
+        } );
+    } );
+    </script>
+
+
     <script src="{{ url_for('.static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('.static', filename='js/plugins.js') }}"></script>
     <script src="{{ url_for('.static', filename='js/main.js') }}"></script>
