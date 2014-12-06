@@ -178,14 +178,11 @@
     <script>
     $(document).ready(function() {
         $('#dataTables-example').dataTable( {
-                "bProcessing" : true,
-    "bServerSide" : true,
-    "sAjaxSource" : "/getbuildings.json?sEcho=0",  
-    "sEcho": 0,
+            
             "oLanguage": {
                 "sLengthMenu": "Wyświetl _MENU_ rekordów na stronę",
             }
-
+            
         } );
     } );
     </script>
