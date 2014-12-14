@@ -10,6 +10,7 @@ from models import User, Category, Newsletter, Offer, Comment, Archive_offer, Ar
 from forms import CategoryForm
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy import func, exists, and_, or_
+from passlib.apps import custom_app_context as pwd_context
 
 @app.route('/admin')
 @app.route('/admin/index')
@@ -239,17 +240,17 @@ def delete_user(user_id):
 
   archive_user = Archive_user(user_id=user.id,
                                 nickname=user.nickname,
-                                email=user.email,
+                                email=pwd_context.encrypt(user.email),
                                 password_hash=user.password_hash,
-                                user_name=user.user_name,
-                                surname=user.surname,
-                                street=user.street,
-                                building_number=user.building_number,
-                                door_number=user.door_number,
+                                user_name=pwd_context.encrypt(user.user_name),
+                                surname=pwd_context.encrypt(user.surname),
+                                street=pwd_context.encrypt(user.street),
+                                building_number=pwd_context.encrypt(user.building_number),
+                                door_number=pwd_context.encrypt(user.door_number),
                                 city=user.city,
                                 zipcode=user.zipcode,
                                 country=user.country,
-                                phone=user.phone,
+                                phone=pwd_context.encrypt(user.phone),
                                 role_id=user.role_id)
   user.to_delete = 1
   user.nickname=None
@@ -405,7 +406,7 @@ def admin_user_delete(user_id):
 @login_required
 @admin_permission.require()
 def admin_transactions():
-    transactions = Transaction.query.all()
+    transactions = Transaction.query.filter(or_(Transaction.to_delete==0, Transaction.to_delete==None))
 
     return render_template('admin/transactions.html',
                            title='Komentarze',
