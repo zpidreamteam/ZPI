@@ -428,7 +428,7 @@ def read_offers_by_user_id(user_id, page=1):
 @app.route('/offers')
 @app.route('/offers/<int:page>')
 def read_offers(page=1):
-    offers = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).order_by(Offer.timestamp.desc()).all()
+    offers = Offer.query.filter(or_(Offer.to_delete==0, Offer.to_delete==None)).filter(Offer.count!=0).order_by(Offer.timestamp.desc()).all()
     categories = Category.query.filter().order_by(Category.name.asc()).all()
     photos_path = map(lambda offer: UPLOADS_BOOKS_IMAGES + Upload.query.get_or_404(offer.id).name, offers)
     offers_with_photo = zip(offers, photos_path)
