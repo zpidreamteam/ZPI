@@ -26,6 +26,12 @@ div.dataTables_paginate {
     margin: 0;
 }
 
+div.offers div.dataTables_paginate {
+    float: right;
+    margin: 0;
+	width: 430px;
+}
+
 div.dataTables_paginate ul.pagination {
     margin: 2px 0;
     white-space: nowrap;

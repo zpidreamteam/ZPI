@@ -36,6 +36,7 @@
 		<div class="col-md-9 col-sm-9">
 			<h2>Witaj, {{ g.user.nickname}}!</h2>
 			<p>Możesz wybrać interesującą się opcję z menu po lewej.</p>
+			<p><a href="{{ url_for('show_profile', user_id=g.user.id) }}">Mój profil </a></p>
 		</div>
 </div>
 {% endblock %}
