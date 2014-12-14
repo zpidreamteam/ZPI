@@ -15,14 +15,20 @@
                     {% endif %}
                     {% endfor %}
                 </a></li>
+                <li><a href="{{ url_for('user_dashboard_to_wait') }}">W trakcie realizacji
+                    {% for number_of_transaction_to_wait in number_of_transactions_to_wait %}
+                        {% if number_of_transaction_to_wait!=0 %}
+                            ({{number_of_transaction_to_wait}})
+                        {% endif %}
+                    {% endfor %}
+                </a></li>
                 <li><a href="../../to/send">Do wysyłki 
                     {% for number_of_transaction_to_send in number_of_transactions_to_send %}
                     {% if number_of_transaction_to_send.1!=0 %}
                     ({{number_of_transaction_to_send.1}})
                     {% endif %}
                     {% endfor %}</a></li>
-                    <li><a href="../../my/offers/current">Moje oferty</a></li>
-                    <li><a href="../../comment">Skomentuj zakup</a></li>      
+                    <li><a href="../../my/offers/current">Moje oferty</a></li> 
                     <li><a href="../../about/me">Moje dane</a></li>           
                     <li><a href="../../archive">Archiwum transakcji</a></li>  
                 </ul>

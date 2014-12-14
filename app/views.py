@@ -625,7 +625,7 @@ def new_comment(trans_id):
         db.session.commit()
         #TODO przekierowanie do odpowiedniej storny
         flash("Poprawnie dodano Twoj komentarz")
-        return redirect(url_for('comment'))
+        return redirect(url_for('user_dashboard_to_wait'))
 
     return render_template('new_comment.html',
                             title='Comment',
@@ -647,6 +647,12 @@ def user_dashboard():
                               join(Transaction, Transaction.offer_id==Offer.id).\
                               filter_by(is_finalised=1, is_sent=0).\
                               join(User, User.id==Transaction.user_id)
+
+    number_of_transactions_to_wait = db.session.query(func.count(Transaction.id)).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                               filter_by(user_id=g.user.id, is_finalised=1, is_sent=0).\
+                               first()
+
     #added veryfication
     transactions_to_comment = db.session.query(Transaction.id, func.count(Transaction.id), Transaction.timestamp,
                                                Transaction.offer_id, Offer.name, Offer.user_id).\
@@ -656,7 +662,8 @@ def user_dashboard():
                                order_by(Transaction.timestamp.desc())
 
     return render_template('user_dashboard.html', number_of_transactions_to_pay_for=number_of_transactions_to_pay_for,
-                           number_of_transactions_to_send=q, transactions_to_comment=transactions_to_comment)
+                           number_of_transactions_to_send=q, transactions_to_comment=transactions_to_comment,
+                           number_of_transactions_to_wait=number_of_transactions_to_wait)
 
 @login_required
 @app.route('/user/dashboard/to/pay')
@@ -672,6 +679,21 @@ def user_dashboard_to_pay():
                                order_by(Transaction.timestamp.desc())
 
     return render_template('user_dashboard_to_pay.html', transactions=transactions)
+
+@login_required
+@app.route('/user/dashboard/to/wait')
+def user_dashboard_to_wait():
+    #added veryfication
+    transactions = db.session.query(Transaction.id, Transaction.user_id,
+                                    Transaction.offer_id, Offer.name, Transaction.timestamp,
+                                    Transaction.count, Transaction.price,
+                                    Transaction.hash_link, Transaction.is_sent, Transaction.is_commented).\
+                               filter(or_(Transaction.to_delete==0, Transaction.to_delete==None)).\
+                               filter_by(user_id=g.user.id, is_finalised=1, is_commented=0).\
+                               join(Offer, Offer.id==Transaction.offer_id).\
+                               order_by(Transaction.timestamp.desc())
+
+    return render_template('user_dashboard_to_wait.html', transactions=transactions)
 
 @login_required
 @app.route('/user/dashboard/to/send')
