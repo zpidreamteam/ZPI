@@ -1,0 +1,89 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+
+<section style="background:#efefe9;">
+    <div class="container">
+      <div class="row">
+        <div class="board">
+
+          <div class="board-inner">
+            <ul class="nav nav-tabs" id="myTab">
+              <div class="liner"></div>
+              <li >
+               <a href="#home" data-toggle="tab" title="welcome">
+                <span class="round-tabs one">
+                  <i style="margin-top:20px;" class="glyphicon glyphicon-home"></i>
+                </span> 
+              </a></li>
+              <li><a href="#messages" data-toggle="tab" title="bootsnipp goodies">
+               <span class="round-tabs three">
+                <i style="margin-top:20px;" class="glyphicon glyphicon-gift"></i>
+              </span> </a>
+            </li>
+
+
+            <li class="active"><a href="#doner" data-toggle="tab" title="completed">
+             <span class="round-tabs five">
+              <i style="margin-top:20px;" class="glyphicon glyphicon-ok"></i>
+            </span> </a>
+          </li>
+
+        </ul></div>
+
+        <div class="tab-content">
+          <div class="tab-pane fade" id="home">
+
+            <h3 class="head text-center">KROK 1 Z 3 - POTWIERDŹ ZAKUP</h3>
+            <p class="narrow text-center">
+              Dane Aukcji:
+            </p>
+
+                            
+            <p class="text-center">
+              <a href="#messages" data-toggle="tab" title="bootsnipp goodies" class="btn btn-success btn-outline-rounded green"> DALEJ <span style="margin-left:10px;" class="glyphicon glyphicon-chevron-right"></span></a>
+            </p>
+          </div>
+          <div class="tab-pane fade" id="messages">
+            <h3 class="head text-center">KROK 2 Z 3 - DANE WYSYŁKI</h3>
+            <p class="narrow text-center">
+
+            </p>
+
+            <p class="text-center">
+              <a href="" class="btn btn-success btn-outline-rounded green"> start using bootsnipp <span style="margin-left:10px;" class="glyphicon glyphicon-send"></span></a>
+            </p>
+          </div>
+          <div class="tab-pane fade in active" id="settings">
+            <h3 class="head text-center">KROK 3 Z 3 - ZAPŁAĆ</h3>
+            <p class="narrow text-center">
+              
+
+             <h2 class="narrow text-center">Przyjęto zamówienie. Możesz dokonać płatności teraz:</h2>
+			<form action="/{{payment_method_name}}/{{transaction.user_id}}/{{transaction.offer_id}}/{{transaction.hash_link}}">
+			    <p class="narrow text-center"><input class="btn btn-success btn-outline-rounded green" type="submit" value="Przelewy48"></p>
+			</form>
+
+            </p>
+          </div>
+          <div class="tab-pane fade" id="doner">
+            <div class="text-center">
+              <i class="img-intro icon-checkmark-circle"></i>
+            </div>
+            <h3 class="head text-center">thanks for staying tuned! <span style="color:#f48260;">♥</span> Bootstrap</h3>
+            <p class="narrow text-center">
+              Lorem ipsum dolor sit amet, his ea mollis fabellas principes. Quo mazim facilis tincidunt ut, utinam saperet facilisi an vim.
+            </p>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+{% endblock %}

@@ -1,0 +1,35 @@
+ <tr class="odd gradeX">
+    <td>{{ transaction.id }}</td>
+    <td>{{ transaction.user_id }}</td>
+    <td>{{ transaction.offer_id }}</td>
+    <td>{{ transaction.count }}</td>
+    <td>{{ transaction.price }}</td>
+    <td>
+        {% if transaction.is_finalised %}
+            <img src="{{ url_for('.static', filename='img/yes.png') }}" style="display: block; margin-left: auto; margin-right: auto;" alt="Yes" />
+        {% else %}
+            <img src="{{ url_for('.static', filename='img/no.png') }}" style="display: block; margin-left: auto; margin-right: auto;" alt="No" />
+        {% endif %}
+    </td>
+    <td>
+        {% if transaction.is_sent %}
+            <img src="{{ url_for('.static', filename='img/yes.png') }}" style="display: block; margin-left: auto; margin-right: auto;" alt="Yes" />
+        {% else %}
+            <img src="{{ url_for('.static', filename='img/no.png') }}" style="display: block; margin-left: auto; margin-right: auto;" alt="No" />
+        {% endif %}
+    </td>
+    <td>
+        {% if transaction.is_commented %}
+            <img src="{{ url_for('.static', filename='img/yes.png') }}" style="display: block; margin-left: auto; margin-right: auto;" alt="Yes" />
+        {% else %}
+            <img src="{{ url_for('.static', filename='img/no.png') }}" style="display: block; margin-left: auto; margin-right: auto;" alt="No" />
+        {% endif %}
+    </td>
+    <td class="center">
+        <div class="tooltip-demo">
+        <a href="./transactions/delete/{{ transaction.id }}">
+        <button type="button" data-toggle="tooltip" data-placement="top" title="Usuń transakcje"><i class="fa fa-times fa-fw"></i> </button>
+        </a>
+        </div>
+    </td>
+</tr>

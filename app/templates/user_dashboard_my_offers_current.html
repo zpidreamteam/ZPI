@@ -1,0 +1,93 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="oglos_area">
+        <div class="col-md-3 col-sm-3">
+        <div class="oglos_left">
+            <h3>Menu</h3>
+            <ul>
+                <li><a href="../../to/pay">Do zapłaty 
+                    {% for number_of_transaction_to_pay_for in number_of_transactions_to_pay_for %}
+                    {% if number_of_transaction_to_pay_for!=0 %}
+                    ({{number_of_transaction_to_pay_for}})
+                    {% endif %}
+                    {% endfor %}
+                </a></li>
+                <li><a href="{{ url_for('user_dashboard_to_wait') }}">W trakcie realizacji
+                    {% for number_of_transaction_to_wait in number_of_transactions_to_wait %}
+                        {% if number_of_transaction_to_wait!=0 %}
+                            ({{number_of_transaction_to_wait}})
+                        {% endif %}
+                    {% endfor %}
+                </a></li>
+                <li><a href="../../to/send">Do wysyłki 
+                    {% for number_of_transaction_to_send in number_of_transactions_to_send %}
+                    {% if number_of_transaction_to_send.1!=0 %}
+                    ({{number_of_transaction_to_send.1}})
+                    {% endif %}
+                    {% endfor %}</a></li>
+                    <li><a href="../../my/offers/current">Moje oferty</a></li> 
+                    <li><a href="../../about/me">Moje dane</a></li>           
+                    <li><a href="../../archive">Archiwum transakcji</a></li>  
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9 col-sm-9">
+
+        
+
+<a href="{{ url_for('user_dashboard') }}"><button class="btn btn_submit">WSTECZ</button></a>
+<h1>Wystawione oferty:</h1>
+<div class="panel-body">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+            <thead>
+                <tr>
+                    <th>Nazwa</th>
+                    <th>Data wystawienia</th>
+                    <th>Ilość egzemplarzy</th>
+                    <th>Cena</th>
+                    <th>Akcja</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for offer in offers %}
+                <tr class="odd gradeX">
+                    <td>{{offer.name}}</td>
+                    <td>
+                    {{ offer.timestamp.year }}-{{ offer.timestamp.month }}-{{ offer.timestamp.day }}
+                    </td>
+                    <td>{{offer.count}}</td>
+                    <td>{{offer.price}}</td>
+                    <td>
+                     <form action="/user/dashboard/my/offers/close/{{offer.id}}">
+                        <input class="btn btn-default" type="submit" value="Zamknij oferte">
+                    </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- /.table-responsive -->
+</div>
+</div>
+ <!-- /.column right end -->
+</div>
+
+<!--
+    <h1>Moje oferty:</h1>
+    <p>OfferID --- Nazwa --- data dodania --- Ilość egzemplarzy --- Cena</p>
+    {% for offer in offers %}
+            {{offer.id}} --- {{offer.name}} --- {{ offer.timestamp.year }}-{{ offer.timestamp.month }}-{{ offer.timestamp.day }} --- {{offer.count}} --- {{offer.price}}
+            <a href="offer/read/{{offer.id}}">Zobacz ofertę</a>
+			<form action="/user/dashboard/my/offers/close/{{offer.id}}">
+                <input type="submit" value="Zamknij oferte">
+            </form>
+            <br>
+    {% endfor %}
+
+-->
+{% endblock %}

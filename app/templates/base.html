@@ -1,0 +1,210 @@
+<html>
+  <head>
+    
+      <meta name="description" content="Super portal."/>
+
+    <meta name="viewport" content="width=1000, initial-scale=1.0, maximum-scale=1.0">
+
+    
+    <title>BOOKSTREE</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="{{ url_for('.static', filename='css/bootstrap.css') }}" rel="stylesheet" media="screen">
+    <link href="{{ url_for('.static', filename='css/plugins/dataTables.bootstrap.css') }}" rel="stylesheet" media="screen">
+    <link href="{{ url_for('.static', filename='css/slicknav.css') }}" rel="stylesheet" media="screen">
+    <link href="{{ url_for('.static', filename='css/normalize.css') }}" rel="stylesheet" media="screen">
+    <link href="{{ url_for('.static', filename='css/font-awesome.min.css') }}" rel="stylesheet" media="screen">
+    <link href="{{ url_for('.static', filename='style.css') }}" rel="stylesheet" media="screen">
+
+    <link href='http://fonts.googleapis.com/css?family=Lato:400,700,300' rel='stylesheet' type='text/css'>
+
+    <script src="{{ url_for('.static', filename='js/vendor/modernizr-2.6.2.min.js') }}"></script>
+
+    
+  </head>
+
+  <body>
+
+         <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        
+        <div class="header_area">
+            <div class="header_top">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-4 col-sm-4">
+                            <div class="logo">
+                                <a href="{{ url_for('index') }}"><img src="{{ url_for('.static', filename='img/logo.png') }}" alt="Logo" /></a>
+                            </div>
+                        </div>
+                        <div class="col-md-9 col-sm-8 col-sm-8">
+                            
+
+                            <div class="main_menu">    
+                                <ul>
+                                    {% if g.user.is_authenticated() %}
+
+                                    <li><a href="{{ url_for('index') }}">Strona Główna</a></li>
+                                    <li><a href="{{ url_for('read_offers') }}">Przeglądaj Ogłoszenia</a></li>
+                                    <li><a href="{{ url_for('create_offer') }}">Dodaj Ogłoszenie</a></li>
+                                    <li><a href="{{ url_for('user_dashboard') }}">Moje Konto</a></li>
+                                    <li><a href="{{ url_for('logout') }}">Wyloguj</a></li>
+                                    
+                                    {% else %}
+
+                                    <li><a href="{{ url_for('index') }}">Strona Główna</a></li>
+                                    <li><a href="{{ url_for('read_offers') }}">Przeglądaj Ogłoszenia</a></li>
+                                    <li><a href="{{ url_for('login') }}">Zaloguj</a></li>
+                                    <li><a href="{{ url_for('register') }}">Rejestracja</a></li>
+
+                                    {% endif %}
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header_bottom">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-sm-12">
+                            <div class="search_from">
+
+                                 <form style="display: inline;" action="{{ url_for('search') }}" method="post" name="search">
+                                 <div class="input-group">
+                                    {{ g.search_form.hidden_tag() }}
+                                    <input class="form-control" id="search" name="search" size="20" type="text" placeholder="Jakiej książki szukasz...?">
+                                    <button type="submit" class="btn btn-default header_search_btn"><i class="fa fa-search"></i></button>
+                                </div>
+                                </form>
+                                    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="slider_area"></div>
+        <div class="slider_bottom_area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-sm-12">
+                        <h2>Kupuj. Sprzedawaj. Za darmo.</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <div class="container">
+              <div class="row">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+
+                <div class="alert alert-info">
+                    <a href="#" class="close" data-dismiss="alert">&times;</a>
+                    <strong>Uwaga!</strong>
+                    {% for message in messages %}{{ message }}{% endfor %}
+                 </div>
+                {% endif %}
+                {% endwith %}
+
+
+
+                {% block content %}{% endblock %}
+             </div>
+         </div>
+        <div class="footer_area">
+            <div class="footer_top">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-sm-12">
+                            <div class="footer_search_from">
+                                <form action="{{ url_for('add_to_newsletter') }}" method="post" name="add_to_newsletter">
+                                    {{ g.newsletter_form.hidden_tag() }}
+                                    <input class="form-control" id="newsletter" name="newsletter" size="20" type="text" value="" placeholder="Zapisz się do naszego newslettera! Wpisz swój adres e-mail.">
+                                    <button type="submit" class="btn btn-default btn_news"><i class="fa fa-envelope "></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-3 col-sm-3">
+                            <div class="footer_left">
+                                <h2>O NAS</h2>
+                                <p>BooksTree to najlepsze miejsce na zakup i sprzedaż podręczników akademickich. Codziennie sprzedajemy ich tysiące, wypróbuj nas!</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-sm-3">
+                            <div class="footer_middle">
+                                <h2>U NAS ZAPŁACISZ</h2>
+                                <div class="footer_tag">
+                                    <button type="button" class="btn btn-default btn-xs">VISA</button>
+                                    <button type="button" class="btn btn-default btn-xs">Paypal</button>
+                                    <button type="button" class="btn btn-default btn-xs">Strlpe</button>
+                                    <button type="button" class="btn btn-default btn-xs">Mastar Card</button>
+                                    <button type="button" class="btn btn-default btn-xs">Amajon</button>
+                                    <button type="button" class="btn btn-default btn-xs">Amex</button>
+                                    <button type="button" class="btn btn-default btn-xs">Discovar</button>
+                                    <button type="button" class="btn btn-default btn-xs">WePay</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5 col-sm-5 col-sm-5">
+                            <div class="footer_last">
+                                <img src="{{ url_for('.static', filename='img/logo_footer.png') }}" alt="" />
+                                <p>Korzystanie z serwisu oznacza akceptacje <a href="">regulaminu</a></p>
+                                <p><a href="{{ url_for('faq') }}">Pomoc</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.2.min.js"><\/script>')</script>
+    <script src="{{ url_for('.static', filename='js/plugins/dataTables/jquery.dataTables.js') }}"></script>
+    <script src="{{ url_for('.static', filename='js/plugins/dataTables/dataTables.bootstrap.js') }}"></script>
+
+    <script>
+    $(document).ready(function() {
+        $('#dataTables-example').dataTable( {
+            
+            "oLanguage": {
+                "sLengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+            }
+            
+        } );
+    } );
+    </script>
+
+
+    <script>
+    $(document).ready(function() {
+        $('#sold').dataTable( {
+            
+            "oLanguage": {
+                "sLengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+            }
+            
+        } );
+    } );
+    </script>
+
+
+    <script src="{{ url_for('.static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('.static', filename='js/plugins.js') }}"></script>
+    <script src="{{ url_for('.static', filename='js/main.js') }}"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,96 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="oglos_area">
+        <div class="col-md-3 col-sm-3">
+        <div class="oglos_left">
+            <h3>Menu</h3>
+            <ul>
+                <li><a href="../../to/pay">Do zapłaty 
+                    {% for number_of_transaction_to_pay_for in number_of_transactions_to_pay_for %}
+                    {% if number_of_transaction_to_pay_for!=0 %}
+                    ({{number_of_transaction_to_pay_for}})
+                    {% endif %}
+                    {% endfor %}
+                </a></li>
+                <li><a href="{{ url_for('user_dashboard_to_wait') }}">W trakcie realizacji
+                    {% for number_of_transaction_to_wait in number_of_transactions_to_wait %}
+                        {% if number_of_transaction_to_wait!=0 %}
+                            ({{number_of_transaction_to_wait}})
+                        {% endif %}
+                    {% endfor %}
+                </a></li>
+                <li><a href="../../to/send">Do wysyłki 
+                    {% for number_of_transaction_to_send in number_of_transactions_to_send %}
+                    {% if number_of_transaction_to_send.1!=0 %}
+                    ({{number_of_transaction_to_send.1}})
+                    {% endif %}
+                    {% endfor %}</a></li>
+                    <li><a href="../../my/offers/current">Moje oferty</a></li>   
+                    <li><a href="../../about/me">Moje dane</a></li>           
+                    <li><a href="../../archive">Archiwum transakcji</a></li>  
+                </ul>
+            </div>
+        </div>
+<div class="col-md-9 col-sm-9">
+    <a href="/user/dashboard/"><button class="btn btn_submit">WSTECZ</button></a>
+    <h1>Twoje dane:</h1>
+    <form action="" method="post" name="YourInformationForm" enctype="multipart/form-s">
+        {{ form.hidden_tag() }}
+        <p>
+            Imię: <br>
+            <input class="form-control" id="user_name" name="user_name" type="text" value="{{ user.user_name }}">
+            {% for error in form.user_name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+            Nazwisko: <br>
+            <input class="form-control" id="surname" name="surname" type="text" value="{{ user.surname }}">
+            {% for error in form.surname.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+            Ulica: <br>
+            <input class="form-control" id="street" name="street" type="text" value="{{ user.street }}">
+            {% for error in form.street.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+            Numer budynku: <br>
+            <input class="form-control" id="building_number" name="building_number" type="text" value="{{ user.building_number }}">
+            {% for error in form.building_number.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+            Numer lokalu: <br>
+            <input class="form-control" id="door_number" name="door_number" type="text" value="{{ user.door_number }}">
+            {% for error in form.door_number.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+            Miasto: <br>
+            <input class="form-control" id="city" name="city" type="text" value="{{ user.city }}">
+            {% for error in form.city.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+            Kod pocztowy: <br>
+            <input class="form-control" id="zipcode" name="zipcode" type="text" value="{{ user.zipcode }}">
+            {% for error in form.zipcode.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+            Kraj: <br>
+            <input class="form-control" id="country" name="country" type="text" value="{{user.country}}">
+            {% for error in form.country.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+           
+            Telefon: <br>
+             <input class="form-control" id="phone" name="phone" type="text" value="{{ user.phone }}">
+            {% for error in form.phone.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p><input class="btn btn-default btn-lg" type="submit" value="Potwierdź"></p>
+    </form>
+    <form action="/user/dashboard/change/password">
+      <input class="btn btn-default btn-lg" type="submit" value="Zmień hasło">
+    </form>
+</div>
+</div>
+{% endblock %}

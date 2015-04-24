@@ -1,0 +1,128 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<div style="margin-top:30px;" id="signupbox" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+
+        <div style="background-color:#e67e22; color:white;" class="panel-heading">
+        <div class="panel-title">Dodaj nową ofertę</div>
+
+        </div>  
+        <div style="border:1px solid #E5E5E5;" class="panel-body">
+
+    <form action="" method="post" name="offer/create" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            Nazwa ogłoszenia:<br>
+            <input  class="form-control" id="name" name="name" type="text" value="">
+            {% for error in form.name.errors %}
+            <div class="alert-group">
+                <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+            {% endfor %}<br>
+
+			Tytuł książki:<br>
+             <input  class="form-control" id="title" name="title" type="text" value="">
+            {% for error in form.name.errors %}
+            <div class="alert-group">
+                <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+            {% endfor %}<br>
+			Autor/Autorzy:<br>
+            <input class="form-control" id="book_author" name="book_author" type="text" value="">
+            {% for error in form.name.errors %}
+            <div class="alert-group">
+                <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+
+            {% endfor %}<br>
+            Cena za sztukę:<br>
+            <input  class="form-control" id="price" name="price" type="text" value="">
+            {% for error in form.price.errors %}
+            <div class="alert-group">
+                <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+            {% endfor %}<br>
+			Koszt przesyłki:<br>
+            <input class="form-control" id="shipping" name="shipping" type="text" value="">
+            {% for error in form.name.errors %}
+            <div class="alert-group">
+                <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+            {% endfor %}<br>
+            Liczba sztuk:<br>
+            <input  class="form-control" id="count" name="count" type="text" value="">
+            {% for error in form.count.errors %}
+            <div class="alert-group">
+                <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+            {% endfor %}<br>
+            Kategoria:<br>
+
+            <select class="btn btn-default" id="category_id" name="category_id">
+                 {% for category in categories %}
+                     <option value="{{category[0]}}">{{category[1]}}</option> 
+                 {% endfor %}
+            </select> 
+            
+            {% for error in form.category_id.errors %}
+            <div class="alert-group">
+                <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+            {% endfor %}<br>
+     
+            <label for="comment">Opis przedmiotu:</label>
+            <textarea class="form-control" rows="5" id="body" name="body"></textarea>
+            {% for error in form.body.errors %}
+            <div class="alert-group">
+                <div style="padding:5px;margin:5px 0px 0px 0px;" class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+            {% endfor %}<br>
+
+            Zdjęcie:
+            <input class="btn btn-default" name="upload" type="file">
+        
+        <p><input class="btn btn-default btn-lg" type="submit" value="Dodaj"></p>
+        </div>
+
+                        <div class="form-group">
+    <div class="col-md-12 control">
+        <div style="border-top: 1px solid#888; padding-top:15px; font-size:85%" >
+            Problem z dodaniem ogłoszenia?
+            <!-- <a href="#" onClick="$('#loginbox').hide(); $('#signupbox').show()"> -->
+            <a href="{{ url_for('contact_us') }}">
+                Napisz do nas!</a>
+            </a>
+        </div>
+    </div>
+</div>   
+
+    </form>
+
+    </div>
+</div>
+{% endblock %}

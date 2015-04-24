@@ -1,0 +1,26 @@
+<!-- extend base layout -->
+{% extends "admin/base_admin.html" %}
+
+{% block content %}
+    <div class="row">
+			    <form action="" method="post" name="send_newsletter" enctype="multipart/form-s">
+        {{ form.hidden_tag() }}
+        <div class="input-group">
+			<h4>Temat:<br></h4>
+			<input  class="form-control" id="subject" name="subject" type="text" value="">
+            {% for error in form.subject.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+
+            <label for="comment">Treść wiadomości:</label>
+            <textarea class="form-control" rows="5" id="message" name="message"></textarea>
+            {% for error in form.message.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+        
+        <p><input class="btn btn-default btn-lg" type="submit" value="Wyślij wiadomość"></p>
+        </div>
+    </form>
+    </div>
+    <br />
+{% endblock %}
